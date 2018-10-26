@@ -17,3 +17,6 @@ class TestCppTCPB(unittest.TestCase):
 if __name__ == '__main__':
     cpp_suite = unittest.TestLoader().loadTestsFromTestCase(TestCppTCPB)
     cpp_results = unittest.TextTestRunner(verbosity=2).run(cpp_suite)
+
+    if cpp_results.errors or cpp_results.failures:
+        sys.exit(1)

@@ -12,6 +12,8 @@ import struct
 from threading import Thread
 from Queue import Queue
 
+from tcpb import terachem_server_pb2 as pb
+
 
 class MockServer(object):
     """Mock server for TCPB client testing
