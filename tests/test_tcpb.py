@@ -4,8 +4,8 @@
 import sys
 import unittest
 
-import available_test
-import energy_grad_force_test
+from available import available_test
+from energy_grad_force import energy_grad_force_test
 
 class TestCppTCPB(unittest.TestCase):
     def test_available(self):
