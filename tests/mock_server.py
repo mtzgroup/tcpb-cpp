@@ -13,7 +13,7 @@ from threading import Thread
 from Queue import Queue
 
 # Must be created by protoc (done in BitBucket Pipelines)
-from . import terachem_server_pb2 as pb
+import terachem_server_pb2 as pb
 
 
 class MockServer(object):
