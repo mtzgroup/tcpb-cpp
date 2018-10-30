@@ -10,4 +10,4 @@ tcpb-example: tcpb-example.cpp
 
 .PHONY: clean
 clean:
-	@rm tcpb-example client.log
+	@rm tcpb-example *.log

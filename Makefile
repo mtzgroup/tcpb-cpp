@@ -19,7 +19,8 @@ LIBS=-lprotobuf
 ## INSTALLATION ##
 ##################
 VER=0.3.0
-PREFIX=/global/user_software/tcpb-client/$(VER)
+#PREFIX=/global/user_software/tcpb-client/$(VER)
+PREFIX=/home/sseritan/personal_modules/software/tcpb-cpp
 
 ################
 ## MAKE RULES ##
@@ -43,7 +44,8 @@ install:
 uninstall:
 	@echo "Uninstalling TCPB C++ client from $(PREFIX)"
 	@rm -v $(PREFIX)/lib/{libtcpb.so.$(VER),libtcpb.so}
-	@rm -v $(PREFIX)/include/{tcpb.h,terachem_server.pb.h}
+	@rm -v $(PREFIX)/include/tcpb.h
+	@rm -v $(PREFIX)/include/terachem_server.pb.h
 
 ###########
 ## RULES ##

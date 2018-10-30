@@ -3,7 +3,7 @@
 *~
 
 terachem_server.pb.*
-socket.log
+client.log
 
 build/
 
