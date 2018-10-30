@@ -12,7 +12,8 @@ import struct
 from threading import Thread
 from Queue import Queue
 
-from tcpb import terachem_server_pb2 as pb
+# Must be created by protoc (done in BitBucket Pipelines)
+from . import terachem_server_pb2 as pb
 
 
 class MockServer(object):

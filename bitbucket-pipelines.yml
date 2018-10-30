@@ -6,6 +6,10 @@ pipelines:
   default:
     - step:
         script:
+          # Set up Python protobuf for tests
+          - cd proto/
+          - protoc terachem_server.proto --python_out=../tests
+          - cd ../
           # Set up C++
           - sed -i 's/^PREFIX=.*/PREFIX=\/tmp\/install/' Makefile
           - make && make install
