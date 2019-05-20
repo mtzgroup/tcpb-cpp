@@ -1,4 +1,4 @@
-# TeraChem Protocol Buffer (TCPB) Client #
+# C++ TeraChem Protocol Buffer (TCPB) Client #
 
 This repository is designed to facilitate the development a C++ client for communicating with TeraChem.
 
