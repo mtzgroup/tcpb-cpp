@@ -27,7 +27,7 @@ using namespace std;
 
 // SOCKETLOGS gives the option to turn on detailed socket communication information
 // Logs will be written to clientLogFile_, which is usually opened as client.log
-#define SOCKETLOGS
+//#define SOCKETLOGS (now defined on commandline if needed)
 
 TCPBClient::TCPBClient(const char* host,
                        int port) {
