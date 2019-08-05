@@ -31,6 +31,11 @@ message Status {
     bool working = 3;
     bool completed = 4;
   }
+
+  // Server job information
+  string job_dir = 5;
+  string job_scr_dir = 6;
+  int32 server_job_id = 7;
 }
 
 // Molecule message
@@ -179,6 +184,12 @@ message JobOutput {
   repeated int32 cas_energy_states = 19;
   repeated int32 cas_energy_mults = 20;
   repeated double cas_transition_dipole = 22;
+
+  // CIS specific output
+  int32 cis_states = 29;
+  repeated double cis_unrelaxed_dipoles = 30;
+  repeated double cis_relaxed_dipoles = 31;
+  repeated double cis_transition_dipoles = 32;
 
   //Bond order matrix
   repeated double bond_order = 16;
