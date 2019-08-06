@@ -4,62 +4,32 @@
  *  \date Jul 2017
  */
 
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string>
-#include <time.h>
-#include <stdarg.h>
 
-//Socket includes
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <sys/time.h>
-
+#include "socket.h"
 #include "tcpb.h"
-// terachem_server.pb.cpp/h must be generated from terachem_server.proto
 #include "terachem_server.pb.h"
 
-using namespace std;
+using std::string;
 
-// SOCKETLOGS gives the option to turn on detailed socket communication information
-// Logs will be written to clientLogFile_, which is usually opened as client.log
-//#define SOCKETLOGS (now defined on commandline if needed)
-
-TCPBClient::TCPBClient(const char* host,
+TCPBClient::TCPBClient(string host,
                        int port) {
-  snprintf(host_, MAX_STR_LEN, "%s", host);
-  port_ = port;
-  server_ = -1;
-
-  atomsSet = false;
-  chargeSet = false;
-  spinMultSet = false;
-  closedSet = false;
-  restrictedSet = false;
-  methodSet = false;
-  basisSet = false;
-
-#ifdef SOCKETLOGS
-  clientLogFile_ = fopen("client.log", "w");
-#endif
+  socket_ = new TCPBSocket(host, port);
 }
 
 TCPBClient::~TCPBClient() {
-  Disconnect();
-
-#ifdef SOCKETLOGS
-  fclose(clientLogFile_);
-#endif
+  delete socket_;
 }
 
 /***********************
  * JOB INPUT (SETTERS) *
  ***********************/
 
+/*
 void TCPBClient::SetAtoms(const char** atoms,
                           const int num_atoms) {
   terachem_server::Mol* mol = jobInput_.mutable_mol();
@@ -153,6 +123,7 @@ void TCPBClient::SetBasis(const char* basis) {
   jobInput_.clear_orb1afile();
   jobInput_.clear_orb1bfile();
 }
+*/
 
 /***********************
  * JOB INPUT (SETTERS) *
@@ -181,14 +152,14 @@ bool TCPBClient::IsAvailable() {
   msgSize = 0;
   header[0] = htonl((uint32_t)msgType);
   header[1] = htonl((uint32_t)msgSize);
-  sendSuccess = HandleSend((char *)header, sizeof(header), "IsAvailable() status header");
+  sendSuccess = socket_->HandleSend((char *)header, sizeof(header), "IsAvailable() status header");
   if (!sendSuccess) {
     printf("IsAvailable: Could not send status header\n");
     exit(1);
   }
   
   // Receive Status Protocol Buffer
-  recvSuccess = HandleRecv((char *)header, sizeof(header), "IsAvailable() status header");
+  recvSuccess = socket_->HandleRecv((char *)header, sizeof(header), "IsAvailable() status header");
   if (!recvSuccess) {
     printf("IsAvailable: Could not receive status header\n");
     exit(1);
@@ -199,7 +170,7 @@ bool TCPBClient::IsAvailable() {
 
   char msg[msgSize];
   if (msgSize > 0) {
-    recvSuccess = HandleRecv(msg, sizeof(msg), "IsAvailable() status protobuf");
+    recvSuccess = socket_->HandleRecv(msg, sizeof(msg), "IsAvailable() status protobuf");
     if (!recvSuccess) {
       printf("IsAvailable: Could not receive status protobuf\n");
       exit(1);
@@ -227,6 +198,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   string msgStr;
 
   // Sanity checks
+  /*
   if (!atomsSet) { printf("Called SendJobAsync() without SetAtoms()\n"); exit(1); }
   if (!chargeSet) { printf("Called SendJobAsync() without SetCharge()\n"); exit(1); }
   if (!spinMultSet) { printf("Called SendJobAsync() without SetSpinMult()\n"); exit(1); }
@@ -234,6 +206,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   if (!restrictedSet) { printf("Called SendJobAsync() without SetRestricted()\n"); exit(1); }
   if (!methodSet) { printf("Called SendJobAsync() without SetMethod()\n"); exit(1); }
   if (!basisSet) { printf("Called SendJobAsync() without SetBasis()\n"); exit(1); }
+  */
 
   // Finish up JobInput Protocol Buffer
   jobInput_.set_run(runType);
@@ -250,7 +223,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   // Send JobInput Protocol Buffer
   header[0] = htonl((uint32_t)msgType);
   header[1] = htonl((uint32_t)msgSize);
-  sendSuccess = HandleSend((char *)header, sizeof(header), "SendJobAsync() job input header");
+  sendSuccess = socket_->HandleSend((char *)header, sizeof(header), "SendJobAsync() job input header");
   if (!sendSuccess) {
     printf("SendJobAsync: Could not send job input header\n");
     exit(1);
@@ -259,7 +232,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   if (msgSize) {
     char msg[msgSize];
     memcpy(msg, (void*)msgStr.data(), msgSize);
-    sendSuccess = HandleSend(msg, msgSize, "SendJobAsync() job input protobuf");
+    sendSuccess = socket_->HandleSend(msg, msgSize, "SendJobAsync() job input protobuf");
     if (!sendSuccess) {
       printf("SendJobAsync: Could not send job input protobuf\n");
       exit(1);
@@ -267,7 +240,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
   }
 
   // Receive Status Protocol Buffer
-  recvSuccess = HandleRecv((char *)header, sizeof(header), "SendJobAsync() status header");
+  recvSuccess = socket_->HandleRecv((char *)header, sizeof(header), "SendJobAsync() status header");
   if (!recvSuccess) {
     printf("SendJobAsync: Could not receive status header\n");
     exit(1);
@@ -278,7 +251,7 @@ bool TCPBClient::SendJobAsync(const terachem_server::JobInput_RunType runType,
 
   char msg[msgSize];
   if (msgSize > 0) {
-    recvSuccess = HandleRecv(msg, sizeof(msg), "SendJobAsync() status protobuf");
+    recvSuccess = socket_->HandleRecv(msg, sizeof(msg), "SendJobAsync() status protobuf");
     if (!recvSuccess) {
       printf("SendJobAsync: Could not receive status protobuf\n");
       exit(1);
@@ -312,14 +285,14 @@ bool TCPBClient::CheckJobComplete() {
 
   header[0] = htonl((uint32_t)msgType);
   header[1] = htonl((uint32_t)msgSize);
-  sendSuccess = HandleSend((char *)header, sizeof(header), "CheckJobComplete() status header");
+  sendSuccess = socket_->HandleSend((char *)header, sizeof(header), "CheckJobComplete() status header");
   if (!sendSuccess) {
     printf("CheckJobComplete: Could not send status header\n");
     exit(1);
   }
   
   // Receive Status Protocol Buffer
-  recvSuccess = HandleRecv((char *)header, sizeof(header), "CheckJobComplete() status header");
+  recvSuccess = socket_->HandleRecv((char *)header, sizeof(header), "CheckJobComplete() status header");
   if (!recvSuccess) {
     printf("CheckJobComplete: Could not receive status header\n");
     exit(1);
@@ -330,7 +303,7 @@ bool TCPBClient::CheckJobComplete() {
 
   char msg[msgSize];
   if (msgSize > 0) {
-    recvSuccess = HandleRecv(msg, sizeof(msg), "CheckJobComplete() status protobuf");
+    recvSuccess = socket_->HandleRecv(msg, sizeof(msg), "CheckJobComplete() status protobuf");
     if (!recvSuccess) {
       printf("CheckJobComplete: Could not receive status protobuf\n");
       exit(1);
@@ -363,7 +336,7 @@ void TCPBClient::RecvJobAsync() {
   int aSize, bSize;
 
   // Receive JobOutput Protocol Buffer
-  recvSuccess = HandleRecv((char *)header, sizeof(header), "RecvJobAsync() job output header");
+  recvSuccess = socket_->HandleRecv((char *)header, sizeof(header), "RecvJobAsync() job output header");
   if (!recvSuccess) {
     printf("RecvJobAsync: Could not receive job output header\n");
     exit(1);
@@ -374,7 +347,7 @@ void TCPBClient::RecvJobAsync() {
 
   char msg[msgSize];
   if (msgSize > 0) {
-    recvSuccess = HandleRecv(msg, sizeof(msg), "RecvJobAsync() job output protobuf");
+    recvSuccess = socket_->HandleRecv(msg, sizeof(msg), "RecvJobAsync() job output protobuf");
     if (!recvSuccess) {
       printf("RecvJobAsync: Could not receive job output protobuf\n");
       exit(1);
@@ -475,171 +448,4 @@ void TCPBClient::ComputeForces(const double* geom,
   for (int i = 0; i < 3*num_atoms; i++) {
     gradient[i] *= -1.0;
   }
-}
-
-/***************************
- * SOCKET HELPER FUNCTIONS *
- ***************************/
-
-void TCPBClient::Connect() {
-  struct hostent* serverinfo;
-  struct sockaddr_in serveraddr;
-  struct timeval tv;
-
-  server_ = socket(AF_INET, SOCK_STREAM, 0);
-
-  // Set timeout to 15 seconds
-  memset(&tv, 0, sizeof(timeval));
-  tv.tv_sec = 15;
-  if (setsockopt(server_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-    SocketLog("Could not set recv timeout to %d seconds", tv.tv_sec);
-    exit(1);
-  }
-  if (setsockopt(server_, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) < 0) {
-    SocketLog("Could not set send timeout to %d seconds", tv.tv_sec);
-    exit(1);
-  }
-
-  // Set up connection
-  serverinfo = gethostbyname(host_);
-  if (serverinfo == NULL) {
-    SocketLog("Could not lookup hostname %s", host_);
-    exit(1);
-  }
-  memset(&serveraddr, 0, sizeof(serveraddr));
-  serveraddr.sin_family = AF_INET;
-  memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)serverinfo->h_addr, serverinfo->h_length);
-  serveraddr.sin_port = htons(port_);
-
-  // Connect
-  if (connect(server_, (struct sockaddr*)&serveraddr, sizeof(serveraddr)) < 0) {
-    SocketLog("Could not connect to host %s, port %d on socket %d", host_, port_, server_);
-    exit(1);
-  }
-}
-
-void TCPBClient::Disconnect() {
-  shutdown(server_, SHUT_RDWR);
-  close(server_);
-  server_ = -1;
-}
-
-
-bool TCPBClient::HandleRecv(char* buf,
-                            int len,
-                            const char* log) {
-  int nrecv;
-
-  // Try to recv
-  nrecv = RecvN(buf, len);
-  if (nrecv < 0) {
-    if (errno == EINTR || errno == EAGAIN) {
-      SocketLog("Packet read for %s on socket %d was interrupted, trying again\n", log, server_);
-      nrecv = RecvN(buf, len);
-    }
-  }
-
-  if (nrecv < 0) {
-    SocketLog("Could not properly recv packet for %s on socket %d, closing socket. Errno: %d (%s)\n", log, server_, errno, strerror(errno));
-    Disconnect();
-    return false;
-  } else if (nrecv == 0) {
-    SocketLog("Received shutdown signal for %s on socket %d, closing socket\n", log, server_);
-    Disconnect();
-    return false;
-  } else if (nrecv != len) {
-    SocketLog("Only recv'd %d bytes of %d expected bytes for %s on socket %d, closing socket\n", nrecv, len, log, server_);
-    Disconnect();
-    return false;
-  }
-  
-  SocketLog("Successfully recv'd packet of %d bytes for %s on socket %d\n", nrecv, log, server_);
-  return true;
-}
-
-bool TCPBClient::HandleSend(const char* buf,
-                            int len,
-                            const char* log) {
-  int nsent;
-
-  if (len == 0) {
-    SocketLog("Trying to send packet of 0 length for %s on socket %d, skipping send\n", log, server_);
-    return true;
-  }
-
-  // Try to send
-  nsent = SendN(buf, len);
-  if (nsent < 0) {
-    if (errno == EINTR || errno == EAGAIN) {
-      SocketLog("Packet send for %s on socket %d was interrupted, trying again\n", log, server_);
-      nsent = SendN(buf, len);
-    }
-  }
-
-  if (nsent <= 0) {
-    SocketLog("Could not properly send packet for %s on socket %d, closing socket. Errno: %d (%s)\n", log, server_, errno, strerror(errno));
-    Disconnect();
-    return false;
-  } else if (nsent != len) {
-    SocketLog("Only sent %d bytes of %d expected bytes for %s on socket %d, closing socket\n", nsent, len, log, server_);
-    Disconnect();
-    return false;
-  }
-  
-  SocketLog("Successfully sent packet of %d bytes for %s on socket %d\n", nsent, log, server_);
-  return true;
-}
-
-int TCPBClient::RecvN(char* buf,
-                      int len) {
-  int nleft, nrecv;
-
-  nleft = len;
-  while (nleft) {
-    nrecv = recv(server_, buf, len, 0);
-    if (nrecv < 0) return nrecv;
-    else if (nrecv == 0) break;
-
-    nleft -= nrecv; 
-    buf += nrecv;
-  }
-
-  return len - nleft;
-}
-
-int TCPBClient::SendN(const char* buf,
-                      int len) {
-  int nleft, nsent;
-
-  nleft = len;
-  while (nleft) {
-    nsent = send(server_, buf, len, 0);
-    if (nsent < 0) return nsent;
-    else if (nsent == 0) break;
-
-    nleft -= nsent; 
-    buf += nsent;
-  }
-
-  return len - nleft;
-}
-
-void TCPBClient::SocketLog(const char* format, ...) {
-#ifdef SOCKETLOGS
-  // Get time info
-  time_t now = time(NULL);
-  struct tm* t = localtime(&now);
-
-  // Get full log string from variable arguments
-  va_list args;
-  va_start(args, format);
-  char logStr[MAX_STR_LEN];
-  vsnprintf(logStr, MAX_STR_LEN, format, args);
-
-  // Print to logfile with timestamp
-  fprintf(clientLogFile_, "%.24s: %s\n", asctime(t), logStr);
-  fflush(clientLogFile_);
-
-  va_end(args);
-#endif
 }

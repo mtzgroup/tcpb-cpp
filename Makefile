@@ -6,15 +6,17 @@ PROTODIR=./proto
 BUILDDIR=./build
 
 TCPBSRC := 	$(SRCDIR)/tcpb.cpp \
-		$(SRCDIR)/terachem_server.pb.cpp
+		$(SRCDIR)/terachem_server.pb.cpp \
+		$(SRCDIR)/utils.cpp
+
 TCPBOBJ := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
 
 ###############
 ## COMPILERS ##
 ###############
 CXX=g++
-CXXFLAGS=-fPIC -O2
-#CXXFLAGS=-fPIC -g -DSOCKETLOGS
+CXXFLAGS=-fPIC -std=c++11
+#CXXFLAGS=-fPIC -std=c++11 -g -DSOCKETLOGS
 PROTOC=protoc
 LIBS=-lprotobuf
 

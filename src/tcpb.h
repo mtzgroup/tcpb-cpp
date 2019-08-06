@@ -9,22 +9,15 @@
 
 #include <string>
 
+#include "socket.h"
 #include "terachem_server.pb.h"
-
-#ifndef MAX_STR_LEN
-#define MAX_STR_LEN 1024
-#endif
 
 /**
  * \brief TeraChem Protocol Buffer (TCPB) Client class
  *
  * TCPBClient handles communicating with a TeraChem server through sockets and protocol buffers.
- * This class is based on protobufserver.cpp/.h in the TeraChem source code and tcpb.py (which came first).
  * Direct control of the asynchronous server communication is possible,
  * but the typical use would be the convenience functions like ComputeEnergy().
- * One major difference to the TCPB server code is that the client only needs one active connection.
- * This removes most threading and select logic (but limits communication to one server);
- * however, timeouts do need to be explicitly set on the socket.
  **/
 class TCPBClient {
   public:
@@ -32,97 +25,16 @@ class TCPBClient {
     /**
      * \brief Constructor for TCPBClient class
      *
-     * Sets up the logfile if the #SOCKETLOGS macro is defined.
-     *
-     * @param host C string of hostname with TCPB server
+     * @param host Hostname of TCPB server
      * @param port Integer port of TCPB server
      **/
-    TCPBClient(const char* host,
+    TCPBClient(std::string host,
                int port);
 
     /**
      * \brief Destructor for TCPBClient
-     *
-     * The destructor also handles disconnect and logfile cleanup.
      **/
     ~TCPBClient();
-
-    /***********************
-     * JOB INPUT (SETTERS) *
-     ***********************/
-    /**
-     * \brief Set the atom types in the JobInput Protocol Buffer
-     *
-     * Also clears saved MO coefficients in jobInput_,
-     * since changing the atoms invalidates the previous solution.
-     *
-     * @param atoms Array of C strings for atom types
-     * @param num_atoms Integer number of entries in atoms
-     **/
-    void SetAtoms(const char** atoms,
-                  const int num_atoms);
-
-    /**
-     * \brief Set the charge in the JobInput Protocol Buffer
-     *
-     * Also clears saved MO coefficients in jobInput_,
-     * since changing the charge invalidates the previous solution.
-     *
-     * @param charge Molecular charge
-     **/
-    void SetCharge(const int charge);
-
-    /**
-     * \brief Set the spin multiplicity in the JobInput Protocol Buffer
-     *
-     * Also clears saved MO coefficients in jobInput_,
-     * since changing the spin multiplicity invalidates the previous solution.
-     *
-     * @param spinMult Spin multiplicity
-     **/
-    void SetSpinMult(const int spinMult);
-
-    /**
-     * \brief Set closed or open shell in the JobInput Protocol Buffer
-     *
-     * Also clears saved MO coefficients in jobInput_,
-     * since changing between closed and open shell invalidates the previous solution.
-     *
-     * @param closed If True, the system is set as closed shell
-     **/
-    void SetClosed(const bool closed);
-
-    /**
-     * \brief Set restricted or unrestricted in the JobInput Protocol Buffer
-     *
-     * Also clears saved MO coefficients in jobInput_,
-     * since changing between restricted and unrestricted invalidates the previous solution.
-     *
-     * @param restricted If True, the system is set as restricted
-     **/
-    void SetRestricted(const bool restricted);
-
-    /**
-     * \brief Set the TeraChem method in the JobInput Protocol Buffer
-     *
-     * Clears saved MO coefficients in jobInput_,
-     * since changing the method invalidates the previous solution.
-     * Also, will error out if not given a valid TeraChem method (as defined in terachem_server.proto).
-     *
-     * @param method C string of method name (case insensitive)
-     **/
-    void SetMethod(const char* method);
-
-    /**
-     * \brief Set the TeraChem basis set in the JobInput Protocol Buffer
-     *
-     * Clears saved MO coefficients in jobInput_,
-     * since changing the basis set invalidates the previous solution.
-     * Also, will error out if not a valid TeraChem basis set (as defined in terachem_server.proto).
-     *
-     * @param basis C string of basis set name (case insensitive)
-     **/
-    void SetBasis(const char* basis);
 
     /************************
      * JOB OUTPUT (GETTERS) *
@@ -153,20 +65,6 @@ class TCPBClient {
     /************************
      * SERVER COMMUNICATION *
      ************************/
-    /**
-     * \brief Connect to the TCPB server
-     *
-     * Initializes the server_ socket and connects to the given host (host_) and port (port_).
-     **/
-    void Connect();
-
-    /**
-     * \brief Disconnect from the TCPB server
-     *
-     * Disconnects and discards the server_ socket.
-     **/
-    void Disconnect();
-
     /**
      * \brief Checks whether the server is available
      *
@@ -290,76 +188,9 @@ class TCPBClient {
                        double* forces);
 
   private:
-    char host_[MAX_STR_LEN];
-    int port_;
-    int server_;
-    FILE* clientLogFile_;
-    // Protocol buffer variables
+    TCPBSocket* socket_;
     terachem_server::JobInput jobInput_;
     terachem_server::JobOutput jobOutput_;
-    // State variables, ensuring everything is set prior to sending the job
-    bool atomsSet, chargeSet, spinMultSet, closedSet, restrictedSet, methodSet, basisSet;
-
-    /***************************
-     * SOCKET HELPER FUNCTIONS *
-     ***************************/
-    // TODO: These should probably be split out, pretty independent
-    // TODO: These functions will not work on Windows at the moment
-    /**
-     * \brief A high-level socket recv with error checking and clean up for broken connections
-     *
-     * @param buf Buffer for incoming packet
-     * @param len Byte size of incoming packet
-     * @param log String message to be printed out as part of SocketLog messages (easier debugging)
-     * @return status True if recv'd full packet, False otherwise (indicating server_ socket is now closed)
-     **/
-    bool HandleRecv(char* buf,
-                    int len,
-                    const char* log);
-
-    /**
-     * \brief A high-level socket send with error checking and clean up for broken connections
-     *
-     * @param buf Buffer for outgoing packet
-     * @param len Byte size of outgoing packet
-     * @param log String message to be printed out as part of SocketLog messages (easier debugging)
-     * @return status True if sent full packet, False otherwise (indicating server_ socket is now closed)
-     **/
-    bool HandleSend(const char* buf,
-                    int len,
-                    const char* log);
-
-    /**
-     * \brief A low-level socket recv wrapper to ensure full packet recv
-     *
-     * @param buf Buffer for incoming packet
-     * @param len Byte size of incoming packet
-     * @return nsent Number of bytes recv'd
-     **/
-    int RecvN(char* buf,
-              int len);
-
-    /**
-     * \brief A low-level socket send wrapper to ensure full packet send
-     *
-     * @param buf Buffer for outgoing packet
-     * @param len Byte size of outgoing packet
-     * @return nsent Number of bytes sent
-     **/
-    int SendN(const char* buf,
-              int len);
-
-    /**
-     * \brief Verbose logging with timestamps for the client socket into "client.log"
-     *
-     * With SOCKETLOGS defined, this method is analagous to fprintf(clientLogFile_, format, asctime(), ...).
-     *
-     * Without SOCKETLOGS defined, this method does nothing.
-     *
-     * @param format Format string for fprintf
-     * @param va_args Variable arguments for fprintf
-     **/
-    void SocketLog(const char* format, ...);
 };
 
 #endif
