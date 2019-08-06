@@ -5,11 +5,12 @@ SRCDIR=./src
 PROTODIR=./proto
 BUILDDIR=./build
 
-TCPBSRC := 	$(SRCDIR)/tcpb.cpp \
+TCPBSRC := 	$(SRCDIR)/socket.cpp \
+		$(SRCDIR)/tcpb.cpp \
 		$(SRCDIR)/terachem_server.pb.cpp \
 		$(SRCDIR)/utils.cpp
 
-TCPBOBJ := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
+OBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
 
 ###############
 ## COMPILERS ##
@@ -27,6 +28,9 @@ VER=2.0.0
 #PREFIX=/global/user_software/tcpb-client/$(VER)
 PREFIX=/home/sseritan/personal_modules/software/tcpb-cpp
 
+HEADERS := $(patsubst $(SRCDIR)/%.cpp, $(SRCDIR)/%.h, $(TCPBSRC))
+INSTHEADERS := $(patsubst $(SRCDIR)/%.cpp, $(PREFIX)/include/%.h, $(TCPBSRC))
+
 ################
 ## MAKE RULES ##
 ################
@@ -43,17 +47,17 @@ install:
 	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(PREFIX)/lib
 	@ln -sfn $(PREFIX)/lib/libtcpb.so.$(VER) $(PREFIX)/lib/libtcpb.so
 	@mkdir -p $(PREFIX)/include
-	@cp -v $(SRCDIR)/{tcpb.h,terachem_server.pb.h} $(PREFIX)/include
+	@cp -v $(HEADERS) $(PREFIX)/include
 
 uninstall:
 	@echo "Uninstalling TCPB C++ client from $(PREFIX)"
 	@rm -v $(PREFIX)/lib/{libtcpb.so.$(VER),libtcpb.so}
-	@rm -v $(PREFIX)/include/tcpb.h $(PREFIX)/include/terachem_server.pb.h
+	@rm -v $(INSTHEADERS)
 
-###########
-## RULES ##
-###########
-$(BUILDDIR)/libtcpb.so.$(VER): $(TCPBOBJ)
+###################
+## COMPILE RULES ##
+###################
+$(BUILDDIR)/libtcpb.so.$(VER): $(OBJS)
 	$(CXX) $(CXXFLAGS) -shared -o $@ $^ $(LIBS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp

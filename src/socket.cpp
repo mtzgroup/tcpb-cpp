@@ -4,6 +4,8 @@
 
 #include <time.h>
 #include <stdarg.h>
+#include <string>
+#include <string.h>
 
 //Socket includes
 #include <unistd.h>
@@ -15,6 +17,7 @@
 
 #include "socket.h"
 
+//#define SOCKETLOGS
 #define MAX_STR_LEN 1024
 
 using std::string;
@@ -56,19 +59,19 @@ void TCPBSocket::Connect() {
   }
 
   // Set up connection
-  serverinfo = gethostbyname(host);
+  serverinfo = gethostbyname(host_.c_str());
   if (serverinfo == NULL) {
-    SocketLog("Could not lookup hostname %s", host);
+    SocketLog("Could not lookup hostname %s", host_.c_str());
     exit(1);
   }
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
   memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)serverinfo->h_addr, serverinfo->h_length);
-  serveraddr.sin_port = htons(port);
+  serveraddr.sin_port = htons(port_);
 
   // Connect
   if (connect(server_, (struct sockaddr*)&serveraddr, sizeof(serveraddr)) < 0) {
-    SocketLog("Could not connect to host %s, port %d on socket %d", host, port, server_);
+    SocketLog("Could not connect to host %s, port %d on socket %d", host_.c_str(), port_, server_);
     exit(1);
   }
 }

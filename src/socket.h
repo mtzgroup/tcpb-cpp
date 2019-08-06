@@ -34,6 +34,16 @@ class TCPBSocket {
     ~TCPBSocket();
 
     /**
+     * \brief Connect function for client socket
+     **/
+     void Connect();
+
+    /**
+     * \brief Disconnect function for client socket
+     **/
+     void Disconnect();
+
+    /**
      * \brief A high-level socket recv with error checking and clean up for broken connections
      *
      * @param buf Buffer for incoming packet
@@ -60,6 +70,7 @@ class TCPBSocket {
   private:
     std::string host_;
     int port_;
+    int server_;
     FILE* logFile_;
 
     /**
