@@ -7,7 +7,9 @@
 #ifndef TCPB_H_
 #define TCPB_H_
 
+#include <map>
 #include <string>
+#include <vector>
 
 #include "socket.h"
 #include "terachem_server.pb.h"
@@ -79,29 +81,29 @@ class TCPBClient {
      *
      * The client sends a JobInput protobuf and waits for a Status protobuf,
      * which indicates whether the server has accepted or declined the job.
-     * The send and recv are actually blocking;
-     * however, this is asynchronous in sense that the function does not wait for job completion.
-     * Status responses should be immediate from the server.
+     * This is asynchronous in sense that the function does not wait for job completion.
      *
-     * @param runType TeraChem run type, as defined in the JobInput_RunType enum 
-     * @param geom Double array of XYZs for each atom
-     * @param num_atoms Integer number of atoms stored in geom
-     * @param unitType Geometry units, as defined in the Mol_UnitType enum
+     * The following keywords are required in options:
+     * charge, spinmult, closed_shell, restricted, method, basis
+     *
+     * @param run TeraChem run type as defined in the JobInput_RunType enum 
+     * @param atoms Atomic symbols
+     * @param options Map of key-value pairs for TeraChem options
+     * @param geom 1D array of atomic positions
+     * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
      * @return True if job was submitted, False if server was busy
      **/
-    bool SendJobAsync(const terachem_server::JobInput_RunType runType,
-                      const double* geom,
-                      const int num_atoms,
-                      const terachem_server::Mol_UnitType unitType);
+    bool SendJobAsync(string run,
+                      const std::vector<std::string>& atoms,
+                      const std::map<std::string, std::string>& options,
+                      const double* const geom,
+                      const double* const geom2 = NULL);
 
     /**
      * \brief Send a Status Protocol Buffer to the TCPB server to check on a submitted job
      *
      * The client sends a Status protobuf and waits for Status protobuf,
      * which indicates whether the server is still working on or has completed the submitted job.
-     * The send and recv are actually blocking;
-     * however, this is asynchronous in sense that the function does not wait for job completion.
-     * Status responses should be immediate from the server.
      *
      * @return True if job is complete, False if job is still in progress
      **/
@@ -112,8 +114,6 @@ class TCPBClient {
      *
      * The client receives a JobOutput protobuf from the server,
      * overwritting jobOutput_ with the new protobuf.
-     * The MO coefficients are taken from jobOutput_ 
-     * and placed as guess MO coefficients in jobInput_ for the next job.
      **/
     void RecvJobAsync();
 
@@ -123,15 +123,18 @@ class TCPBClient {
      * The client repeatedly tries to submit and check on the status of the job, until job completion.
      * Called exactly like SendJobAsync(), but blocks until the job is finished and stored in jobOutput_.
      *
-     * @param runType TeraChem run type, as defined in the JobInput_RunType enum 
-     * @param geom Double array of XYZs for each atom
-     * @param num_atoms Integer number of atoms stored in geom
-     * @param unitType Geometry units, as defined in the Mol_UnitType enum
+     * @param run TeraChem run type as defined in the JobInput_RunType enum 
+     * @param atoms Atomic symbols
+     * @param options Map of key-value pairs for TeraChem options
+     * @param geom 1D array of atomic positions
+     * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
+     * @return True if job was submitted, False if server was busy
      **/
-    void ComputeJobSync(const terachem_server::JobInput_RunType runType,
-                        const double* geom,
-                        const int num_atoms,
-                        const terachem_server::Mol_UnitType unitType);
+    bool ComputeJobSync(string run,
+                        const std::vector<std::string>& atoms,
+                        const std::map<std::string, std::string>& options,
+                        const double* const geom,
+                        const double* const geom2 = NULL);
 
     /*************************
      * CONVENIENCE FUNCTIONS *
