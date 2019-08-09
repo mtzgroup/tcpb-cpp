@@ -1,7 +1,5 @@
 /** \file tcpb.h
  *  \brief Definition of TCPBClient class
- *  \author Stefan Seritan <sseritan@stanford.edu>
- *  \date Jul 2017
  */
 
 #ifndef TCPB_H_
@@ -12,7 +10,8 @@
 #include <vector>
 
 #include "socket.h"
-#include "terachem_server.pb.h"
+#include "tcpbinput.h"
+#include "tcpboutput.h"
 
 /**
  * \brief TeraChem Protocol Buffer (TCPB) Client class
@@ -39,32 +38,6 @@ class TCPBClient {
     ~TCPBClient();
 
     /************************
-     * JOB OUTPUT (GETTERS) *
-     ************************/
-    /**
-     * \brief Gets the energy from the JobOutput Protocol Buffer
-     *
-     * Takes the energy from the current jobOutput_,
-     * and stores it in the double passed in by reference.
-     * This is to stay consistent with how the getters for arrays is coded.
-     *
-     * @param energy Double reference of computed energy
-     **/
-    void GetEnergy(double& energy);
-
-    /**
-     * \brief Gets the gradient from the JobOutput Protocol Buffer
-     *
-     * Takes the gradient array from the current jobOutput_.
-     * It currently does not check the size of the array, which must be allocated by the user.
-     *
-     * @param gradient Double array of computed gradient (user-allocated)
-     **/
-    void GetGradient(double* gradient);
-
-    //TODO: Add more getters
-
-    /************************
      * SERVER COMMUNICATION *
      ************************/
     /**
@@ -77,27 +50,16 @@ class TCPBClient {
     bool IsAvailable();
 
     /**
-     * \brief Send the JobInput Protocol Buffer to the TCPB server
+     * \brief Send a JobInput Protocol Buffer to the TCPB server
      *
      * The client sends a JobInput protobuf and waits for a Status protobuf,
      * which indicates whether the server has accepted or declined the job.
      * This is asynchronous in sense that the function does not wait for job completion.
      *
-     * The following keywords are required in options:
-     * charge, spinmult, closed_shell, restricted, method, basis
-     *
-     * @param run TeraChem run type as defined in the JobInput_RunType enum 
-     * @param atoms Atomic symbols
-     * @param options Map of key-value pairs for TeraChem options
-     * @param geom 1D array of atomic positions
-     * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
+     * @param input TCPBInput with JobInput protocol buffer
      * @return True if job was submitted, False if server was busy
      **/
-    bool SendJobAsync(string run,
-                      const std::vector<std::string>& atoms,
-                      const std::map<std::string, std::string>& options,
-                      const double* const geom,
-                      const double* const geom2 = NULL);
+    bool SendJobAsync(const TCPBInput& input);
 
     /**
      * \brief Send a Status Protocol Buffer to the TCPB server to check on a submitted job
@@ -112,10 +74,9 @@ class TCPBClient {
     /**
      * \brief Receive the JobOutput Protocol Buffer from the TCPB server
      *
-     * The client receives a JobOutput protobuf from the server,
-     * overwritting jobOutput_ with the new protobuf.
+     * @return TCPBOutput wrapping JobOutput protocol buffer
      **/
-    void RecvJobAsync();
+    const TCPBOutput RecvJobAsync();
 
     /**
      * \brief Blocking wrapper for SendJobAsync(), CheckJobComplete(), and RecvJobAsync()
@@ -123,18 +84,10 @@ class TCPBClient {
      * The client repeatedly tries to submit and check on the status of the job, until job completion.
      * Called exactly like SendJobAsync(), but blocks until the job is finished and stored in jobOutput_.
      *
-     * @param run TeraChem run type as defined in the JobInput_RunType enum 
-     * @param atoms Atomic symbols
-     * @param options Map of key-value pairs for TeraChem options
-     * @param geom 1D array of atomic positions
-     * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
-     * @return True if job was submitted, False if server was busy
+     * @param input TCPBInput with JobInput protocol buffer
+     * @return TCPBOutput wrapping JobOutput protocol buffer
      **/
-    bool ComputeJobSync(string run,
-                        const std::vector<std::string>& atoms,
-                        const std::map<std::string, std::string>& options,
-                        const double* const geom,
-                        const double* const geom2 = NULL);
+    const TCPBOutput ComputeJobSync(const TCPBInput& input);
 
     /*************************
      * CONVENIENCE FUNCTIONS *
@@ -150,10 +103,8 @@ class TCPBClient {
      * @param angstrom If True, geometry units are Angstrom instead of Bohr
      * @param energy Double for storing the computed energy
      **/
-    void ComputeEnergy(const double* geom,
-                       const int num_atoms,
-                       const bool angstrom,
-                       double& energy);
+    const TCPBOutput ComputeEnergy(const TCPBInput& input,
+                                   double& energy);
 
     /**
      * \brief Blocking wrapper for a gradient ComputeJobSync() call
@@ -167,11 +118,9 @@ class TCPBClient {
      * @param energy Double for storing the computed energy
      * @param gradient Double array for storing the computed gradient (user-allocated)
      **/
-    void ComputeGradient(const double* geom,
-                         const int num_atoms,
-                         const bool angstrom,
-                         double& energy,
-                         double* gradient);
+    const TCPBOutput ComputeGradient(const TCPBInput& input,
+                                     double& energy,
+                                     double* gradient);
 
     /**
      * \brief Blocking wrapper for a gradient ComputeJobSync() call
@@ -184,16 +133,12 @@ class TCPBClient {
      * @param energy Double for storing the computed energy
      * @param forces Double array for storing the negative of the computed gradient (user-allocated)
      **/
-    void ComputeForces(const double* geom,
-                       const int num_atoms,
-                       const bool angstrom,
-                       double& energy,
-                       double* forces);
+    const TCPBOutput ComputeForces(const TCPBInput& input,
+                                   double& energy,
+                                   double* forces);
 
   private:
     TCPBSocket* socket_;
-    terachem_server::JobInput jobInput_;
-    terachem_server::JobOutput jobOutput_;
 };
 
 #endif

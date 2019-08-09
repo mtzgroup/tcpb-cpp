@@ -1,7 +1,5 @@
 /** \file tcpb.cpp
  *  \brief Implementation of TCPBClient class
- *  \author Stefan Seritan <sseritan@stanford.edu>
- *  \date Jul 2017
  */
 
 #include <arpa/inet.h>
@@ -13,7 +11,8 @@
 
 #include "socket.h"
 #include "tcpb.h"
-#include "terachem_server.pb.h"
+#include "tcpbinput.h"
+#include "tcpboutput.h"
 
 using std::string, std::vector, std::map;
 
@@ -24,119 +23,6 @@ TCPBClient::TCPBClient(string host,
 
 TCPBClient::~TCPBClient() {
   delete socket_;
-}
-
-/***********************
- * JOB INPUT (SETTERS) *
- ***********************/
-
-/*
-void TCPBClient::SetAtoms(const char** atoms,
-                          const int num_atoms) {
-  terachem_server::Mol* mol = jobInput_.mutable_mol();
-  mol->clear_atoms();
-  for (int i = 0; i < num_atoms; i++) {
-    mol->add_atoms(atoms[i]);
-  }
-  atomsSet = true;
-
-  // Clear MO coeffs
-  jobInput_.clear_orb1afile();
-  jobInput_.clear_orb1bfile();
-}
-
-void TCPBClient::SetCharge(const int charge) {
-  terachem_server::Mol* mol = jobInput_.mutable_mol();
-  mol->set_charge(charge);
-  chargeSet = true;
-
-  // Clear MO coeffs
-  jobInput_.clear_orb1afile();
-  jobInput_.clear_orb1bfile();
-}
-
-void TCPBClient::SetSpinMult(const int spinMult) {
-  terachem_server::Mol* mol = jobInput_.mutable_mol();
-  mol->set_multiplicity(spinMult);
-  spinMultSet = true;
-
-  // Clear MO coeffs
-  jobInput_.clear_orb1afile();
-  jobInput_.clear_orb1bfile();
-}
-
-void TCPBClient::SetClosed(const bool closed) {
-  terachem_server::Mol* mol = jobInput_.mutable_mol();
-  mol->set_closed(closed);
-  closedSet = true;
-
-  // Clear MO coeffs
-  jobInput_.clear_orb1afile();
-  jobInput_.clear_orb1bfile();
-}
-
-void TCPBClient::SetRestricted(const bool restricted) {
-  terachem_server::Mol* mol = jobInput_.mutable_mol();
-  mol->set_restricted(restricted);
-  restrictedSet = true;
-
-  // Clear MO coeffs
-  jobInput_.clear_orb1afile();
-  jobInput_.clear_orb1bfile();
-}
-
-void TCPBClient::SetMethod(const char* method) {
-  bool valid;
-  terachem_server::JobInput_MethodType methodType;
-
-  // Convert to uppercase
-  char* methodUpper = strdup(method);
-  char* l = methodUpper;
-  while (*l) {
-    *l = toupper((unsigned char) *l);
-    l++;
-  }
-  
-  valid = jobInput_.MethodType_Parse(methodUpper, &methodType);
-  if (!valid) {
-    printf("Method %s passed to SetMethod() is not valid.\n", method);
-    printf("Valid methods (case-insensitive):\n%s\n",
-           jobInput_.MethodType_descriptor()->DebugString().c_str());
-    exit(1);
-  }
-
-  jobInput_.set_method(methodType);
-  methodSet = true;
-
-  // Clear MO coeffs
-  jobInput_.clear_orb1afile();
-  jobInput_.clear_orb1bfile();
-
-  free(methodUpper);
-}
-
-void TCPBClient::SetBasis(const char* basis) {
-  //TODO: Should do same check as method with enum in .proto
-  jobInput_.set_basis(basis);
-  basisSet = true;
-
-  // Clear MO coeffs
-  jobInput_.clear_orb1afile();
-  jobInput_.clear_orb1bfile();
-}
-*/
-
-/************************
- * JOB OUTPUT (GETTERS) *
- ************************/
-
-double TCPBClient::GetEnergy(int state, int mult) {
-  energy = jobOutput_.energy(0);
-}
-
-vector<double> TCPBClient::GetGradient(int state, int mult) {
-  int grad_size = jobOutput_.gradient_size();
-  memcpy(gradient, jobOutput_.mutable_gradient()->mutable_data(), grad_size*sizeof(double));
 }
 
 /************************
