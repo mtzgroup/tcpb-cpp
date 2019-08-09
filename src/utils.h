@@ -1,5 +1,5 @@
 /** \file utils.h
- *  \brief Definition of TCPBClient class
+ *  \brief Definition of TCPBUtils functions
  */
 
 #ifndef UTILS_H_
