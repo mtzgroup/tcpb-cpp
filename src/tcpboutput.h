@@ -17,7 +17,7 @@
  **/
 class TCPBOutput {
   public:
-    const terachem_server::JobOutput pb_; //!< Internal protobuf for advanced manipulation
+
 
     /**
      * \brief Constructor for TCPBClient class
@@ -59,6 +59,16 @@ class TCPBOutput {
      * @return True if job_status is success, False otherwise
      **/
     bool IsJobCompleted();
+
+    /**
+     * \brief Accessor for internal protobuf object
+     *
+     * @return Reference to internal protobuf object
+     **/
+    const terachem_server::JobOutput& GetOutputPB() { return pb_; }   
+
+  private:
+    terachem_server::JobOutput pb_; //!< Internal protobuf for advanced manipulation
 };
 
 #endif

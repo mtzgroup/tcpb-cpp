@@ -21,8 +21,6 @@
  **/
 class TCPBInput {
   public:
-    terachem_server::JobInput pb_; //!< Internal protobuf object for advanced manipulation
-
     /**
      * \brief Constructor for TCPBInput class
      * 
@@ -59,6 +57,16 @@ class TCPBInput {
      * \brief Destructor for TCPBClient
      **/
     ~TCPBInput() = default;
+
+    /**
+     * \brief Accessor for internal protobuf object
+     *
+     * @return Reference to internal protobuf object
+     **/
+    terachem_server::JobInput& GetInputPB() { return pb_; }
+
+  private:
+    terachem_server::JobInput pb_; //!< Internal protobuf object for advanced manipulation
 };
 
 #endif
