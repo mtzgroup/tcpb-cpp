@@ -5,10 +5,12 @@ SRCDIR=./src
 PROTODIR=./proto
 BUILDDIR=./build
 
-TCPBSRC := 	$(SRCDIR)/socket.cpp \
-		$(SRCDIR)/tcpb.cpp \
-		$(SRCDIR)/terachem_server.pb.cpp \
-		$(SRCDIR)/utils.cpp
+TCPBSRC := 	$(SRCDIR)/client.cpp \
+						$(SRCDIR)/input.cpp \
+						$(SRCDIR)/output.cpp \
+						$(SRCDIR)/socket.cpp \
+						$(SRCDIR)/terachem_server.pb.cpp \
+						$(SRCDIR)/utils.cpp
 
 OBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
 
