@@ -14,6 +14,7 @@ TCPBSRC := 	$(SRCDIR)/exceptions.cpp \
 		$(SRCDIR)/utils.cpp
 
 OBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
+HEADERS := $(patsubst $(SRCDIR)/%.cpp, $(SRCDIR)/%.h, $(TCPBSRC))
 
 ###############
 ## COMPILERS ##
@@ -30,9 +31,8 @@ LIBS=-lprotobuf
 VER=2.0.0
 #PREFIX=/global/user_software/tcpb-client/$(VER)
 PREFIX=/home/sseritan/personal_modules/software/tcpb-cpp
-
-HEADERS := $(patsubst $(SRCDIR)/%.cpp, $(SRCDIR)/%.h, $(TCPBSRC))
-INSTHEADERS := $(patsubst $(SRCDIR)/%.cpp, $(PREFIX)/include/%.h, $(TCPBSRC))
+LIBPREFIX=$(PREFIX)/lib
+INCPREFIX=$(PREFIX)/include/tcpb
 
 ################
 ## MAKE RULES ##
@@ -46,16 +46,16 @@ clean:
 
 install:
 	@echo "Installing TCPB C++ client into $(PREFIX)"
-	@mkdir -p $(PREFIX)/lib
-	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(PREFIX)/lib
-	@ln -sfn $(PREFIX)/lib/libtcpb.so.$(VER) $(PREFIX)/lib/libtcpb.so
-	@mkdir -p $(PREFIX)/include
-	@cp -v $(HEADERS) $(PREFIX)/include
+	@mkdir -p $(LIBPREFIX)
+	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(LIBPREFIX)
+	@ln -sfn $(LIBPREFIX)/libtcpb.so.$(VER) $(LIBPREFIX)/libtcpb.so
+	@mkdir -p $(INCPREFIX)
+	@cp -v $(HEADERS) $(INCPREFIX)
 
 uninstall:
 	@echo "Uninstalling TCPB C++ client from $(PREFIX)"
-	@rm -v $(PREFIX)/lib/{libtcpb.so.$(VER),libtcpb.so}
-	@rm -v $(INSTHEADERS)
+	@rm -v $(LIBPREFIX)/{libtcpb.so.$(VER),libtcpb.so}
+	@rm -rv $(INCPREFIX)
 
 ###################
 ## COMPILE RULES ##

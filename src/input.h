@@ -33,7 +33,7 @@ class TCPBInput {
      * @param geom 1D array of atomic positions
      * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
      **/
-    TCPBInput(string run,
+    TCPBInput(std::string run,
               const std::vector<std::string>& atoms,
               const std::map<std::string, std::string>& options,
               const double* const geom,
@@ -49,9 +49,9 @@ class TCPBInput {
      * @param xyzfile Geometry file
      * @param xyzfile2 Second geometry file (default to "", needed for overlap jobs)
      **/
-    TCPBInput(string tcfile,
-              string xyzfile,
-              string xyzfile2 = "");
+    TCPBInput(std::string tcfile,
+              std::string xyzfile,
+              std::string xyzfile2 = "");
 
     /**
      * \brief Destructor for TCPBClient

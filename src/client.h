@@ -2,8 +2,8 @@
  *  \brief Definition of TCPBClient class
  */
 
-#ifndef TCPB_H_
-#define TCPB_H_
+#ifndef TCPBCLIENT_H_
+#define TCPBCLIENT_H_
 
 #include <string>
 
