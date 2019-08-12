@@ -1,4 +1,4 @@
-/** \file tcpboutput.h
+/** \file output.h
  *  \brief Definition of TCPBOutput class
  */
 

@@ -1,17 +1,20 @@
-/** \file tcpboutput.cpp
- *  \brief Implementation of TCPBOutput class
+/** \file input.cpp
+ *  \brief Implementation of TCPBInput class
  */
 
 #include <map>
+using std::map;
 #include <string>
+using std::string, stoi;
 #include <vector>
+using std::vector;
 
-#include "tcpbinput.h"
+#include "input.h"
 #include "terachem_server.pb.h"
-#include "utils.h"
-
-using std::map, std::string, std::vector;
 using terachem_server::JobInput, terachem_server::Mol;
+#include "utils.h"
+using TCPBUtils::ReadXYZFile, TCPBUtils::ReadTCFile;
+
 
 TCPBInput::TCPBInput(string run,
                      const vector<string>& atoms,
@@ -61,11 +64,11 @@ TCPBInput::TCPBInput(string run,
 
   // Handle protocol-specific required keywords
   try {
-    int charge = std::stoi(options.at("charge"));
+    int charge = stoi(options.at("charge"));
     mol->set_charge(charge);
     options.erase("charge");
 
-    int spinmult = std::stoi(options.at("spinmult"));
+    int spinmult = stoi(options.at("spinmult"));
     mol->set_multiplicity(spinmult);
     options.erase("spinmult");
 
@@ -125,9 +128,9 @@ TCPBInput::TCPBInput(string tcfile,
   vector<double> geom2;
   map<string, string> options;
 
-  TCPBUtils::ReadXYZFile(xyzfile, atoms, geom);
+  ReadXYZFile(xyzfile, atoms, geom);
 
-  options = TCPBUtils::ReadTCFile(tcfile);
+  options = ReadTCFile(tcfile);
 
   string run = options["run"];
   options.erase("run");
@@ -135,7 +138,7 @@ TCPBInput::TCPBInput(string tcfile,
   if (!xyzfile2.empty()) {
     TCPBInput(run, atoms, options, geom);
   } else {
-    TCPBUtils::ReadXYZFile(xyzfile2, atoms, geom2);
+    ReadXYZFile(xyzfile2, atoms, geom2);
 
     TCPBInput(run, atoms, options, geom, geom2);
   }

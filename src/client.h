@@ -8,8 +8,8 @@
 #include <string>
 
 #include "socket.h"
-#include "tcpbinput.h"
-#include "tcpboutput.h"
+#include "input.h"
+#include "output.h"
 
 /**
  * \brief TeraChem Protocol Buffer (TCPB) Client class

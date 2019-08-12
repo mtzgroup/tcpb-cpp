@@ -1,10 +1,10 @@
-/** \file tcpboutput.cpp
+/** \file output.cpp
  *  \brief Implementation of TCPBOutput class
  */
 
 #include <string>
 
-#include "tcpboutput.h"
+#include "output.h"
 #include "terachem_server.pb.h"
 using terachem_server::JobOutput;
 

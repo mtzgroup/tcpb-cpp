@@ -1,4 +1,4 @@
-/** \file tcpbinput.h
+/** \file input.h
  *  \brief Definition of TCPBInput class
  */
 
