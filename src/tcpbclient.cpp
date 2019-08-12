@@ -2,23 +2,25 @@
  *  \brief Implementation of TCPBClient class
  */
 
-#include <arpa/inet.h>
-//#include <errno.h>
-#include <stdexcept>
+#include <arpa/inet.h> // For htonl()/ntohl()
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+using std::string;
 
 #include "socket.h"
-#include "tcpb.h"
-#include "tcpbinput.h"
-#include "tcpboutput.h"
+#include "client.h"
+#include "input.h"
+#include "output.h"
 
-using std::string, std::vector, std::map;
+
 
 TCPBClient::TCPBClient(string host,
                        int port) {
   socket_ = new TCPBSocket(host, port);
+  currJobDir_ = "";
+  currJobScrDir_ = "";
+  currJobId_ = -1;
 }
 
 TCPBClient::~TCPBClient() {
@@ -136,6 +138,10 @@ bool TCPBClient::SendJobAsync(const TCPBInput& input) {
     return false;
   }
 
+  currJobDir_ = status.job_dir();
+  currJobScrDir_ = status.job_scr_dir();
+  currJobId_ = status.server_job_id();
+
   return true;
 }
 
@@ -248,7 +254,13 @@ const TCPBOutput TCPBClient::ComputeJobSync(const TCPBInput& input) {
     sleep(1);
   }
 
-  return RecvJobAsync();
+  TCPBOutput output = RecvJobAsync();
+
+  currJobDir_ = "";
+  currJobScrDir_ = "";
+  currJobId_ = -1;
+
+  return output;
 }
 
 /*************************

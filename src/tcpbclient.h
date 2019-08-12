@@ -138,6 +138,9 @@ class TCPBClient {
                                    double* forces);
 
   private:
+    std::string currJobDir_;
+    std::string currJobScrDir_;
+    int currJobId_;
     TCPBSocket* socket_;
 };
 

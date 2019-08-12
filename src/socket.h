@@ -1,4 +1,4 @@
-/** \file tcpbsocket.h
+ /** \file tcpbsocket.h
  *  \brief Definition of TCPBSocket class
  */
 
@@ -66,6 +66,20 @@ class TCPBSocket {
     bool HandleSend(const char* buf,
                     int len,
                     const char* log);
+
+    /**
+     * \brief Getter for server hostname
+     *
+     * @return host_ Hostname
+     **/
+    std::string GetHost() { return host_; }
+
+    /**
+     * \brief Getter for server port number
+     *
+     * @return port_ Port number
+     **/
+    int GetPort() { return port_; }
 
   private:
     std::string host_;
