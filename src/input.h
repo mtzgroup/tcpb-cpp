@@ -33,11 +33,11 @@ class TCPBInput {
      * @param geom 1D array of atomic positions
      * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
      **/
-    TCPBInput::TCPBInput(string run,
-                         const std::vector<std::string>& atoms,
-                         const std::map<std::string, std::string>& options,
-                         const double* const geom,
-                         const double* const geom2 = NULL);
+    TCPBInput(string run,
+              const std::vector<std::string>& atoms,
+              const std::map<std::string, std::string>& options,
+              const double* const geom,
+              const double* const geom2 = NULL);
 
     /**
      * \brief Alternate file-based constructor for TCPBInput class
@@ -49,9 +49,9 @@ class TCPBInput {
      * @param xyzfile Geometry file
      * @param xyzfile2 Second geometry file (default to "", needed for overlap jobs)
      **/
-    TCPBInput::TCPBInput(string tcfile,
-                         string xyzfile,
-                         string xyzfile2 = "");
+    TCPBInput(string tcfile,
+              string xyzfile,
+              string xyzfile2 = "");
 
     /**
      * \brief Destructor for TCPBClient
@@ -63,10 +63,18 @@ class TCPBInput {
      *
      * @return Reference to internal protobuf object
      **/
-    terachem_server::JobInput& GetInputPB() { return pb_; }
+    const terachem_server::JobInput& GetInputPB() const { return pb_; }
 
   private:
     terachem_server::JobInput pb_; //!< Internal protobuf object for advanced manipulation
+
+    /**
+     * \brief Helper function to uppercase a C++ string
+     *
+     * @param str String to uppercase
+     * @return Uppercased string
+     **/
+    std::string ToUpper(const std::string& str);
 };
 
 #endif

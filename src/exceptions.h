@@ -31,7 +31,7 @@ class ServerError : public std::runtime_error {
                 std::string jobDir,
                 int jobId);
 
-    const char* what() const throw() { return msg_; }
+    const char* what() const throw() { return msg_.c_str(); }
   
   private:
     std::string msg_;

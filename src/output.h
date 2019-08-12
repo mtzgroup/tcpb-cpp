@@ -61,7 +61,7 @@ class TCPBOutput {
      *
      * @return Reference to internal protobuf object
      **/
-    const terachem_server::JobOutput& GetOutputPB() { return pb_; }   
+    const terachem_server::JobOutput& GetOutputPB() const { return pb_; }   
 
   private:
     terachem_server::JobOutput pb_; //!< Internal protobuf for advanced manipulation

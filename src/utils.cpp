@@ -3,22 +3,22 @@
  */
 
 #include <fstream>
-#include <iostream>
+using std::ifstream;
 #include <map>
+using std::map;
 #include <sstream>
+using std::istringstream;
 #include <string>
+using std::string; using std::getline; using std::stoi;
 #include <vector>
+using std::vector;
 
 #include "utils.h"
-
-using std::string; using std::map; using std::vector;
-using std::ifstream; using std::istringstream;
-using std::getline; using std::stoi;
 
 namespace TCPBUtils {
 
 // Based on https://stackoverflow.com/a/15206674/3052876
-map<string, string> ReadTCInput(string tcfile) {
+map<string, string> ReadTCFile(string tcfile) {
   ifstream f(tcfile.c_str());
   string line;
   map<string, string> options;
@@ -64,6 +64,5 @@ void ReadXYZFile(string xyzfile,
     geom.push_back(z);
   }
 }
-
 
 } // end namespace TCPBUtils

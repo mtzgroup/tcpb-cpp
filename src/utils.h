@@ -17,7 +17,7 @@ namespace TCPBUtils {
  * @param tcfile Filename of TeraChem input file
  * @return Key-value pairs of options
  **/
-std::map<std::string, std::string> ReadTCInput(std::string tcfile);
+std::map<std::string, std::string> ReadTCFile(std::string tcfile);
 
 /**
  * \brief Read XYZ file

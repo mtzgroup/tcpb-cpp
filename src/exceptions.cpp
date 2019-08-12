@@ -5,26 +5,24 @@
 #include <fstream>
 using std::ifstream;
 #include <string>
-using std::string, std::getline, std::stoi;
+using std::string; using std::getline; using std::to_string;
 
 #include "exceptions.h"
-
-
 
 ServerError::ServerError(string msg,
                          string host,
                          int port,
                          string jobDir,
-                         int jobId) {
+                         int jobId) : runtime_error("TCPB Server Error") {
   msg_ = msg;
   msg_ += "\n\n";
 
   msg_ += "Server Hostname: " + host + "\n";
-  msg_ += "Server Port: " + stoi(port) + "\n";
+  msg_ += "Server Port: " + to_string(port) + "\n";
 
   ifstream logfile;
   logfile.exceptions(ifstream::badbit);
-  string lfname = jobDir + "/" + stoi(jobId) + ".log";
+  string lfname = jobDir + "/" + to_string(jobId) + ".log";
   try {
     logfile.open(lfname);
 
@@ -45,6 +43,6 @@ ServerError::ServerError(string msg,
       if (++i >= size) i=0;
     }
   } catch (const ifstream::failure& e) {
-    msg_ ++ "Could not open logfile (" + lfname + ")\n";
+    msg_ += "Could not open logfile (" + lfname + ")\n";
   }
 }

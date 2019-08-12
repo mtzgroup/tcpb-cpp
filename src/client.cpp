@@ -5,11 +5,15 @@
 #include <arpa/inet.h> // For htonl()/ntohl()
 #include <string>
 using std::string;
+#include <unistd.h> //For sleep()
 
-#include "socket.h"
+#include "exceptions.h"
 #include "client.h"
 #include "input.h"
 #include "output.h"
+#include "socket.h"
+#include "terachem_server.pb.h"
+using terachem_server::JobInput; using terachem_server::JobOutput;
 
 TCPBClient::TCPBClient(string host,
                        int port) {
@@ -79,7 +83,7 @@ bool TCPBClient::SendJobAsync(const TCPBInput& input) {
   bool sendSuccess, recvSuccess;
   int msgType, msgSize;
   string msgStr;
-  JobInput pb = input.GetInputPB();
+  const JobInput pb = input.GetInputPB();
   
   msgType = terachem_server::JOBINPUT;
   msgSize = pb.ByteSize();
@@ -190,6 +194,7 @@ bool TCPBClient::CheckJobComplete() {
 
 const TCPBOutput TCPBClient::RecvJobAsync() {
   uint32_t header[2];
+  bool recvSuccess;
   int msgType, msgSize;
   string msgStr;
   JobOutput pb;
@@ -262,7 +267,7 @@ const TCPBOutput TCPBClient::ComputeEnergy(const TCPBInput& input,
 
   TCPBOutput output = ComputeJobSync(new_input);
 
-  energy = output.GetEnergy();
+  output.GetEnergy(energy);
 
   return output;
 }
@@ -277,8 +282,8 @@ const TCPBOutput TCPBClient::ComputeGradient(const TCPBInput& input,
 
   TCPBOutput output = ComputeJobSync(new_input);
 
-  energy = output.GetEnergy();
-  gradient = output.GetGradient();
+  output.GetEnergy(energy);
+  output.GetGradient(gradient);
 
   return output;
 }
@@ -290,6 +295,8 @@ const TCPBOutput TCPBClient::ComputeForces(const TCPBInput& input,
   TCPBOutput output = ComputeGradient(input, energy, gradient);
 
   // Flip sign on gradient
+  const JobInput pb = input.GetInputPB();
+  int num_atoms = pb.mol().atoms().size();
   for (int i = 0; i < 3*num_atoms; i++) {
     gradient[i] *= -1.0;
   }
