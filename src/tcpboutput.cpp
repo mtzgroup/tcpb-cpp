@@ -6,12 +6,7 @@
 
 #include "tcpboutput.h"
 #include "terachem_server.pb.h"
-
 using terachem_server::JobOutput;
-
-TCPBOutput::TCPBOutput(JobOutput pb) {
-  pb_ = pb;
-}
 
 void TCPBOutput::GetEnergy(double& energy,
                            int state,

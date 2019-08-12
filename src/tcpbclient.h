@@ -5,9 +5,7 @@
 #ifndef TCPB_H_
 #define TCPB_H_
 
-#include <map>
 #include <string>
-#include <vector>
 
 #include "socket.h"
 #include "tcpbinput.h"
@@ -36,6 +34,13 @@ class TCPBClient {
      * \brief Destructor for TCPBClient
      **/
     ~TCPBClient();
+
+    /**
+     * \brief Accessor for previous job output
+     *
+     * @return TCPBOutput object for last job
+     **/
+    const TCPBOutput GetPrevResults() { return prevResults_; }
 
     /************************
      * SERVER COMMUNICATION *
@@ -138,10 +143,15 @@ class TCPBClient {
                                    double* forces);
 
   private:
+    std::string host_;
+    int port_;
+    TCPBSocket* socket_;
+
     std::string currJobDir_;
     std::string currJobScrDir_;
     int currJobId_;
-    TCPBSocket* socket_;
+
+    TCPBOutput prevResults_;
 };
 
 #endif

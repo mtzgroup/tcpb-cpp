@@ -17,14 +17,17 @@
  **/
 class TCPBOutput {
   public:
-
-
     /**
-     * \brief Constructor for TCPBClient class
+     * \brief Constructor for TCPBOutput class
      *
      * @param pb JobOutput protobuf to wrap
      **/
-    TCPBOutput(terachem_server::JobOutput pb);
+    TCPBOutput(terachem_server::JobOutput pb) : pb_(pb) {}
+
+    /**
+     * \brief Alternate constructor for TCPBOutput class
+     **/
+    TCPBOutput() : pb_(terachem_server::JobOutput()) {}
 
     /**
      * \brief Destructor for TCPBClient
@@ -52,13 +55,6 @@ class TCPBOutput {
     void GetGradient(double* gradient,
                      int state=0,
                      int mult=1);
-
-    /**
-     * \brief Check job completed properly
-     *
-     * @return True if job_status is success, False otherwise
-     **/
-    bool IsJobCompleted();
 
     /**
      * \brief Accessor for internal protobuf object

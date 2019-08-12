@@ -26,10 +26,10 @@ class ServerError : public std::runtime_error {
      * @param jobId Current job id number from server
      **/
     ServerError(std::string msg,
-      std::string host,
-      int port,
-      std::string jobDir,
-      int jobId);
+                std::string host,
+                int port,
+                std::string jobDir,
+                int jobId);
 
     const char* what() const throw() { return msg_; }
   
