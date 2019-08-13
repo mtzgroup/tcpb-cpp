@@ -2,6 +2,8 @@
  *  \brief Utility functions for TCPB C++ client
  */
 
+#include <cstdio> // For printf() debugging
+#include <cstdlib> // For atoi()
 #include <fstream>
 using std::ifstream;
 #include <map>
@@ -24,6 +26,7 @@ map<string, string> ReadTCFile(string tcfile) {
   map<string, string> options;
 
   while (getline(f, line)) {
+    if (line.empty()) continue;
     // Comment lines
     if (line.rfind("#", 0) == 0) continue;
     if (line.rfind("!", 0) == 0) continue;
@@ -40,11 +43,13 @@ map<string, string> ReadTCFile(string tcfile) {
 
 void ReadXYZFile(string xyzfile,
                  vector<string>& atoms,
-                 vector<double>& geom) {
+                 vector<double>& geom,
+                 double scale) {
   ifstream f(xyzfile.c_str());
   string line;
 
   getline(f, line);
+  printf(line.c_str());
   int natoms = stoi(line);
 
   // Comment line
@@ -59,9 +64,9 @@ void ReadXYZFile(string xyzfile,
 
     ss >> sym >> x >> y >> z;
     atoms.push_back(sym);
-    geom.push_back(x);
-    geom.push_back(y);
-    geom.push_back(z);
+    geom.push_back(x * scale);
+    geom.push_back(y * scale);
+    geom.push_back(z * scale);
   }
 }
 

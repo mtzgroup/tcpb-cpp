@@ -46,17 +46,12 @@ class TCPBInput {
      * charge, spinmult, closed_shell, restricted, method, basis
      *
      * @param tcfile Template TeraChem input deck
-     * @param xyzfile Geometry file
+     * @param xyzfile Geometry file (default to "", will try to read coordinates option from input deck)
      * @param xyzfile2 Second geometry file (default to "", needed for overlap jobs)
      **/
     TCPBInput(std::string tcfile,
-              std::string xyzfile,
+              std::string xyzfile = "",
               std::string xyzfile2 = "");
-
-    /**
-     * \brief Destructor for TCPBClient
-     **/
-    ~TCPBInput() = default;
 
     /**
      * \brief Accessor for internal protobuf object
@@ -64,6 +59,13 @@ class TCPBInput {
      * @return Reference to internal protobuf object
      **/
     const terachem_server::JobInput& GetInputPB() const { return pb_; }
+
+    /**
+     * \brief Getter of protobuf string for debugging
+     *
+     * @return Debug string of internal protobuf object
+     **/
+    std::string GetDebugString() { return pb_.DebugString(); }
 
   private:
     terachem_server::JobInput pb_; //!< Internal protobuf object for advanced manipulation

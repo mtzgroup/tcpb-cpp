@@ -14,7 +14,6 @@ TCPBSRC := 	$(SRCDIR)/exceptions.cpp \
 		$(SRCDIR)/utils.cpp
 
 OBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
-HEADERS := $(patsubst $(SRCDIR)/%.cpp, $(SRCDIR)/%.h, $(TCPBSRC))
 
 ###############
 ## COMPILERS ##
@@ -50,7 +49,7 @@ install:
 	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(LIBPREFIX)
 	@ln -sfn $(LIBPREFIX)/libtcpb.so.$(VER) $(LIBPREFIX)/libtcpb.so
 	@mkdir -p $(INCPREFIX)
-	@cp -v $(HEADERS) $(INCPREFIX)
+	@cp -v $(SRCDIR)/*.h $(INCPREFIX)
 
 uninstall:
 	@echo "Uninstalling TCPB C++ client from $(PREFIX)"

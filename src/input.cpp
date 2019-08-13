@@ -4,7 +4,7 @@
 
 #include <algorithm>
 using std::transform;
-#include <ctype.h>
+#include <cctype>
 using std::toupper;
 #include <map>
 using std::map;
@@ -133,13 +133,21 @@ TCPBInput::TCPBInput(string tcfile,
   vector<double> geom2;
   map<string, string> options;
 
-  ReadXYZFile(xyzfile, atoms, geom);
-
   options = ReadTCFile(tcfile);
+
+  if (options.count("coordinates")) {
+    xyzfile = options["coordinates"];
+  }
+
+  // TODO: More error checking
+
+  // TODO: Check units for whether to scale or not
+  ReadXYZFile(xyzfile, atoms, geom);
 
   string run = options["run"];
   options.erase("run");
 
+  // TODO: Pull from tcfile like coordinates
   if (!xyzfile2.empty()) {
     TCPBInput(run, atoms, options, geom.data());
   } else {
