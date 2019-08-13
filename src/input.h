@@ -63,6 +63,9 @@ class TCPBInput {
     /**
      * \brief Getter of protobuf string for debugging
      *
+     * Note: This function does not print default values
+     * (e.g. method: HF or closed: false would not appear in the printout)
+     *
      * @return Debug string of internal protobuf object
      **/
     std::string GetDebugString() { return pb_.DebugString(); }

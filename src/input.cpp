@@ -13,11 +13,14 @@ using std::string; using std::stoi;
 #include <vector>
 using std::vector;
 
+#include "constants.h"
+using constants::ANGSTROM_TO_AU;
 #include "input.h"
 #include "terachem_server.pb.h"
 using terachem_server::JobInput; using terachem_server::Mol;
 #include "utils.h"
 using TCPBUtils::ReadXYZFile; using TCPBUtils::ReadTCFile;
+using TCPBUtils::ParseMethod;
 
 
 TCPBInput::TCPBInput(string run,
@@ -51,7 +54,7 @@ TCPBInput::TCPBInput(string run,
     mol->add_atoms(atoms[i]);
   }
 
-  // Units
+  // Units (legacy, most interfaces are now designed for coordinates to be in bohr)
   if (parsed_options.count("units")) {
     terachem_server::Mol_UnitType units;
     bool valid = Mol::UnitType_Parse(ToUpper(parsed_options["units"]), &units);
@@ -77,16 +80,17 @@ TCPBInput::TCPBInput(string run,
     mol->set_multiplicity(spinmult);
     parsed_options.erase("spinmult");
 
-    bool closed_shell = (ToUpper(parsed_options.at("closed_shell")).compare("TRUE") == 0);
-    mol->set_closed(closed_shell);
-    parsed_options.erase("closed_shell");
+    //Handle method prefix
+    string methodStr = parsed_options.at("method");
+    bool closed = true;
+    bool restricted = true;
+    ParseMethod(methodStr, closed, restricted);
 
-    bool restricted = (ToUpper(parsed_options.at("restricted")).compare("TRUE") == 0);
+    mol->set_closed(closed);
     mol->set_restricted(restricted);
-    parsed_options.erase("restricted");
 
     terachem_server::JobInput_MethodType method;
-    bool valid_method = JobInput::MethodType_Parse(ToUpper(parsed_options.at("method")), &method);
+    bool valid_method = JobInput::MethodType_Parse(ToUpper(methodStr), &method);
     if (!valid) {
       printf("Method %s passed in options map is not valid.\n", parsed_options.at("method").c_str());
       printf("Valid methods (case-insensitive):\n%s\n",
@@ -100,9 +104,9 @@ TCPBInput::TCPBInput(string run,
     pb_.set_basis(basis);
     parsed_options.erase("basis");
   } catch (const std::out_of_range& oor) {
+    // TODO: Should probably have some exception for this and other errors in this block
     printf("Missing a required keyword in options map:\n");
     printf("charge, spinmult, closed_shell, restricted, method, basis\n");
-    printf("Out-of-range error: %s\n", oor.what());
     exit(1);
   }
 
@@ -128,6 +132,7 @@ TCPBInput::TCPBInput(string run,
 TCPBInput::TCPBInput(string tcfile,
                      string xyzfile,
                      string xyzfile2) {
+  float scale = ANGSTROM_TO_AU;
   vector<string> atoms;
   vector<double> geom;
   vector<double> geom2;
@@ -135,24 +140,28 @@ TCPBInput::TCPBInput(string tcfile,
 
   options = ReadTCFile(tcfile);
 
-  if (options.count("coordinates")) {
-    xyzfile = options["coordinates"];
-  }
-
-  // TODO: More error checking
-
-  // TODO: Check units for whether to scale or not
-  ReadXYZFile(xyzfile, atoms, geom);
-
+  // Preprocess some options
   string run = options["run"];
   options.erase("run");
+  if (options.count("coordinates")) {
+    xyzfile = options["coordinates"];
+    options.erase("coordinates");
+  }
+  if (options.count("units")) {
+    if (ToUpper(options["units"]).compare("BOHR") == 0) scale = 1.0;
+    options.erase("units");
+  }
+  if (options.count("old_coors")) {
+    xyzfile2 = options["old_coors"];
+    options.erase("old_coors");
+  }
 
-  // TODO: Pull from tcfile like coordinates
+  ReadXYZFile(xyzfile, atoms, geom, scale);
+
   if (!xyzfile2.empty()) {
     TCPBInput(run, atoms, options, geom.data());
   } else {
-    ReadXYZFile(xyzfile2, atoms, geom2);
-
+    ReadXYZFile(xyzfile2, atoms, geom2, scale);
     TCPBInput(run, atoms, options, geom.data(), geom2.data());
   }
 }
