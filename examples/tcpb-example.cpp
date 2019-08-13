@@ -1,27 +1,53 @@
 /** \file tcpb-example.cpp
  *  \brief Example of TCPBClient use
- *  \author Stefan Seritan <sseritan@stanford.edu>
- *  \date Aug 2017
  */
 
+#include <map>
+using std::map;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+using std::string;
+#include <vector>
+using std::vector;
 
 #include "tcpb/client.h"
-//#include "tcpb/input.h"
-//#include "tcpb/output.h"
+#include "tcpb/input.h"
+#include "tcpb/output.h"
+#include "tcpb/utils.h"
 
 int main(int argc, char** argv) {
-  if (argc != 5) {
-    printf("Usage: %s host port tcfile xyzfile\n", argv[0]);
-  }
+  string host("localhost");
+  int port = 54321;
+  string xyzf("c2h4.xyz");
+  string tcf("tc.template");
 
-  TCPBClient TC(argv[1], atoi(argv[2]));
+  TCPBClient TC(host, port);
   bool avail = TC.IsAvailable();
   printf("Server is available: %s\n", (avail ? "True" : "False"));
 
-  //TCPBInput input(argv[3], argv[4]);
+  vector<string> atoms;
+  vector<double> geom;
+  TCPBUtils::ReadXYZFile(xyzf, atoms, geom);
+  
+  int num_atoms = atoms.size();
+  for (int i = 0; i < num_atoms; i++) {
+    printf("%s %lf %lf %lf\n", atoms[i].c_str(), geom[3*i+0], geom[3*i+1], geom[3*i+2]);
+  }
+
+  map<string, string> options = TCPBUtils::ReadTCFile(tcf);
+  printf("Options:\n");
+  for (map<string, string>::iterator it = options.begin(); it != options.end(); ++it) {
+    printf("%s: %s\n", it->first.c_str(), it->second.c_str());
+  }
+
+  string run = options["run"];
+  options.erase("run");
+  TCPBInput input(run, atoms, options, geom.data());
+  printf("Debug protobuf string:\n%s\n", input.GetDebugString().c_str());
+
+  TCPBInput input2(tcf);
+  printf("Debug protobuf string:\n%s\n", input2.GetDebugString().c_str());
 
   //// Set up water system
   //int num_atoms = 3;

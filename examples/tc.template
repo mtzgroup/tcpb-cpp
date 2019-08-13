@@ -1,0 +1,22 @@
+run         gradient
+method      rhf
+basis       6-31g**
+coordinates c2h4.xyz
+charge      0
+spinmult    1
+
+precision   double
+threall     1e-20
+
+# CASCI
+casci       yes
+closed      7
+active      2
+cassinglets 3
+
+# FOMO
+fon         yes
+
+# Target info
+castarget       0
+castargetmult   1
