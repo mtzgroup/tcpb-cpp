@@ -2,10 +2,13 @@
  *  \brief Implementation of TCPBSocket class
  */
 
-#include <stdarg.h>
+#include <cstdarg>
+#include <cstring>
+#include <ctime>
+#include <stdexcept>
+using std::runtime_error;
 #include <string>
-#include <string.h>
-#include <time.h>
+using std::string;
 
 //Socket includes
 #include <unistd.h>
@@ -20,7 +23,6 @@
 //#define SOCKETLOGS
 #define MAX_STR_LEN 1024
 
-using std::string;
 
 TCPBSocket::TCPBSocket(string host,
                        int port) {
@@ -51,18 +53,18 @@ void TCPBSocket::Connect() {
   tv.tv_sec = 15;
   if (setsockopt(server_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
     SocketLog("Could not set recv timeout to %d seconds", tv.tv_sec);
-    exit(1);
+    throw runtime_error("Socket timeout setup failed for recv");
   }
   if (setsockopt(server_, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) < 0) {
     SocketLog("Could not set send timeout to %d seconds", tv.tv_sec);
-    exit(1);
+    throw runtime_error("Socket timeout setup failed for send");
   }
 
   // Set up connection
   serverinfo = gethostbyname(host_.c_str());
   if (serverinfo == NULL) {
     SocketLog("Could not lookup hostname %s", host_.c_str());
-    exit(1);
+    throw runtime_error("Could not lookup hostname");
   }
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
@@ -72,7 +74,7 @@ void TCPBSocket::Connect() {
   // Connect
   if (connect(server_, (struct sockaddr*)&serveraddr, sizeof(serveraddr)) < 0) {
     SocketLog("Could not connect to host %s, port %d on socket %d", host_.c_str(), port_, server_);
-    exit(1);
+    throw runtime_error("Could not connect");
   }
 }
 

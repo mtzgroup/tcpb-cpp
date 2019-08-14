@@ -43,7 +43,7 @@ class TCPBOutput {
      **/
     void GetEnergy(double& energy,
                    int state=0,
-                   int mult=1);
+                   int mult=1) const;
 
     /**
      * \brief Gets the gradient from a JobOutput Protocol Buffer
@@ -54,7 +54,7 @@ class TCPBOutput {
      **/
     void GetGradient(double* gradient,
                      int state=0,
-                     int mult=1);
+                     int mult=1) const;
 
     /**
      * \brief Accessor for internal protobuf object

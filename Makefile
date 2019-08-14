@@ -19,7 +19,7 @@ OBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
 ## COMPILERS ##
 ###############
 CXX=g++
-CXXFLAGS=-fPIC -std=c++11
+CXXFLAGS=-fPIC -std=c++11 -g
 #CXXFLAGS=-fPIC -std=c++11 -g -DSOCKETLOGS # Debug settings
 PROTOC=protoc
 LIBS=-lprotobuf

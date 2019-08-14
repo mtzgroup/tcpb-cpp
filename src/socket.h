@@ -44,6 +44,13 @@ class TCPBSocket {
      void Disconnect();
 
     /**
+     * \brief Check if connection is alive
+     *
+     * @return True if socket is active
+     **/
+     bool IsConnected() { return (server_ != -1); }
+
+    /**
      * \brief A high-level socket recv with error checking and clean up for broken connections
      *
      * @param buf Buffer for incoming packet

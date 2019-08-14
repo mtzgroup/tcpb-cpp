@@ -22,17 +22,60 @@ using terachem_server::JobInput; using terachem_server::Mol;
 using TCPBUtils::ReadXYZFile; using TCPBUtils::ReadTCFile;
 using TCPBUtils::ParseMethod;
 
-
 TCPBInput::TCPBInput(string run,
                      const vector<string>& atoms,
                      const map<string, string>& options,
                      const double* const geom,
                      const double* const geom2) {
-  pb_ = JobInput();
+  pb_ = InitInputPB(run, atoms, options, geom, geom2);
+}
 
+TCPBInput::TCPBInput(string tcfile,
+                     string xyzfile,
+                     string xyzfile2) {
+  float scale = ANGSTROM_TO_AU;
+  vector<string> atoms;
+  vector<double> geom;
+  vector<double> geom2;
+  map<string, string> options;
+
+  options = ReadTCFile(tcfile);
+
+  // Preprocess some options
+  string run = options["run"];
+  options.erase("run");
+  if (options.count("coordinates")) {
+    xyzfile = options["coordinates"];
+    options.erase("coordinates");
+  }
+  if (options.count("units")) {
+    if (ToUpper(options["units"]).compare("BOHR") == 0) scale = 1.0;
+    options.erase("units");
+  }
+  if (options.count("old_coors")) {
+    xyzfile2 = options["old_coors"];
+    options.erase("old_coors");
+  }
+
+  ReadXYZFile(xyzfile, atoms, geom, scale);
+
+  if (xyzfile2.empty()) {
+    pb_ = InitInputPB(run, atoms, options, geom.data());
+  } else {
+    ReadXYZFile(xyzfile2, atoms, geom2, scale);
+    pb_ = InitInputPB(run, atoms, options, geom.data(), geom2.data());
+  }
+}
+
+// Convenience function to enable both constructors
+JobInput TCPBInput::InitInputPB(string run,
+                                const vector<string>& atoms,
+                                const map<string, string>& options,
+                                const double* const geom,
+                                const double* const geom2) {
+  JobInput pb = JobInput();
+  Mol* mol = pb.mutable_mol();
   int numAtoms = atoms.size();
-  Mol* mol = pb_.mutable_mol();
-
   map<string, string> parsed_options(options);
 
   // Runtype
@@ -44,7 +87,7 @@ TCPBInput::TCPBInput(string run,
            JobInput::RunType_descriptor()->DebugString().c_str());
     exit(1);
   }
-  pb_.set_run(runtype);
+  pb.set_run(runtype);
 
   // Geometry and atoms
   mol->mutable_xyz()->Resize(3*numAtoms, 0.0);
@@ -97,11 +140,11 @@ TCPBInput::TCPBInput(string run,
              JobInput::MethodType_descriptor()->DebugString().c_str());
       exit(1);
     }
-    pb_.set_method(method);
+    pb.set_method(method);
     parsed_options.erase("method");
 
     string basis = parsed_options.at("basis");
-    pb_.set_basis(basis);
+    pb.set_basis(basis);
     parsed_options.erase("basis");
   } catch (const std::out_of_range& oor) {
     // TODO: Should probably have some exception for this and other errors in this block
@@ -113,57 +156,22 @@ TCPBInput::TCPBInput(string run,
   // Optional protocol-specific keywords
   if (parsed_options.count("bond_order")) {
     if (ToUpper(parsed_options["bond_order"]).compare("TRUE") == 0) {
-      pb_.set_return_bond_order(true);
+      pb.set_return_bond_order(true);
     }
     parsed_options.erase("bond_order");
   }
   if (geom2 != NULL) {
-    pb_.mutable_xyz2()->Resize(3*numAtoms, 0.0);
-    memcpy(pb_.mutable_xyz2()->mutable_data(), geom2, 3*numAtoms*sizeof(double));
+    pb.mutable_xyz2()->Resize(3*numAtoms, 0.0);
+    memcpy(pb.mutable_xyz2()->mutable_data(), geom2, 3*numAtoms*sizeof(double));
   }
 
   // All other options are passed straight through to TeraChem
   for (map<string,string>::iterator it=parsed_options.begin(); it != parsed_options.end(); ++it) {
-    pb_.add_user_options(it->first);
-    pb_.add_user_options(it->second);
-  }
-}
-
-TCPBInput::TCPBInput(string tcfile,
-                     string xyzfile,
-                     string xyzfile2) {
-  float scale = ANGSTROM_TO_AU;
-  vector<string> atoms;
-  vector<double> geom;
-  vector<double> geom2;
-  map<string, string> options;
-
-  options = ReadTCFile(tcfile);
-
-  // Preprocess some options
-  string run = options["run"];
-  options.erase("run");
-  if (options.count("coordinates")) {
-    xyzfile = options["coordinates"];
-    options.erase("coordinates");
-  }
-  if (options.count("units")) {
-    if (ToUpper(options["units"]).compare("BOHR") == 0) scale = 1.0;
-    options.erase("units");
-  }
-  if (options.count("old_coors")) {
-    xyzfile2 = options["old_coors"];
-    options.erase("old_coors");
+    pb.add_user_options(it->first);
+    pb.add_user_options(it->second);
   }
 
-  ReadXYZFile(xyzfile, atoms, geom, scale);
-
-  if (!xyzfile2.empty()) {
-    TCPBInput(run, atoms, options, geom.data());
-  } else {
-    ReadXYZFile(xyzfile2, atoms, geom2, scale);
-    TCPBInput(run, atoms, options, geom.data(), geom2.data());
-  }
+  return pb;
 }
 
 // Based on https://stackoverflow.com/a/313990/3052876
