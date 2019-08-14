@@ -78,11 +78,13 @@ def run_cpp_test(port=56789):
         port: Port to use for server and client in testing
     Returns True if passed the tests, and False if failed the tests
     """
+    os.chdir('energy_grad_force')
+
     # Set up MockServer for testing
-    mock = MockServer(port, 'energy_grad_force/client_recv.bin', 'energy_grad_force/client_sent.bin')
+    mock = MockServer(port, 'client_recv.bin', 'client_sent.bin')
 
     # Subprocess out, expect a returncode of 1 for failure and 0 for success
-    rc = subprocess.call("./energy_grad_force/energy_grad_force_test localhost {}".format(port), shell=True)
+    rc = subprocess.call("./energy_grad_force_test localhost {}".format(port), shell=True)
 
     if rc:
         return False

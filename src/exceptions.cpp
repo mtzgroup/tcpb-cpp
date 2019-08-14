@@ -21,7 +21,7 @@ ServerError::ServerError(string msg,
   msg_ += "Server Port: " + to_string(port) + "\n";
 
   ifstream logfile;
-  logfile.exceptions(ifstream::badbit);
+  logfile.exceptions(ifstream::failbit | ifstream::badbit);
   string lfname = jobDir + "/" + to_string(jobId) + ".log";
   try {
     logfile.open(lfname);
