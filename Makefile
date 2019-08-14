@@ -27,7 +27,7 @@ LIBS=-lprotobuf
 ##################
 ## INSTALLATION ##
 ##################
-VER=2.0.0
+VER=0.4.0
 #PREFIX=/global/user_software/tcpb-client/$(VER)
 PREFIX=/home/sseritan/personal_modules/software/tcpb-cpp
 LIBPREFIX=$(PREFIX)/lib
