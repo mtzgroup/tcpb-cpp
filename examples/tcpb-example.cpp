@@ -1,57 +1,90 @@
 /** \file tcpb-example.cpp
  *  \brief Example of TCPBClient use
- *  \author Stefan Seritan <sseritan@stanford.edu>
- *  \date Aug 2017
  */
 
+#include <map>
+using std::map;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+using std::string;
+#include <vector>
+using std::vector;
 
-#include "tcpb.h"
+#include "tcpb/client.h"
+#include "tcpb/input.h"
+#include "tcpb/output.h"
+#include "tcpb/utils.h"
 
 int main(int argc, char** argv) {
-  if (argc != 3) {
-    printf("Usage: %s host port\n", argv[0]);
-  }
+  string host("localhost");
+  int port = 54321;
+  string xyzf("c2h4.xyz");
+  string tcf("tc.template");
 
-  int port = atoi(argv[2]);
-  TCPBClient* TC = new TCPBClient(argv[1], port);
-
-  TC->Connect();
-
-  // Set up water system
-  int num_atoms = 3;
-  const char* atoms[3] = {"O", "H", "H"};
-  double geom[9] = {0.00000,  0.00000, -0.12948,
-                    0.00000, -1.49419,  1.02744,
-                    0.00000,  1.49419,  1.02744};
-  TC->SetAtoms(atoms, num_atoms);
-  TC->SetCharge(0);
-  TC->SetSpinMult(1);
-  TC->SetClosed(true);
-  TC->SetRestricted(true);
-  TC->SetMethod("pbe0");
-  TC->SetBasis("6-31g");
-
-  bool avail = TC->IsAvailable();
+  TCPBClient TC(host, port);
+  bool avail = TC.IsAvailable();
   printf("Server is available: %s\n", (avail ? "True" : "False"));
 
+  // Creating Input 1: Explicitly processing files separately (full control over options)
+  vector<string> atoms;
+  vector<double> geom;
+  TCPBUtils::ReadXYZFile(xyzf, atoms, geom);
+
+  map<string, string> options = TCPBUtils::ReadTCFile(tcf);
+  string run = options["run"];
+  options.erase("run");
+  options.erase("coordinates");
+
+  TCPBInput input(run, atoms, options, geom.data());
+  printf("Debug protobuf string:\n%s\n", input.GetDebugString().c_str());
+
+  // Creating Input 2: Fulling parsing from TC input
+  TCPBInput input2(tcf);
+  printf("Debug protobuf string:\n%s\n", input2.GetDebugString().c_str());
+
+  // Most general compute call
+  const TCPBOutput output = TC.ComputeJobSync(input2);
+
+  // Parameters can be pulled out of protobuf directly
+  // In this case, we are using the repeated field's <field>_size() function
+  // For more docs, check out https://developers.google.com/protocol-buffers/docs/reference/cpp-generated
+  int num_atoms = input2.GetInputPB().mol().atoms_size();
+
   double energy;
-  double* grad = new double[9];
+  double* grad = new double[3*num_atoms];
 
-  TC->ComputeEnergy(geom, num_atoms, false, energy);
-  printf("H2O Energy: %lf\n", energy);
+  // Convenience accessors after job
+  output.GetEnergy(energy);
+  output.GetGradient(grad);
 
-  TC->ComputeGradient(geom, num_atoms, false, energy, grad);
-  printf("H2O Gradient:\n");
+  printf("From TCPBOutput getters:\n");
+  printf("Energy: %lf\n", energy);
+
+  printf("Gradient:\n");
+  for (int i = 0; i < 3*num_atoms; i++) {
+    printf("%lf ", grad[i]);
+    if ((i+1)%3 == 0) printf("\n");
+  }
+  printf("\n");
+
+  // Convenience compute calls to pull base properties out
+  energy = 0.0;
+  memset(grad, 0.0, 3*num_atoms*sizeof(double));
+
+  const TCPBOutput output2 = TC.ComputeGradient(input2, energy, grad);
+
+  printf("From ComputeGradient call:\n");
+  printf("Energy: %lf\n", energy);
+
+  printf("Gradient:\n");
   for (int i = 0; i < 3*num_atoms; i++) {
     printf("%lf ", grad[i]);
     if ((i+1)%3 == 0) printf("\n");
   }
 
   // Memory Management
-  delete TC; //Handles disconnect
+  // TCPBClient will disconnect as it drops off the stack
   delete grad;
 
   return 0;

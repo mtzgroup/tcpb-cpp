@@ -1,0 +1,6 @@
+run         energy
+method      rpbe0
+basis       6-31g
+coordinates h2o.xyz
+charge      0
+spinmult    1

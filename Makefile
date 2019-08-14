@@ -2,70 +2,71 @@
 ## DIRECTORIES ##
 #################
 SRCDIR=./src
-INCDIR=./include
 PROTODIR=./proto
 BUILDDIR=./build
-OBJDIR=$(BUILDDIR)/obj
+
+TCPBSRC := 	$(SRCDIR)/exceptions.cpp \
+		$(SRCDIR)/client.cpp \
+		$(SRCDIR)/input.cpp \
+		$(SRCDIR)/output.cpp \
+		$(SRCDIR)/socket.cpp \
+		$(SRCDIR)/terachem_server.pb.cpp \
+		$(SRCDIR)/utils.cpp
+
+OBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
 
 ###############
 ## COMPILERS ##
 ###############
 CXX=g++
-CXXFLAGS=-I$(INCDIR) -fPIC
+CXXFLAGS=-fPIC -std=c++11 -g
+#CXXFLAGS=-fPIC -std=c++11 -g -DSOCKETLOGS # Debug settings
 PROTOC=protoc
 LIBS=-lprotobuf
 
 ##################
 ## INSTALLATION ##
 ##################
-VER=0.3.0
+VER=0.4.0
 #PREFIX=/global/user_software/tcpb-client/$(VER)
 PREFIX=/home/sseritan/personal_modules/software/tcpb-cpp
+LIBPREFIX=$(PREFIX)/lib
+INCPREFIX=$(PREFIX)/include/tcpb
 
 ################
 ## MAKE RULES ##
 ################
 .PHONY: all clean install uninstall
-all: libtcpb.so.$(VER)
+all: $(SRCDIR)/terachem_server.pb.cpp $(BUILDDIR)/libtcpb.so.$(VER)
 
 clean:
-	@rm -rf $(OBJDIR) $(BUILDDIR)
-	@rm -f $(SRCDIR)/terachem_server.pb.cpp $(INCDIR)/terachem_server.pb.h
+	@rm -rf $(BUILDDIR)
+	@rm -f $(SRCDIR)/terachem_server.pb.cpp $(SRCDIR)/terachem_server.pb.h
 
 install:
 	@echo "Installing TCPB C++ client into $(PREFIX)"
-	@mkdir -p $(PREFIX)/lib
-	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(PREFIX)/lib
-	@ln -sfn $(PREFIX)/lib/libtcpb.so.$(VER) $(PREFIX)/lib/libtcpb.so
-	@mkdir -p $(PREFIX)/include
-	@cp -v $(INCDIR)/tcpb.h $(PREFIX)/include
-	@cp -v $(INCDIR)/terachem_server.pb.h $(PREFIX)/include
+	@mkdir -p $(LIBPREFIX)
+	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(LIBPREFIX)
+	@ln -sfn $(LIBPREFIX)/libtcpb.so.$(VER) $(LIBPREFIX)/libtcpb.so
+	@mkdir -p $(INCPREFIX)
+	@cp -v $(SRCDIR)/*.h $(INCPREFIX)
 
 uninstall:
 	@echo "Uninstalling TCPB C++ client from $(PREFIX)"
-	@rm -v $(PREFIX)/lib/{libtcpb.so.$(VER),libtcpb.so}
-	@rm -v $(PREFIX)/include/tcpb.h
-	@rm -v $(PREFIX)/include/terachem_server.pb.h
+	@rm -v $(LIBPREFIX)/{libtcpb.so.$(VER),libtcpb.so}
+	@rm -rv $(INCPREFIX)
 
-###########
-## RULES ##
-###########
-$(SRCDIR)/terachem_server.pb.cpp $(INCDIR)/terachem_server.pb.h: $(PROTODIR)/terachem_server.proto
+###################
+## COMPILE RULES ##
+###################
+$(BUILDDIR)/libtcpb.so.$(VER): $(OBJS)
+	$(CXX) $(CXXFLAGS) -shared -o $@ $^ $(LIBS)
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(BUILDDIR)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(SRCDIR)/terachem_server.pb.cpp: $(PROTODIR)/terachem_server.proto
 	$(PROTOC) $< --proto_path=$(PROTODIR) --cpp_out=.
 	@mv terachem_server.pb.cc $(SRCDIR)/terachem_server.pb.cpp
-	@mv terachem_server.pb.h $(INCDIR)
-
-$(OBJDIR)/terachem_server.pb.o: $(SRCDIR)/terachem_server.pb.cpp $(INCDIR)/terachem_server.pb.h
-	@mkdir -p $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-$(OBJDIR)/tcpb.o: $(SRCDIR)/tcpb.cpp $(INCDIR)/tcpb.h $(INCDIR)/terachem_server.pb.h
-	@mkdir -p $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-
-libtcpb.so.$(VER): $(OBJDIR)/tcpb.o $(OBJDIR)/terachem_server.pb.o
-	@mkdir -p $(BUILDDIR)
-	$(CXX) $(CXXFLAGS) -shared -o $(BUILDDIR)/$@ $^ $(LIBS)
-
-
+	@mv terachem_server.pb.h $(SRCDIR)

@@ -1,14 +1,12 @@
 /** \file available_test.cpp
- *  \brief C++ version of available_test.py
- *  \author Stefan Seritan <sseritan@stanford.edu>
- *  \date Aug 2017
+ *  \brief Test IsAvailable() against mock server
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 
-#include "tcpb.h"
+#include "tcpb/client.h"
 
 const int expected_cycles = 6;
 
@@ -18,12 +16,10 @@ int main(int argc, char** argv) {
   }
 
   int port = atoi(argv[2]);
-  TCPBClient* TC = new TCPBClient(argv[1], port);
-
-  TC->Connect();
+  TCPBClient TC(argv[1], port);
 
   int count = 0;
-  while (!TC->IsAvailable()) {
+  while (!TC.IsAvailable()) {
     count++;
   }
 
@@ -31,9 +27,6 @@ int main(int argc, char** argv) {
     printf("Expected %d cycles, but only got %d\n", expected_cycles, count);
     return 1;
   }
- 
-  // Memory Management
-  delete TC; //Handles disconnect
 
   return 0;
 }
