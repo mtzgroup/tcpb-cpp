@@ -17,7 +17,9 @@ using std::vector;
 
 #include "utils.h"
 
-namespace TCPBUtils {
+namespace TCPB {
+
+namespace Utils {
 
 // Based on https://stackoverflow.com/a/15206674/3052876
 map<string, string> ReadTCFile(string tcfile) {
@@ -35,6 +37,7 @@ map<string, string> ReadTCFile(string tcfile) {
     string key, value;
 
     ss >> key >> value;
+    // TODO: Handle multiple options per line (e.g. unrestricted guess)
     options[key] = value;
   }
 
@@ -103,4 +106,6 @@ void ReadXYZFile(string xyzfile,
   }
 }
 
-} // end namespace TCPBUtils
+} // end namespace Utils
+
+} // end namespace TCPB

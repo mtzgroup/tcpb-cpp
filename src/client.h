@@ -1,9 +1,9 @@
-/** \file tcpb.h
- *  \brief Definition of TCPBClient class
+/** \file client.h
+ *  \brief Definition of Client class
  */
 
-#ifndef TCPBCLIENT_H_
-#define TCPBCLIENT_H_
+#ifndef TCPB_CLIENT_H_
+#define TCPB_CLIENT_H_
 
 #include <string>
 
@@ -11,36 +11,38 @@
 #include "input.h"
 #include "output.h"
 
+namespace TCPB {
+
 /**
  * \brief TeraChem Protocol Buffer (TCPB) Client class
  *
- * TCPBClient handles communicating with a TeraChem server through sockets and protocol buffers.
+ * Client handles communicating with a TeraChem server through sockets and protocol buffers.
  * Direct control of the asynchronous server communication is possible,
  * but the typical use would be the convenience functions like ComputeEnergy().
  **/
-class TCPBClient {
+class Client {
   public:
     //Constructor/Destructor
     /**
-     * \brief Constructor for TCPBClient class
+     * \brief Constructor for Client class
      *
      * @param host Hostname of TCPB server
      * @param port Integer port of TCPB server
      **/
-    TCPBClient(std::string host,
+    Client(std::string host,
                int port);
 
     /**
-     * \brief Destructor for TCPBClient
+     * \brief Destructor for Client
      **/
-    ~TCPBClient();
+    ~Client();
 
     /**
      * \brief Accessor for previous job output
      *
-     * @return TCPBOutput object for last job
+     * @return Output object for last job
      **/
-    const TCPBOutput GetPrevResults() { return prevResults_; }
+    const Output GetPrevResults() { return prevResults_; }
 
     /************************
      * SERVER COMMUNICATION *
@@ -61,10 +63,10 @@ class TCPBClient {
      * which indicates whether the server has accepted or declined the job.
      * This is asynchronous in sense that the function does not wait for job completion.
      *
-     * @param input TCPBInput with JobInput protocol buffer
+     * @param input Input with JobInput protocol buffer
      * @return True if job was submitted, False if server was busy
      **/
-    bool SendJobAsync(const TCPBInput& input);
+    bool SendJobAsync(const Input& input);
 
     /**
      * \brief Send a Status Protocol Buffer to the TCPB server to check on a submitted job
@@ -79,9 +81,9 @@ class TCPBClient {
     /**
      * \brief Receive the JobOutput Protocol Buffer from the TCPB server
      *
-     * @return TCPBOutput wrapping JobOutput protocol buffer
+     * @return Output wrapping JobOutput protocol buffer
      **/
-    const TCPBOutput RecvJobAsync();
+    const Output RecvJobAsync();
 
     /**
      * \brief Blocking wrapper for SendJobAsync(), CheckJobComplete(), and RecvJobAsync()
@@ -89,10 +91,10 @@ class TCPBClient {
      * The client repeatedly tries to submit and check on the status of the job, until job completion.
      * Called exactly like SendJobAsync(), but blocks until the job is finished and stored in jobOutput_.
      *
-     * @param input TCPBInput with JobInput protocol buffer
-     * @return TCPBOutput wrapping JobOutput protocol buffer
+     * @param input Input with JobInput protocol buffer
+     * @return Output wrapping JobOutput protocol buffer
      **/
-    const TCPBOutput ComputeJobSync(const TCPBInput& input);
+    const Output ComputeJobSync(const Input& input);
 
     /*************************
      * CONVENIENCE FUNCTIONS *
@@ -107,8 +109,9 @@ class TCPBClient {
      * @param num_atoms Integer number of atoms stored in geom
      * @param angstrom If True, geometry units are Angstrom instead of Bohr
      * @param energy Double for storing the computed energy
+     * @return Copy of job Output data
      **/
-    const TCPBOutput ComputeEnergy(const TCPBInput& input,
+    const Output ComputeEnergy(const Input& input,
                                    double& energy);
 
     /**
@@ -122,8 +125,9 @@ class TCPBClient {
      * @param angstrom If True, geometry units are Angstrom instead of Bohr
      * @param energy Double for storing the computed energy
      * @param gradient Double array for storing the computed gradient (user-allocated)
+     * @return Copy of job Output data
      **/
-    const TCPBOutput ComputeGradient(const TCPBInput& input,
+    const Output ComputeGradient(const Input& input,
                                      double& energy,
                                      double* gradient);
 
@@ -137,21 +141,24 @@ class TCPBClient {
      * @param angstrom If True, geometry units are Angstrom instead of Bohr
      * @param energy Double for storing the computed energy
      * @param forces Double array for storing the negative of the computed gradient (user-allocated)
+     * @return Copy of job Output data
      **/
-    const TCPBOutput ComputeForces(const TCPBInput& input,
+    const Output ComputeForces(const Input& input,
                                    double& energy,
                                    double* forces);
 
   private:
     std::string host_;
     int port_;
-    TCPBSocket* socket_;
+    Socket* socket_;
 
     std::string currJobDir_;
     std::string currJobScrDir_;
     int currJobId_;
 
-    TCPBOutput prevResults_;
-};
+    Output prevResults_;
+}; // end class Client
+
+} // end namespace TCPB
 
 #endif

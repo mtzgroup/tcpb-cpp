@@ -9,11 +9,13 @@ using std::string; using std::getline; using std::to_string;
 
 #include "exceptions.h"
 
-ServerError::ServerError(string msg,
-                         string host,
-                         int port,
-                         string jobDir,
-                         int jobId) : runtime_error("TCPB Server Error") {
+namespace TCPB {
+
+ServerCommError::ServerCommError(string msg,
+                                 string host,
+                                 int port,
+                                 string jobDir,
+                                 int jobId) : runtime_error("TCPB Server Error") {
   msg_ = msg;
   msg_ += "\n\n";
 
@@ -46,3 +48,5 @@ ServerError::ServerError(string msg,
     msg_ += "Could not open logfile (" + lfname + ")\n";
   }
 }
+
+} // end namespace TCPB

@@ -1,21 +1,23 @@
-/** \file tcpboutput.h
- *  \brief Definition of TCPBExceptions class
+/** \file exceptions.h
+ *  \brief Definition of exceptions classes
  */
 
-#ifndef TCPBEXCEPTIONS_H_
-#define TCPBEXCEPTIONS_H_
+#ifndef TCPB_EXCEPTIONS_H_
+#define TCPB_EXCEPTIONS_H_
 
 #include <stdexcept>
+
+namespace TCPB {
 
 /**
  * \brief Exception class for errors communicating to the TeraChem Protocol Buffer (TCPB) server
  *
- * Primarily designed to be called in TCPBClient, which has socket/job information
+ * Primarily designed to be called in TCPB::Client, which has socket/job information
  **/
-class ServerError : public std::runtime_error {
+class ServerCommError : public std::runtime_error {
   public:
     /**
-     * \brief Constructor for ServerError
+     * \brief Constructor for ServerCommError
      *
      * Constructs a more helpful message based on current job
      *
@@ -25,16 +27,17 @@ class ServerError : public std::runtime_error {
      * @param jobDir Current job directory from server
      * @param jobId Current job id number from server
      **/
-    ServerError(std::string msg,
-                std::string host,
-                int port,
-                std::string jobDir,
-                int jobId);
+    ServerCommError(std::string msg,
+                    std::string host,
+                    int port,
+                    std::string jobDir,
+                    int jobId);
 
     const char* what() const throw() { return msg_.c_str(); }
   
   private:
     std::string msg_;
-};
+}; // end class ServerCommError 
 
+} // end namespace TCPB
 #endif

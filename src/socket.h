@@ -1,37 +1,47 @@
  /** \file tcpbsocket.h
- *  \brief Definition of TCPBSocket class
+ *  \brief Definition of Socket class
  */
 
-#ifndef TCPBSOCKET_H_
-#define TCPBSOCKET_H_
+#ifndef TCPB_SOCKET_H_
+#define TCPB_SOCKET_H_
 
 #include <string>
+
+namespace TCPB {
 
 /**
  * \brief TeraChem Protocol Buffer (TCPB) Socket class
  *
- * Helper class to manage a socket for TCPBSocket
+ * Helper class to manage a socket for Socket
  **/
-class TCPBSocket {
+class Socket {
   public:
     //Constructor/Destructor
     /**
-     * \brief Constructor for TCPBSocket class
+     * \brief Constructor for Socket class
      *
      * Sets up the logfile if the #SOCKETLOGS macro is defined.
      *
      * @param host C string of hostname with TCPB server
      * @param port Integer port of TCPB server
      **/
-    TCPBSocket(std::string host,
-               int port);
+    Socket(std::string host,
+           int port);
 
     /**
-     * \brief Destructor for TCPBSocket
+     * \brief Destructor for Socket
      *
      * The destructor also handles disconnect and logfile cleanup.
      **/
-    ~TCPBSocket();
+    ~Socket();
+
+    // Rule of 5: Moveable but not copyable
+    // Pattern taken from https://codereview.stackexchange.com/q/131137
+    void swap(Socket& other)          noexcept;
+    Socket(Socket&& move)             noexcept;
+    Socket& operator=(Socket&& move)  noexcept;
+    Socket(Socket const&)             = delete;
+    Socket& operator=(Socket const&)  = delete;
 
     /**
      * \brief Connect function for client socket
@@ -111,6 +121,8 @@ class TCPBSocket {
      * @param va_args Variable arguments for fprintf
      **/
     void SocketLog(const char* format, ...);
-};
+}; // end class Socket
+
+} // end namespace TCPB 
 
 #endif

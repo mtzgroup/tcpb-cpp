@@ -1,5 +1,5 @@
 /** \file socket.cpp
- *  \brief Implementation of TCPBSocket class
+ *  \brief Implementation of Socket class
  */
 
 #include <cstdarg>
@@ -23,21 +23,23 @@ using std::string;
 //#define SOCKETLOGS
 #define MAX_STR_LEN 1024
 
+namespace TCPB {
 
-TCPBSocket::TCPBSocket(string host,
+Socket::Socket(string host,
                        int port) {
   host_ = host;
   port_ = port;
   server_ = -1;
+  logFile_ = NULL;
 
   Connect();
 }
 
-TCPBSocket::~TCPBSocket() {
+Socket::~Socket() {
   Disconnect();
 }
 
-void TCPBSocket::Connect() {
+void Socket::Connect() {
   struct hostent* serverinfo;
   struct sockaddr_in serveraddr;
   struct timeval tv;
@@ -78,7 +80,7 @@ void TCPBSocket::Connect() {
   }
 }
 
-void TCPBSocket::Disconnect() {
+void Socket::Disconnect() {
   shutdown(server_, SHUT_RDWR);
   close(server_);
   server_ = -1;
@@ -88,9 +90,9 @@ void TCPBSocket::Disconnect() {
 #endif
 }
 
-bool TCPBSocket::HandleRecv(char* buf,
-                            int len,
-                            const char* log) {
+bool Socket::HandleRecv(char* buf,
+                        int len,
+                        const char* log) {
   int nrecv;
 
   // Try to recv
@@ -120,9 +122,9 @@ bool TCPBSocket::HandleRecv(char* buf,
   return true;
 }
 
-bool TCPBSocket::HandleSend(const char* buf,
-                            int len,
-                            const char* log) {
+bool Socket::HandleSend(const char* buf,
+                        int len,
+                        const char* log) {
   int nsent;
 
   if (len == 0) {
@@ -153,8 +155,8 @@ bool TCPBSocket::HandleSend(const char* buf,
   return true;
 }
 
-int TCPBSocket::RecvN(char* buf,
-                      int len) {
+int Socket::RecvN(char* buf,
+                  int len) {
   int nleft, nrecv;
 
   nleft = len;
@@ -170,8 +172,8 @@ int TCPBSocket::RecvN(char* buf,
   return len - nleft;
 }
 
-int TCPBSocket::SendN(const char* buf,
-                      int len) {
+int Socket::SendN(const char* buf,
+                  int len) {
   int nleft, nsent;
 
   nleft = len;
@@ -187,7 +189,7 @@ int TCPBSocket::SendN(const char* buf,
   return len - nleft;
 }
 
-void TCPBSocket::SocketLog(const char* format, ...) {
+void Socket::SocketLog(const char* format, ...) {
 #ifdef SOCKETLOGS
   // Get time info
   time_t now = time(NULL);
@@ -206,3 +208,5 @@ void TCPBSocket::SocketLog(const char* format, ...) {
   va_end(args);
 #endif
 }
+
+} // end namespace TCPB

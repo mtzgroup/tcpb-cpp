@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=
+CXXFLAGS=-std=c++11
 LIBS=-lprotobuf -ltcpb
 
 .PHONY: all

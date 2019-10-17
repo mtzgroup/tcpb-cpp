@@ -1,5 +1,5 @@
 /** \file input.cpp
- *  \brief Implementation of TCPBInput class
+ *  \brief Implementation of TCPB::Input class
  */
 
 #include <algorithm>
@@ -13,33 +13,33 @@ using std::string; using std::stoi;
 #include <vector>
 using std::vector;
 
-#include "constants.h"
-using constants::ANGSTROM_TO_AU;
 #include "input.h"
+
+#include "constants.h"
 #include "terachem_server.pb.h"
 using terachem_server::JobInput; using terachem_server::Mol;
 #include "utils.h"
-using TCPBUtils::ReadXYZFile; using TCPBUtils::ReadTCFile;
-using TCPBUtils::ParseMethod;
 
-TCPBInput::TCPBInput(string run,
-                     const vector<string>& atoms,
-                     const map<string, string>& options,
-                     const double* const geom,
-                     const double* const geom2) {
+namespace TCPB {
+
+Input::Input(string run,
+             const vector<string>& atoms,
+             const map<string, string>& options,
+             const double* const geom,
+             const double* const geom2) {
   pb_ = InitInputPB(run, atoms, options, geom, geom2);
 }
 
-TCPBInput::TCPBInput(string tcfile,
-                     string xyzfile,
-                     string xyzfile2) {
-  float scale = ANGSTROM_TO_AU;
+Input::Input(string tcfile,
+             string xyzfile,
+             string xyzfile2) {
+  float scale = constants::ANGSTROM_TO_AU;
   vector<string> atoms;
   vector<double> geom;
   vector<double> geom2;
   map<string, string> options;
 
-  options = ReadTCFile(tcfile);
+  options = Utils::ReadTCFile(tcfile);
 
   // Preprocess some options
   string run = options["run"];
@@ -57,18 +57,18 @@ TCPBInput::TCPBInput(string tcfile,
     options.erase("old_coors");
   }
 
-  ReadXYZFile(xyzfile, atoms, geom, scale);
+  Utils::ReadXYZFile(xyzfile, atoms, geom, scale);
 
   if (xyzfile2.empty()) {
     pb_ = InitInputPB(run, atoms, options, geom.data());
   } else {
-    ReadXYZFile(xyzfile2, atoms, geom2, scale);
+    Utils::ReadXYZFile(xyzfile2, atoms, geom2, scale);
     pb_ = InitInputPB(run, atoms, options, geom.data(), geom2.data());
   }
 }
 
 // Convenience function to enable both constructors
-JobInput TCPBInput::InitInputPB(string run,
+JobInput Input::InitInputPB(string run,
                                 const vector<string>& atoms,
                                 const map<string, string>& options,
                                 const double* const geom,
@@ -127,7 +127,7 @@ JobInput TCPBInput::InitInputPB(string run,
     string methodStr = parsed_options.at("method");
     bool closed = true;
     bool restricted = true;
-    ParseMethod(methodStr, closed, restricted);
+    Utils::ParseMethod(methodStr, closed, restricted);
 
     mol->set_closed(closed);
     mol->set_restricted(restricted);
@@ -175,7 +175,7 @@ JobInput TCPBInput::InitInputPB(string run,
 }
 
 // Based on https://stackoverflow.com/a/313990/3052876
-string TCPBInput::ToUpper(const string& str) {
+string Input::ToUpper(const string& str) {
   string upper(str);
 
   // Basically lambda to call toupper on each individual character
@@ -183,3 +183,5 @@ string TCPBInput::ToUpper(const string& str) {
 
   return upper;
 }
+
+} // end namespace TCPB

@@ -2,8 +2,8 @@
  *  \brief Definition of TCPBUtils functions
  */
 
-#ifndef UTILS_H_
-#define UTILS_H_
+#ifndef TCPB_UTILS_H_
+#define TCPB_UTILS_H_
 
 #include <map>
 #include <string>
@@ -11,7 +11,9 @@
 
 #include "constants.h"
 
-namespace TCPBUtils {
+namespace TCPB {
+
+namespace Utils {
 
 /**
  * \brief Read old-style TeraChem input file
@@ -51,6 +53,8 @@ void ReadXYZFile(std::string xyzfile,
                  std::vector<double>& geom,
                  double scale = constants::ANGSTROM_TO_AU);
 
-} // end namespace TCPBUtils
+} // end namespace Utils
+
+} // end namespace TCPB
 
 #endif

@@ -7,6 +7,7 @@
 #include <string>
 
 #include "tcpb/client.h"
+using TCPB::Client;
 
 const int expected_cycles = 6;
 
@@ -16,7 +17,7 @@ int main(int argc, char** argv) {
   }
 
   int port = atoi(argv[2]);
-  TCPBClient TC(argv[1], port);
+  Client TC(argv[1], port);
 
   int count = 0;
   while (!TC.IsAvailable()) {

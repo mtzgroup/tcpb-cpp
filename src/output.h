@@ -1,38 +1,42 @@
 /** \file output.h
- *  \brief Definition of TCPBOutput class
+ *  \brief Definition of Output class
  */
 
-#ifndef TCPBOUTPUT_H_
-#define TCPBOUTPUT_H_
+#ifndef TCPB_OUTPUT_H_
+#define TCPB_OUTPUT_H_
 
 #include "terachem_server.pb.h"
+
+namespace TCPB {
 
 /**
  * \brief TeraChem Protocol Buffer (TCPB) Output class
  *
- * TCPBOutput is a lightweight wrapper on top of the JobOutput protocol buffer.
+ * Output is a lightweight wrapper on top of the JobOutput protocol buffer.
  * Storing directly in protobuf is nice because it serializes and has explicit typing.
  * This class is designed to solidify the TCPB interface with explicit getters
  * and avoid developers needing to learn how to use protobufs.
  **/
-class TCPBOutput {
+class Output {
   public:
     /**
-     * \brief Constructor for TCPBOutput class
+     * \brief Constructor for Output class
      *
      * @param pb JobOutput protobuf to wrap
      **/
-    TCPBOutput(terachem_server::JobOutput pb) : pb_(pb) {}
+    Output(terachem_server::JobOutput pb) : pb_(pb) {}
 
     /**
-     * \brief Alternate constructor for TCPBOutput class
+     * \brief Alternate constructor for Output class
      **/
-    TCPBOutput() : pb_(terachem_server::JobOutput()) {}
+    Output() : pb_(terachem_server::JobOutput()) {}
 
     /**
      * \brief Destructor for TCPBClient
      **/
-    ~TCPBOutput() = default;
+    ~Output() = default;
+
+    // TODO: Copy constructor for underlying object
 
     /**
      * \brief Gets the energy from a JobOutput Protocol Buffer
@@ -65,6 +69,8 @@ class TCPBOutput {
 
   private:
     terachem_server::JobOutput pb_; //!< Internal protobuf for advanced manipulation
-};
+}; // end class Output
+ 
+} // end namespace TCPB
 
 #endif
