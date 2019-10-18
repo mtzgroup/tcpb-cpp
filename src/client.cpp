@@ -21,7 +21,7 @@ Client::Client(string host,
                        int port) {
   host_ = host;
   port_ = port;
-  socket_ = new Socket(host, port);
+  socket_ = new ClientSocket(host, port);
 
   currJobDir_ = "";
   currJobScrDir_ = "";

@@ -1,11 +1,15 @@
  /** \file tcpbsocket.h
  *  \brief Definition of Socket class
+ *
  */
 
 #ifndef TCPB_SOCKET_H_
 #define TCPB_SOCKET_H_
 
+#include <functional>
+#include <mutex>
 #include <string>
+#include <thread>
 
 namespace TCPB {
 
@@ -13,6 +17,7 @@ namespace TCPB {
  * \brief TeraChem Protocol Buffer (TCPB) Socket class
  *
  * Helper class to manage a socket for Socket
+ * Influenced by https://codereview.stackexchange.com/q/131137
  **/
 class Socket {
   public:
@@ -20,13 +25,9 @@ class Socket {
     /**
      * \brief Constructor for Socket class
      *
-     * Sets up the logfile if the #SOCKETLOGS macro is defined.
-     *
-     * @param host C string of hostname with TCPB server
-     * @param port Integer port of TCPB server
+     * @param logName Logfile name (defaults to socket.log)
      **/
-    Socket(std::string host,
-           int port);
+    Socket(const string& logName = "socket.log");
 
     /**
      * \brief Destructor for Socket
@@ -36,29 +37,18 @@ class Socket {
     ~Socket();
 
     // Rule of 5: Moveable but not copyable
-    // Pattern taken from https://codereview.stackexchange.com/q/131137
-    void swap(Socket& other)          noexcept;
-    Socket(Socket&& move)             noexcept;
-    Socket& operator=(Socket&& move)  noexcept;
-    Socket(Socket const&)             = delete;
-    Socket& operator=(Socket const&)  = delete;
-
-    /**
-     * \brief Connect function for client socket
-     **/
-     void Connect();
-
-    /**
-     * \brief Disconnect function for client socket
-     **/
-     void Disconnect();
+    void swap(Socket& other)          noexcept; // Helper swap function
+    Socket(Socket&& move)             noexcept; // Move constructor
+    Socket& operator=(Socket&& move)  noexcept; // Move operator
+    Socket(Socket const&)             = delete; // Copy constructor
+    Socket& operator=(Socket const&)  = delete; // Copy operator
 
     /**
      * \brief Check if connection is alive
      *
      * @return True if socket is active
      **/
-     bool IsConnected() { return (server_ != -1); }
+     bool IsConnected() { return (socket_ != -1); }
 
     /**
      * \brief A high-level socket recv with error checking and clean up for broken connections
@@ -84,10 +74,8 @@ class Socket {
                     int len,
                     const char* log);
 
-  private:
-    std::string host_;
-    int port_;
-    int server_;
+  protected:
+    int socket_;
     FILE* logFile_;
 
     /**
@@ -122,6 +110,89 @@ class Socket {
      **/
     void SocketLog(const char* format, ...);
 }; // end class Socket
+
+/**
+ * \brief ClientSocket class
+ *
+ * Uses the connect() function to bind a socket, designed for client usage
+ **/
+class ClientSocket : public Socket {
+  public:
+    /**
+     * \brief Constructor for ClientSocket class
+     *
+     * @param host Server hostname
+     * @param port Server port number
+     **/
+    ClientSocket(const std::string& host, int port);
+
+    /**
+     * \brief Destructor for ClientSocket class
+     **/
+    ~ClientSocket();
+}; // end class ClientSocket
+
+/**
+ * \brief SelectServerSocket class
+ *
+ * Uses the bind() and listen() functions to bind a socket, designed for server usage
+ * Uses select() to multiplex sockets with a background thread
+ * Basing this off of https://www.gnu.org/software/libc/manual/html_node/Server-Example.html
+ * and http://www.binarytides.com/multiple-socket-connections-fdset-select-linux/
+ *
+ * A function callback is used so that this class can respond with "busy" messages to nonactive clients
+ **/
+class SelectServerSocket : public Socket {
+  public:
+    /**
+     * \brief Constructor for SelectServerSocket class
+     *
+     * Launches select() loop in the background to handle multiple clients
+     *
+     * @param port Port to listen on
+     * @param respCB Function callback to handle unactive client responses in select() loop
+     **/
+    SelectServerSocket(int port,
+                 std::function<void(int)> replyCB);
+
+    /**
+     * \brief Destructor for SelectServerSocket class
+     **/
+    ~SelectServerSocket();
+
+    // Rule of 5: Not moveable or copyable
+    void swap(SelectServerSocket& other)                      = delete; // Helper swap function
+    SelectServerSocket(SelectServerSocket&& move)             = delete; // Move constructor
+    SelectServerSocket& operator=(SelectServerSocket&& move)  = delete; // Move operator
+
+    /**
+     * \brief Blocking call to wait for client connection
+     *
+     * select() is always running in background, this function
+     * just exposes one of the client sockets as "active"
+     *
+     * @return Base socket for read/write access to client
+     **/
+    Socket AcceptClient();
+
+  protected:
+    std::thread listenThread_;  //!< Thread for select() loop
+    std::mutex listenMutex_;    //!< Mutex for select() loop thread
+    fd_set activefds_;          //!< Set of active sockets in select() loop
+    int maxfd_;                 //!< Largest file descriptor in activefds_
+    bool exitFlag_;             //!< Flag for exiting select() loop
+
+    // Inter-thread variables
+    bool accept_;               //!< Flag for select() loop populating acceptedSocket_;
+    int activeClient_;          //!< Selected socket to return from AcceptClient() (-1 is inactive)
+
+    std::function<void(int)> NonactiveReplyCB_; //!< Function callback for responding to non-active clients
+
+    /**
+     * \brief Run the select() loop to multiplex the listening socket
+     **/
+    void RunSelectLoop();
+}; // end class SelectServerSocket
 
 } // end namespace TCPB 
 

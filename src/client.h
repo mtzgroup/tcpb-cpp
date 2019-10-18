@@ -150,7 +150,7 @@ class Client {
   private:
     std::string host_;
     int port_;
-    Socket* socket_;
+    ClientSocket* socket_;
 
     std::string currJobDir_;
     std::string currJobScrDir_;
