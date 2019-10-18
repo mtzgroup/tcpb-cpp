@@ -29,7 +29,7 @@ class Socket {
      *
      * @param logName Logfile name (defaults to socket.log)
      **/
-    Socket(const string& logName = "socket.log");
+    Socket(const std::string& logName = "socket.log");
 
     /**
      * \brief Destructor for Socket
@@ -42,8 +42,8 @@ class Socket {
     void swap(Socket& other)          noexcept; // Helper swap function
     Socket(Socket&& move)             noexcept; // Move constructor
     Socket& operator=(Socket&& move)  noexcept; // Move operator
-    Socket(Socket const&)             = delete; // Copy constructor
-    Socket& operator=(Socket const&)  = delete; // Copy operator
+    Socket(const Socket&)             = delete; // Copy constructor
+    Socket& operator=(const Socket&)  = delete; // Copy operator
 
     /**
      * \brief Check if connection is alive
@@ -127,11 +127,6 @@ class ClientSocket : public Socket {
      * @param port Server port number
      **/
     ClientSocket(const std::string& host, int port);
-
-    /**
-     * \brief Destructor for ClientSocket class
-     **/
-    ~ClientSocket();
 }; // end class ClientSocket
 
 /**
@@ -162,7 +157,7 @@ class SelectServerSocket : public Socket {
      **/
     ~SelectServerSocket();
 
-    // Rule of 5: Not moveable or copyable
+    // Rule of 5: Not moveable or copyable due to threading
     void swap(SelectServerSocket& other)                      = delete; // Helper swap function
     SelectServerSocket(SelectServerSocket&& move)             = delete; // Move constructor
     SelectServerSocket& operator=(SelectServerSocket&& move)  = delete; // Move operator
