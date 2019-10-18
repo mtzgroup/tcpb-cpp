@@ -6,6 +6,8 @@
 #ifndef TCPB_SOCKET_H_
 #define TCPB_SOCKET_H_
 
+#include <sys/time.h> // for fd_set
+
 #include <functional>
 #include <mutex>
 #include <string>
