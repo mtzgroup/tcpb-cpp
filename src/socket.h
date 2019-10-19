@@ -27,9 +27,13 @@ class Socket {
     /**
      * \brief Constructor for Socket class
      *
-     * @param logName Logfile name (defaults to socket.log)
+     * @param sfd Socket file descriptor (default: -1, which creates new)
+     * @param logName Logfile name (default: socket_<fd>.log)
+     * @param cleanOnDestroy Whether to close the socket in destructor (default: true)
      **/
-    Socket(const std::string& logName = "socket.log");
+    Socket(int sfd = -1,
+           const std::string& logName = "socket.log",
+           bool cleanOnDestroy = true);
 
     /**
      * \brief Destructor for Socket
@@ -50,7 +54,7 @@ class Socket {
      *
      * @return True if socket is active
      **/
-     bool IsConnected() { return (socket_ != -1); }
+     bool IsConnected() const { return (socket_ != -1); }
 
     /**
      * \brief A high-level socket recv with error checking and clean up for broken connections
@@ -62,7 +66,7 @@ class Socket {
      **/
     bool HandleRecv(char* buf,
                     int len,
-                    const char* log);
+                    const char* log) const;
 
     /**
      * \brief A high-level socket send with error checking and clean up for broken connections
@@ -74,11 +78,12 @@ class Socket {
      **/
     bool HandleSend(const char* buf,
                     int len,
-                    const char* log);
+                    const char* log) const;
 
   protected:
-    int socket_;
-    FILE* logFile_;
+    int socket_;          //!< Socket file descriptor
+    FILE* logFile_;       //!< Logfile pointer
+    bool cleanOnDestroy_; //!< Bool for closing socket in destructor
 
     /**
      * \brief A low-level socket recv wrapper to ensure full packet recv
@@ -88,7 +93,7 @@ class Socket {
      * @return nsent Number of bytes recv'd
      **/
     int RecvN(char* buf,
-              int len);
+              int len) const;
 
     /**
      * \brief A low-level socket send wrapper to ensure full packet send
@@ -98,7 +103,7 @@ class Socket {
      * @return nsent Number of bytes sent
      **/
     int SendN(const char* buf,
-              int len);
+              int len) const;
 
     /**
      * \brief Verbose logging with timestamps for the client socket into "client.log"
@@ -110,7 +115,7 @@ class Socket {
      * @param format Format string for fprintf
      * @param va_args Variable arguments for fprintf
      **/
-    void SocketLog(const char* format, ...);
+    void SocketLog(const char* format, ...) const;
 }; // end class Socket
 
 /**
@@ -150,7 +155,7 @@ class SelectServerSocket : public Socket {
      * @param respCB Function callback to handle unactive client responses in select() loop
      **/
     SelectServerSocket(int port,
-                 std::function<void(int)> replyCB);
+                       std::function<void(const Socket&)> replyCB);
 
     /**
      * \brief Destructor for SelectServerSocket class
@@ -172,6 +177,11 @@ class SelectServerSocket : public Socket {
      **/
     Socket AcceptClient();
 
+    /**
+     * \brief Release the active client from AcceptClient()
+     **/
+    void ReleaseClient();
+
   protected:
     std::thread listenThread_;  //!< Thread for select() loop
     std::mutex listenMutex_;    //!< Mutex for select() loop thread
@@ -183,7 +193,7 @@ class SelectServerSocket : public Socket {
     bool accept_;               //!< Flag for select() loop populating acceptedSocket_;
     int activeClient_;          //!< Selected socket to return from AcceptClient() (-1 is inactive)
 
-    std::function<void(int)> NonactiveReplyCB_; //!< Function callback for responding to non-active clients
+    std::function<void(const Socket&)> NonactiveReplyCB_; //!< Function callback for responding to non-active clients
 
     /**
      * \brief Run the select() loop to multiplex the listening socket

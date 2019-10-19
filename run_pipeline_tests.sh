@@ -1,9 +1,6 @@
 #!/bin/bash
 # Designed to build and run tests inside the sseritan/tcpb-client-docker:latest container
-
-cd proto
-protoc terachem_server.proto --python_out=../tests
-cd ../
+# docker run -v \`pwd`:/tmp/tcpb-cpp -w /tmp/tcpb-cpp sseritan/tcpb-client-docker:latest ./run_pipeline_tests.sh
 
 sed -i 's/^PREFIX=.*/PREFIX=\/tmp\/install/' Makefile
 make clean && make && make install
@@ -13,4 +10,9 @@ export CPLUS_INCLUDE_PATH=/tmp/install/include:$CPLUS_INCLUDE_PATH
 
 cd tests/
 make all
-python test_tcpb.py
+
+./socket_test
+
+# Clean up directories for local Docker debugging
+cd ../
+make clean

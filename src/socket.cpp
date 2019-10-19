@@ -36,19 +36,29 @@ using std::swap;
 
 namespace TCPB {
 
-Socket::Socket(const string& logName) :
-  socket_(socket(AF_INET, SOCK_STREAM, 0)),
-  logFile_(NULL)
+Socket::Socket(
+  int sfd,
+  const string& logName,
+  bool cleanOnDestroy) :
+  socket_(sfd),
+  logFile_(NULL),
+  cleanOnDestroy_(cleanOnDestroy)
 {
+  if (socket_ == -1) {
+    socket_ = socket(AF_INET, SOCK_STREAM, 0);
+  }
+
 #ifdef SOCKETLOGS
-  logFile_ = fopen(logName, "a");
+  logFile_ = fopen(logName.c_str(), "a");
 #endif
 }
 
 Socket::~Socket() {
-  shutdown(socket_, SHUT_RDWR);
-  close(socket_);
-  SocketLog("Successfully closed socket %d", socket_);
+  if (cleanOnDestroy_) {
+    shutdown(socket_, SHUT_RDWR);
+    close(socket_);
+    SocketLog("Successfully closed socket %d", socket_);
+  }
 
 #ifdef SOCKETLOGS
   fclose(logFile_);
@@ -60,6 +70,7 @@ void Socket::swap(Socket& other) noexcept {
   using std::swap;
   swap(socket_, other.socket_);
   swap(logFile_, other.logFile_);
+  swap(cleanOnDestroy_, other.cleanOnDestroy_);
 }
 
 Socket::Socket(Socket&& move) noexcept : Socket() { 
@@ -73,7 +84,7 @@ Socket& Socket::operator=(Socket&& move) noexcept {
 
 bool Socket::HandleRecv(char* buf,
                         int len,
-                        const char* log) {
+                        const char* log) const {
   int nrecv;
 
   // Try to recv
@@ -102,7 +113,7 @@ bool Socket::HandleRecv(char* buf,
 
 bool Socket::HandleSend(const char* buf,
                         int len,
-                        const char* log) {
+                        const char* log) const {
   int nsent;
 
   if (len == 0) {
@@ -132,7 +143,7 @@ bool Socket::HandleSend(const char* buf,
 }
 
 int Socket::RecvN(char* buf,
-                  int len) {
+                  int len) const {
   int nleft, nrecv;
 
   nleft = len;
@@ -149,7 +160,7 @@ int Socket::RecvN(char* buf,
 }
 
 int Socket::SendN(const char* buf,
-                  int len) {
+                  int len) const {
   int nleft, nsent;
 
   nleft = len;
@@ -165,7 +176,7 @@ int Socket::SendN(const char* buf,
   return len - nleft;
 }
 
-void Socket::SocketLog(const char* format, ...) {
+void Socket::SocketLog(const char* format, ...) const {
 #ifdef SOCKETLOGS
   // Get time info
   time_t now = time(NULL);
@@ -190,7 +201,7 @@ void Socket::SocketLog(const char* format, ...) {
  ***************/
 
 ClientSocket::ClientSocket(const string& host, int port) :
-  Socket("client.log")
+  Socket(-1, "client.log", true)
 {
   struct hostent* serverinfo;
   struct sockaddr_in serveraddr;
@@ -232,21 +243,14 @@ ClientSocket::ClientSocket(const string& host, int port) :
  * SelectServerSocket
  ***************/
 
-SelectServerSocket::SelectServerSocket(int port, function<void(int)> replyCB) :
-  Socket("server.log"),
+SelectServerSocket::SelectServerSocket(int port, function<void(const Socket&)> replyCB) :
+  Socket(-1, "server.log", true),
   NonactiveReplyCB_(replyCB),
   exitFlag_(false),
   accept_(false),
   activeClient_(-1)
 {
   struct sockaddr_in listenaddr;
-
-  // Set up port reuse
-  int t = 1;
-  if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, &t, sizeof(t)) < 0) {
-    SocketLog("Could not set address reuse on socket %d", socket_);
-    throw runtime_error("Could not set address reuse on socket");
-  }
 
   // Try to bind port
   listenaddr.sin_family = AF_INET;
@@ -289,20 +293,29 @@ SelectServerSocket::~SelectServerSocket() {
 }
 
 Socket SelectServerSocket::AcceptClient() {
+  ReleaseClient();
+
   {
     lock_guard<mutex> guard(listenMutex_);
-    if (activeClient_ == -1) activeClient_ = -1;
     accept_ = true;
   }
 
   bool localAccept = true;
   while ( localAccept ) {
     // Sleep and wait for select to populate a new client
-    usleep(1e5); // 0.01 seconds
+    usleep(1e4); // 0.01 seconds (matching select timeout)
     
     lock_guard<mutex> guard(listenMutex_);
     localAccept = accept_;
   }
+
+  // Return socket that logs with server socket and doesn't close socket on destruction
+  return Socket(activeClient_, "server.log", false);
+}
+
+void SelectServerSocket::ReleaseClient() {
+  lock_guard<mutex> guard(listenMutex_);
+  activeClient_ = -1;
 }
 
 void SelectServerSocket::RunSelectLoop() {
@@ -364,7 +377,8 @@ void SelectServerSocket::RunSelectLoop() {
             activeClient_ = i;
             accept_ = false;
           } else {
-            NonactiveReplyCB_(i); // Use callback to send right busy response
+            Socket s(i, "server.log", false);
+            NonactiveReplyCB_(s); // Use callback to send right busy response
           }
         }
       } // End FD_ISSET(readfds) + mutex guard dropping out of scope
@@ -374,6 +388,8 @@ void SelectServerSocket::RunSelectLoop() {
       lock_guard<mutex> guard(listenMutex_);
       localExit = exitFlag_;
     }
+
+    fflush(stdout);
   }
 }
 
