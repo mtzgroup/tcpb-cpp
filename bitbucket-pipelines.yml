@@ -15,4 +15,4 @@ pipelines:
           # Test both
           - cd tests/
           - make all
-          - ./socket_tests
+          - ./socket_test
