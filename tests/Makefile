@@ -10,5 +10,4 @@ socket_test: socket_test.cpp
 
 .PHONY: clean
 clean:
-	@rm socket_test
-	@rm *.log
+	@rm -f socket_test *.log

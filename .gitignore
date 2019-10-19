@@ -3,12 +3,10 @@
 *~
 
 terachem_server.pb.*
-client.log
+*.log
 
 build/
 
-tests/available/available_test
-tests/energy_grad_force/energy_grad_force_test
-tests/terachem_server_pb2.py
+tests/socket_test
 
 examples/tcpb-example

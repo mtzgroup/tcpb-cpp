@@ -19,8 +19,7 @@ OBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
 ## COMPILERS ##
 ###############
 CXX=g++
-CXXFLAGS=-fPIC -std=c++11 -g
-#CXXFLAGS=-fPIC -std=c++11 -g -DSOCKETLOGS # Debug settings
+CXXFLAGS=-fPIC -std=c++11 -g -DSOCKETLOGS
 PROTOC=protoc
 LIBS=-lprotobuf
 
@@ -41,10 +40,10 @@ all: $(SRCDIR)/terachem_server.pb.cpp $(BUILDDIR)/libtcpb.so.$(VER)
 
 clean:
 	@rm -rf $(BUILDDIR)
-	@rm -f $(SRCDIR)/terachem_server.pb.cpp $(SRCDIR)/terachem_server.pb.h
+	@rm -f $(SRCDIR)/terachem_server.pb.*
 
 install:
-	@echo "Installing TCPB C++ client into $(PREFIX)"
+	@echo "Installing TCPB C++ library into $(PREFIX)"
 	@mkdir -p $(LIBPREFIX)
 	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(LIBPREFIX)
 	@ln -sfn $(LIBPREFIX)/libtcpb.so.$(VER) $(LIBPREFIX)/libtcpb.so
@@ -52,7 +51,7 @@ install:
 	@cp -v $(SRCDIR)/*.h $(INCPREFIX)
 
 uninstall:
-	@echo "Uninstalling TCPB C++ client from $(PREFIX)"
+	@echo "Uninstalling TCPB C++ library from $(PREFIX)"
 	@rm -v $(LIBPREFIX)/{libtcpb.so.$(VER),libtcpb.so}
 	@rm -rv $(INCPREFIX)
 

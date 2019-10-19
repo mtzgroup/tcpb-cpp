@@ -28,6 +28,8 @@ void busyResponse(const Socket& client) {
   client.HandleRecv((char*)&buf, sizeof(buf), "int from client in busy response");
   printf("Receiving %d from client in busy response\n", buf);
 
+  usleep(100000);
+
   buf = -1;
   printf("Sending %d to client in busy response\n", buf);
   client.HandleSend((char*)&buf, sizeof(buf), "int to client in busy response");
@@ -45,7 +47,7 @@ void ServerLoop() {
     printf("Received %d from client\n", buf);
     
     buf++;
-    usleep(1e6);
+    usleep(100000);
 
     printf("Sending %d to client\n", buf);
     client.HandleSend((char*)&buf, sizeof(buf), "int to client");
@@ -87,20 +89,15 @@ bool testSimpleClientServer() {
   try {
     client.HandleSend((char*)&buf, sizeof(int), "int to server");
     client.HandleRecv((char*)&buf, sizeof(int), "int from server");
-
-    shutdown = true;
-    sthread.join();
   } catch (exception& err) {
-    shutdown = true;
-    if (sthread.joinable()) sthread.join();
-
-    printf("FAILED. Error: %s\n", err.what());
-    return false;
+    printf("Error in client send/recv: %s\n", err.what());
   }
 
+  shutdown = true;
+  sthread.join();
 
   if (buf != 2) {
-    printf("FAILED. Recv'd %d from server\n", buf);
+    printf("FAILED. buf value is %d\n", buf);
     return false;
   }
 

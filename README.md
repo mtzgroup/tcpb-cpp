@@ -49,12 +49,8 @@ Extensions of the protocol are encouraged, but please follow some basic guidelin
 
 * Submit a pull request for your branch to facilitate code review
 
-Now that the client and server are both available in one repo, there are no excuses for not testing locally.
-Once Docker is installed, use the following to build and run the tests exactly as BitBucket Pipelines will.
-```
-docker run -v \`pwd`:/tmp/tcpb-cpp -w /tmp/tcpb-cpp sseritan/tcpb-client-docker:latest ./run_pipeline_tests.sh
-```
-TODO: This currently changes PREFIX in the Makefile. Make sure to change that back before committing. Working on a workaround
+The `run_pipelines_tests.sh` script automates build, install, and testing for the repo.
+The `run_docker_tests.sh` script wraps the magic Docker lines to do this with the container that Pipelines will use.
 
 ## Contact
 

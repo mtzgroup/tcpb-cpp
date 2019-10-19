@@ -252,6 +252,13 @@ SelectServerSocket::SelectServerSocket(int port, function<void(const Socket&)> r
 {
   struct sockaddr_in listenaddr;
 
+  // Set up port reuse
+  int t = 1;
+  if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, &t, sizeof(t)) < 0) {
+    SocketLog("Could not set address reuse on socket %d", socket_);
+    throw runtime_error("Could not set address reuse on socket");
+  }
+
   // Try to bind port
   listenaddr.sin_family = AF_INET;
   listenaddr.sin_port = htons((uint16_t)port);
