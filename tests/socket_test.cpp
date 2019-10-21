@@ -19,7 +19,6 @@ using TCPB::Socket;
 using TCPB::ClientSocket;
 using TCPB::SelectServerSocket;
 
-bool shutdown = false;
 string host = "localhost";
 int port = 12346;
 
@@ -35,24 +34,20 @@ void busyResponse(const Socket& client) {
   client.HandleSend((char*)&buf, sizeof(buf), "int to client in busy response");
 }
 
+// Assume this will be called on a detached thread
 void ServerLoop() {
  int buf; 
 
   SelectServerSocket server(port, busyResponse);
 
-  while ( !shutdown ) {
+  while (true) {
     Socket client = server.AcceptClient();
 
     client.HandleRecv((char*)&buf, sizeof(buf), "int from client");
-    printf("Received %d from client\n", buf);
     
     buf++;
-    usleep(100000);
 
-    printf("Sending %d to client\n", buf);
     client.HandleSend((char*)&buf, sizeof(buf), "int to client");
-    
-    fflush(stdout);
   }
 }
 
@@ -80,10 +75,10 @@ bool testSimpleClientServer() {
 
   int buf = 1;
 
-  shutdown = false;
   thread sthread(&ServerLoop);
+  sthread.detach();
 
-  usleep(1000000); // Sleep 1 second
+  usleep(1000000); // Sleep 1 second for server to bind port
   ClientSocket client(host, port);
 
   try {
@@ -92,9 +87,6 @@ bool testSimpleClientServer() {
   } catch (exception& err) {
     printf("Error in client send/recv: %s\n", err.what());
   }
-
-  shutdown = true;
-  sthread.join();
 
   if (buf != 2) {
     printf("FAILED. buf value is %d\n", buf);
@@ -115,9 +107,9 @@ int main(int argc, char** argv) {
   printf("---\n");
 
   if (failed) {
-    printf("\nFAILED %d SOCKET TESTS\n", failed);
+    printf("FAILED %d SOCKET TESTS\n\n", failed);
   } else {
-    printf("\nPASSED ALL SOCKET TESTS\n");
+    printf("PASSED ALL SOCKET TESTS\n\n");
   }
 
   return failed;

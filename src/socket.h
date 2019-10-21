@@ -8,6 +8,7 @@
 
 #include <sys/time.h> // for fd_set
 
+#include <atomic>
 #include <functional>
 #include <mutex>
 #include <string>
@@ -183,15 +184,13 @@ class SelectServerSocket : public Socket {
     void ReleaseClient();
 
   protected:
-    std::thread listenThread_;  //!< Thread for select() loop
-    std::mutex listenMutex_;    //!< Mutex for select() loop thread
-    fd_set activefds_;          //!< Set of active sockets in select() loop
-    int maxfd_;                 //!< Largest file descriptor in activefds_
-    bool exitFlag_;             //!< Flag for exiting select() loop
-
-    // Inter-thread variables
-    bool accept_;               //!< Flag for select() loop populating acceptedSocket_;
-    int activeClient_;          //!< Selected socket to return from AcceptClient() (-1 is inactive)
+    std::thread listenThread_;      //!< Thread for select() loop
+    std::mutex listenMutex_;        //!< Mutex for select() loop thread
+    fd_set activefds_;              //!< Set of active sockets in select() loop
+    int maxfd_;                     //!< Largest file descriptor in activefds_
+    std::atomic<bool> exitFlag_;    //!< Flag for exiting select() loop
+    std::atomic<bool> accept_;      //!< Flag for select() loop populating acceptedSocket_;
+    std::atomic<int> activeClient_; //!< Selected socket to return from AcceptClient() (-1 is inactive)
 
     std::function<void(const Socket&)> NonactiveReplyCB_; //!< Function callback for responding to non-active clients
 

@@ -276,6 +276,11 @@ SelectServerSocket::SelectServerSocket(int port, function<void(const Socket&)> r
 
   SocketLog("Successfully bound and listening on port %d with socket %d", port, socket_);
 
+  // Set up file descriptor set
+  FD_ZERO(&activefds_);
+  FD_SET(socket_, &activefds_);
+  maxfd_ = socket_ + 1;
+
   // Launch select() loop
   listenThread_ = thread(&SelectServerSocket::RunSelectLoop, this);
 
@@ -283,14 +288,10 @@ SelectServerSocket::SelectServerSocket(int port, function<void(const Socket&)> r
 }
 
 SelectServerSocket::~SelectServerSocket() {
-  {
-    lock_guard<mutex> guard(listenMutex_);
-    exitFlag_ = true;
-  }
-
+  exitFlag_ = true;
   listenThread_.join();
 
-  // Socket cleanup
+  // Socket cleanup (no longer need mutex)
   for (int i = 0; i < maxfd_; i++) {
     if (FD_ISSET(i, &activefds_)) {
       shutdown(i, SHUT_RDWR);
@@ -302,18 +303,10 @@ SelectServerSocket::~SelectServerSocket() {
 Socket SelectServerSocket::AcceptClient() {
   ReleaseClient();
 
-  {
-    lock_guard<mutex> guard(listenMutex_);
-    accept_ = true;
-  }
-
-  bool localAccept = true;
-  while ( localAccept ) {
+  accept_ = true;
+  while ( accept_ ) {
     // Sleep and wait for select to populate a new client
-    usleep(1e4); // 0.01 seconds (matching select timeout)
-    
-    lock_guard<mutex> guard(listenMutex_);
-    localAccept = accept_;
+    usleep(1000);
   }
 
   // Return socket that logs with server socket and doesn't close socket on destruction
@@ -321,7 +314,6 @@ Socket SelectServerSocket::AcceptClient() {
 }
 
 void SelectServerSocket::ReleaseClient() {
-  lock_guard<mutex> guard(listenMutex_);
   activeClient_ = -1;
 }
 
@@ -329,27 +321,12 @@ void SelectServerSocket::RunSelectLoop() {
   int newsock; // Socket to listen for connections, and new socket for accepting connections
   struct sockaddr_in clientaddr; // Address for new active client
   size_t size; //Used for sizeof(clientaddr) in accept()
-  fd_set readfds, writefds; // Set of sockets that are active, reading, and writing, respectively
-  // By default, all new sockets will be in the member activefds fd set, so that we can listen for status requests
-  // At the start of each loop, readfds will be set to activefds (this is so that we don't try to read from a new connection)
-  // I will only keep one socket in the writefds set, the client whose job we are currently processing
-  struct timeval tv; //Timeout struct for select()
-  int maxfd; // Local copy of maxfd
+  fd_set readfds; // Set of sockets that are reading (local copy of activefds_)
+  int maxfd; // Local copy of maxfd_
 
-  // Set up file descriptor set
-  FD_ZERO(&activefds_);
-  FD_SET(socket_, &activefds_);
-  maxfd_ = socket_ + 1;
-
-  bool localExit = false;
-  while ( !localExit ) {
+  while ( !exitFlag_ ) {
     // Reset fd sets
     FD_ZERO(&readfds);
-    FD_ZERO(&writefds); // Currently basically unused
-
-    //Reset timeout for .1 second
-    tv.tv_sec = 0;
-    tv.tv_usec = 100000;
 
     {
       lock_guard<mutex> guard(listenMutex_);
@@ -358,13 +335,13 @@ void SelectServerSocket::RunSelectLoop() {
     }
 
     // Block until action on any socket
-    if (select(maxfd, &readfds, &writefds, NULL, &tv) < 0) {
+    if (select(maxfd, &readfds, NULL, NULL, NULL) < 0) {
       SocketLog("Error in select: %d (%s)", errno, strerror(errno));
       throw runtime_error("Error in select()");
     }
 
     // Loop through all sockets and handle reading and writing
-    for (int i = 0; i < maxfd_; i++) {
+    for (int i = 0; i < maxfd; i++) {
       if (FD_ISSET(i, &readfds)) {
         lock_guard<mutex> guard(listenMutex_); // Generous guard for member variable touches
 
@@ -376,7 +353,7 @@ void SelectServerSocket::RunSelectLoop() {
           } else {
             SocketLog("Accepting connection from host %s, port %d", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
             FD_SET(newsock, &activefds_); //Set as active for next select, but do not read now
-            maxfd_ = max(maxfd_, newsock + 1);
+            maxfd_ = max(maxfd, newsock + 1);
           }
         } else if (i != activeClient_) { // We have activity on a client socket
           if (accept_) {
@@ -390,14 +367,7 @@ void SelectServerSocket::RunSelectLoop() {
         }
       } // End FD_ISSET(readfds) + mutex guard dropping out of scope
     } // End socket for loop
-    
-    {
-      lock_guard<mutex> guard(listenMutex_);
-      localExit = exitFlag_;
-    }
-
-    fflush(stdout);
-  }
+  } // end while(!exitFlag_)
 }
 
 } // end namespace TCPB

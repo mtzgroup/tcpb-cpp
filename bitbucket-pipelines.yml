@@ -1,18 +1,8 @@
 # Since I want to test Python and C++, need to use a Linux container
-# Local debug line: docker run -it --volume=/Users/sseritan/Documents/Research/MartinezGroup/tcpb-client:/tcpb-client --workdir="/tcpb-client" sseritan/tcpb-client-docker
-image: sseritan/tcpb-client-docker:latest
+image: sseritan/tcpb-client-docker:1.0
 
 pipelines:
   default:
     - step:
         script:
-          # Set up C++
-          - sed -i 's/^PREFIX=.*/PREFIX=\/tmp\/install/' Makefile
-          - make && make install
-          - export LD_LIBRARY_PATH=/tmp/install/lib:$LD_LIBRARY_PATH
-          - export LIBRARY_PATH=/tmp/install/lib:$LIBRARY_PATH
-          - export CPLUS_INCLUDE_PATH=/tmp/install/include:$CPLUS_INCLUDE_PATH
-          # Test both
-          - cd tests/
-          - make all
-          - ./socket_test
+          - ./run_pipeline.sh
