@@ -1,4 +1,5 @@
 #!/bin/bash
 
-# docker run -it -v `pwd`:/tmp/tcpb-cpp -w /tmp/tcpb-cpp sseritan/tcpb-client-docker:latest # Interactive version
-docker run -v `pwd`:/tmp/tcpb-cpp -w /tmp/tcpb-cpp sseritan/tcpb-client-docker:latest ./run_pipeline_tests.sh
+VERSION=1.0
+# Interactive version: docker run -it -v "`pwd`":/tmp/tcpb -w /home/tcpb-cpp sseritan/tcpb-client-docker:$VERSION
+docker run -v "`pwd`":/tmp/tcpb -w /home/tcpb-cpp sseritan/tcpb-client-docker:$VERSION /bin/bash -c "cp -r /tmp/tcpb/* /home/tcpb-cpp; ./run_pipeline.sh"
