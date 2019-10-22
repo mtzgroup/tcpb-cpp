@@ -51,6 +51,13 @@ class Socket {
     Socket& operator=(const Socket&)  = delete; // Copy operator
 
     /**
+     * \brief Comparison between sockets
+     *
+     * @return True if underlying socket file descriptor is the same
+     **/
+    bool HasSameFD(const Socket& other) const { return (socket_ == other.socket_); }
+
+    /**
      * \brief Check if connection is alive
      *
      * @return True if socket is active
@@ -85,11 +92,6 @@ class Socket {
     int socket_;          //!< Socket file descriptor
     FILE* logFile_;       //!< Logfile pointer
     bool cleanOnDestroy_; //!< Bool for closing socket in destructor
-
-    /**
-     * \brief Getter for internal socket file descriptor
-     */
-    int GetFD() { return socket_; }
 
     /**
      * \brief A low-level socket recv wrapper to ensure full packet recv
@@ -148,7 +150,8 @@ class ClientSocket : public Socket {
  * Basing this off of https://www.gnu.org/software/libc/manual/html_node/Server-Example.html
  * and http://www.binarytides.com/multiple-socket-connections-fdset-select-linux/
  *
- * A function callback is used so that this class can respond with "busy" messages to nonactive clients
+ * This is an abstract class: You must inherit this class and implement the HandleClientMessage()
+ * function, which is called in the select() loop, in order to use this.
  **/
 class SelectServerSocket : public Socket {
   public:
@@ -160,8 +163,7 @@ class SelectServerSocket : public Socket {
      * @param port Port to listen on
      * @param respCB Function callback to handle unactive client responses in select() loop
      **/
-    SelectServerSocket(int port,
-                       std::function<bool(const Socket&)> replyCB);
+    SelectServerSocket(int port);
 
     /**
      * \brief Destructor for SelectServerSocket class
@@ -180,12 +182,20 @@ class SelectServerSocket : public Socket {
     int maxfd_;                     //!< Largest file descriptor in activefds_
     std::atomic<bool> exitFlag_;    //!< Flag for exiting select() loop
 
-    std::function<bool(const Socket&)> ReplyCB_; //!< Function callback for responding to clients (returns true if all OK)
-
     /**
      * \brief Run the select() loop to multiplex the listening socket
      **/
     void RunSelectLoop();
+
+
+    /**
+     * \brief Handle processing and replying to clients in the select() loop
+     *
+     * This pure virtual function must be implemented in a derived class
+     *
+     * @param client Socket object for incoming message
+     **/
+    virtual bool HandleClientMessage(const Socket& client) = 0;
 }; // end class SelectServerSocket
 
 } // end namespace TCPB 

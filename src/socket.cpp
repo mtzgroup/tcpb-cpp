@@ -243,9 +243,8 @@ ClientSocket::ClientSocket(const string& host, int port) :
  * SelectServerSocket
  ***************/
 
-SelectServerSocket::SelectServerSocket(int port, function<bool(const Socket&)> replyCB) :
+SelectServerSocket::SelectServerSocket(int port) :
   Socket(-1, "server.log", true),
-  ReplyCB_(replyCB),
   exitFlag_(false)
 {
   struct sockaddr_in listenaddr;
@@ -334,18 +333,18 @@ void SelectServerSocket::RunSelectLoop() {
           } else {
             SocketLog("Accepting connection from host %s, port %d", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
             FD_SET(newsock, &activefds_); //Set as active for next select, but do not read now
-            maxfd_ = max(maxfd, newsock + 1);
+            maxfd_ = max(maxfd_, newsock + 1);
           }
         } else { // We have activity on a client socket
-          bool success = ReplyCB_(Socket(i, "server_client.log", false));
+          bool success = HandleClientMessage(Socket(i, "server_client.log", false));
           if (!success) {
             shutdown(i, SHUT_RDWR);
             close(i);
             FD_CLR(i, &activefds_);
           }
-        }
-      } // End FD_ISSET(readfds) + mutex guard dropping out of scope
-    } // End socket for loop
+        } // end socket is listening or client
+      } // end FD_ISSET(readfds) + mutex guard dropping out of scope
+    } // end socket for loop
   } // end while(!exitFlag_)
 }
 

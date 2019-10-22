@@ -28,16 +28,22 @@ using TCPB::SelectServerSocket;
 string host = "localhost";
 int port = 12346;
 
-bool serverResponse(const Socket& client) {
-  int buf;
-  if (!client.HandleRecv((char*)&buf, sizeof(buf), "int from client")) return false;
+class IncrementServer : public SelectServerSocket {
+public:
+  IncrementServer(int port) : SelectServerSocket(port) {}
 
-  buf++;
+private:
+  bool HandleClientMessage(const Socket& client) {
+    int buf;
+    if (!client.HandleRecv((char*)&buf, sizeof(buf), "int from client")) return false;
 
-  if (!client.HandleSend((char*)&buf, sizeof(buf), "int to client")) return false;
+    buf++;
 
-  return true;
-}
+    if (!client.HandleSend((char*)&buf, sizeof(buf), "int to client")) return false;
+
+    return true;
+  }
+};
 
 // Assume this will be called on std::async
 int ClientRun(int start, int loop) {
@@ -62,7 +68,7 @@ int ClientRun(int start, int loop) {
 bool testSimpleClientServer() {
   printf("Testing simple one-to-one client server...\n");
 
-  SelectServerSocket server(port, serverResponse);
+  IncrementServer server(port);
 
   int start = rand() % 100;
   int loops = rand() % 8 + 2;
@@ -81,7 +87,7 @@ bool testSimpleClientServer() {
 bool testMultiClientServer() {
   printf("Testing multiple clients to one server...\n");
 
-  SelectServerSocket server(port, serverResponse);
+  IncrementServer server(port);
 
   int start = rand() % 100;
   int loops = rand() % 8 + 2;
