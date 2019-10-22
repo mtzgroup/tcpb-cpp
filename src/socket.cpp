@@ -243,12 +243,10 @@ ClientSocket::ClientSocket(const string& host, int port) :
  * SelectServerSocket
  ***************/
 
-SelectServerSocket::SelectServerSocket(int port, function<void(const Socket&)> replyCB) :
+SelectServerSocket::SelectServerSocket(int port, function<bool(const Socket&)> replyCB) :
   Socket(-1, "server.log", true),
-  NonactiveReplyCB_(replyCB),
-  exitFlag_(false),
-  accept_(false),
-  activeClient_(-1)
+  ReplyCB_(replyCB),
+  exitFlag_(false)
 {
   struct sockaddr_in listenaddr;
 
@@ -300,23 +298,6 @@ SelectServerSocket::~SelectServerSocket() {
   }
 }
 
-Socket SelectServerSocket::AcceptClient() {
-  ReleaseClient();
-
-  accept_ = true;
-  while ( accept_ ) {
-    // Sleep and wait for select to populate a new client
-    usleep(1000);
-  }
-
-  // Return socket that logs with server socket and doesn't close socket on destruction
-  return Socket(activeClient_, "server.log", false);
-}
-
-void SelectServerSocket::ReleaseClient() {
-  activeClient_ = -1;
-}
-
 void SelectServerSocket::RunSelectLoop() {
   int newsock; // Socket to listen for connections, and new socket for accepting connections
   struct sockaddr_in clientaddr; // Address for new active client
@@ -355,14 +336,12 @@ void SelectServerSocket::RunSelectLoop() {
             FD_SET(newsock, &activefds_); //Set as active for next select, but do not read now
             maxfd_ = max(maxfd, newsock + 1);
           }
-        } else if (i != activeClient_) { // We have activity on a client socket
-          if (accept_) {
-            // Take this client as the new active since we are accepting
-            activeClient_ = i;
-            accept_ = false;
-          } else {
-            Socket s(i, "server.log", false);
-            NonactiveReplyCB_(s); // Use callback to send right busy response
+        } else { // We have activity on a client socket
+          bool success = ReplyCB_(Socket(i, "server_client.log", false));
+          if (!success) {
+            shutdown(i, SHUT_RDWR);
+            close(i);
+            FD_CLR(i, &activefds_);
           }
         }
       } // End FD_ISSET(readfds) + mutex guard dropping out of scope

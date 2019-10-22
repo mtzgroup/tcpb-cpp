@@ -3,16 +3,22 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include <functional>
 using std::function;
+#include <future>
+using std::future;
 #include <stdexcept>
 using std::exception;
 #include <string>
 using std::string;
 #include <thread>
-using std::thread;
+using std::thread; using std::async;
+#include <vector>
+using std::vector;
 
 #include "tcpb/socket.h"
 using TCPB::Socket;
@@ -22,75 +28,76 @@ using TCPB::SelectServerSocket;
 string host = "localhost";
 int port = 12346;
 
-void busyResponse(const Socket& client) {
+bool serverResponse(const Socket& client) {
   int buf;
-  client.HandleRecv((char*)&buf, sizeof(buf), "int from client in busy response");
-  printf("Receiving %d from client in busy response\n", buf);
+  if (!client.HandleRecv((char*)&buf, sizeof(buf), "int from client")) return false;
 
-  usleep(100000);
+  buf++;
 
-  buf = -1;
-  printf("Sending %d to client in busy response\n", buf);
-  client.HandleSend((char*)&buf, sizeof(buf), "int to client in busy response");
+  if (!client.HandleSend((char*)&buf, sizeof(buf), "int to client")) return false;
+
+  return true;
 }
 
-// Assume this will be called on a detached thread
-void ServerLoop() {
- int buf; 
+// Assume this will be called on std::async
+int ClientRun(int start, int loop) {
+  int buf;
+  int val = start;
+  ClientSocket client(host, port);
+  for (int i = 0; i < loop; ++i) {
+    client.HandleSend((char*)&val, sizeof(int), "int to server");
+    client.HandleRecv((char*)&val, sizeof(int), "int from server");
 
-  SelectServerSocket server(port, busyResponse);
-
-  while (true) {
-    Socket client = server.AcceptClient();
-
-    client.HandleRecv((char*)&buf, sizeof(buf), "int from client");
-    
-    buf++;
-
-    client.HandleSend((char*)&buf, sizeof(buf), "int to client");
+    // Sleep some short amount of time to mix up server requests
+    usleep(rand() % 1000);
   }
+
+  return val;
 }
 
 /**********/
 // TESTS //
 /**********/
 
-bool testServerInit() {
-  printf("Testing SelectServerSocket initialization...\n");
+bool testSimpleClientServer() {
+  printf("Testing simple one-to-one client server...\n");
 
-  try {
-    SelectServerSocket server(port, busyResponse);
-  } catch (exception& err) {
-    printf("FAILED: %s\n", err.what());
+  SelectServerSocket server(port, serverResponse);
+
+  int start = rand() % 100;
+  int loops = rand() % 8 + 2;
+
+  future<int> val = async(&ClientRun, start, loops);
+
+  if (val.get() != start + loops) {
+    printf("FAILED. buf value is %d\n", val.get());
     return false;
   }
 
   printf("SUCCESS\n");
-
   return true;
 }
 
-bool testSimpleClientServer() {
-  printf("Testing simple one-to-one client server...\n");
+bool testMultiClientServer() {
+  printf("Testing multiple clients to one server...\n");
 
-  int buf = 1;
+  SelectServerSocket server(port, serverResponse);
 
-  thread sthread(&ServerLoop);
-  sthread.detach();
+  int start = rand() % 100;
+  int loops = rand() % 8 + 2;
+  int nthreads = rand() % 8 + 2;
 
-  usleep(1000000); // Sleep 1 second for server to bind port
-  ClientSocket client(host, port);
-
-  try {
-    client.HandleSend((char*)&buf, sizeof(int), "int to server");
-    client.HandleRecv((char*)&buf, sizeof(int), "int from server");
-  } catch (exception& err) {
-    printf("Error in client send/recv: %s\n", err.what());
+  vector<future<int>> vals;
+  for (int i = 0; i < nthreads; ++i) {
+    vals.push_back(async(std::launch::async, &ClientRun, start, loops));
   }
 
-  if (buf != 2) {
-    printf("FAILED. buf value is %d\n", buf);
-    return false;
+  for (int i = 0; i < nthreads; ++i) {
+    int val = vals[i].get();
+    if (val != start + loops) {
+      printf("FAILED. buf value is %d\n for thread %d", val, i);
+      return false;
+    }
   }
 
   printf("SUCCESS\n");
@@ -100,10 +107,13 @@ bool testSimpleClientServer() {
 int main(int argc, char** argv) {
   int failed = 0;
 
-  if (!testServerInit()) failed++;
-  printf("---\n");
+  srand(time(NULL));
+  
 
   if (!testSimpleClientServer()) failed++;
+  printf("---\n");
+
+  if (!testMultiClientServer()) failed++;
   printf("---\n");
 
   if (failed) {

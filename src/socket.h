@@ -87,6 +87,11 @@ class Socket {
     bool cleanOnDestroy_; //!< Bool for closing socket in destructor
 
     /**
+     * \brief Getter for internal socket file descriptor
+     */
+    int GetFD() { return socket_; }
+
+    /**
      * \brief A low-level socket recv wrapper to ensure full packet recv
      *
      * @param buf Buffer for incoming packet
@@ -156,7 +161,7 @@ class SelectServerSocket : public Socket {
      * @param respCB Function callback to handle unactive client responses in select() loop
      **/
     SelectServerSocket(int port,
-                       std::function<void(const Socket&)> replyCB);
+                       std::function<bool(const Socket&)> replyCB);
 
     /**
      * \brief Destructor for SelectServerSocket class
@@ -168,31 +173,14 @@ class SelectServerSocket : public Socket {
     SelectServerSocket(SelectServerSocket&& move)             = delete; // Move constructor
     SelectServerSocket& operator=(SelectServerSocket&& move)  = delete; // Move operator
 
-    /**
-     * \brief Blocking call to wait for client connection
-     *
-     * select() is always running in background, this function
-     * just exposes one of the client sockets as "active"
-     *
-     * @return Base socket for read/write access to client
-     **/
-    Socket AcceptClient();
-
-    /**
-     * \brief Release the active client from AcceptClient()
-     **/
-    void ReleaseClient();
-
   protected:
     std::thread listenThread_;      //!< Thread for select() loop
     std::mutex listenMutex_;        //!< Mutex for select() loop thread
     fd_set activefds_;              //!< Set of active sockets in select() loop
     int maxfd_;                     //!< Largest file descriptor in activefds_
     std::atomic<bool> exitFlag_;    //!< Flag for exiting select() loop
-    std::atomic<bool> accept_;      //!< Flag for select() loop populating acceptedSocket_;
-    std::atomic<int> activeClient_; //!< Selected socket to return from AcceptClient() (-1 is inactive)
 
-    std::function<void(const Socket&)> NonactiveReplyCB_; //!< Function callback for responding to non-active clients
+    std::function<bool(const Socket&)> ReplyCB_; //!< Function callback for responding to clients (returns true if all OK)
 
     /**
      * \brief Run the select() loop to multiplex the listening socket
