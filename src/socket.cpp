@@ -303,6 +303,7 @@ void SelectServerSocket::RunSelectLoop() {
   size_t size; //Used for sizeof(clientaddr) in accept()
   fd_set readfds; // Set of sockets that are reading (local copy of activefds_)
   int maxfd; // Local copy of maxfd_
+  struct timeval tv; // Timeout struct for select
 
   while ( !exitFlag_ ) {
     // Reset fd sets
@@ -314,8 +315,12 @@ void SelectServerSocket::RunSelectLoop() {
       maxfd = maxfd_;
     }
 
+    // Set timeout (useful to not block forever and check exitFlag_ eventually)
+    tv.tv_sec = 0;
+    tv.tv_usec = 100000;
+
     // Block until action on any socket
-    if (select(maxfd, &readfds, NULL, NULL, NULL) < 0) {
+    if (select(maxfd, &readfds, NULL, NULL, &tv) < 0) {
       SocketLog("Error in select: %d (%s)", errno, strerror(errno));
       throw runtime_error("Error in select()");
     }
@@ -336,8 +341,7 @@ void SelectServerSocket::RunSelectLoop() {
             maxfd_ = max(maxfd_, newsock + 1);
           }
         } else { // We have activity on a client socket
-          bool success = HandleClientMessage(Socket(i, "server_client.log", false));
-          if (!success) {
+          if (!HandleClientMessage(i)) {
             shutdown(i, SHUT_RDWR);
             close(i);
             FD_CLR(i, &activefds_);

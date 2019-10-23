@@ -33,7 +33,9 @@ public:
   IncrementServer(int port) : SelectServerSocket(port) {}
 
 private:
-  bool HandleClientMessage(const Socket& client) {
+  bool HandleClientMessage(int sfd) {
+    Socket client(sfd, "server_handle.log", false);
+
     int buf;
     if (!client.HandleRecv((char*)&buf, sizeof(buf), "int from client")) return false;
 
@@ -66,7 +68,7 @@ int ClientRun(int start, int loop) {
 /**********/
 
 bool testSimpleClientServer() {
-  printf("Testing simple one-to-one client server...\n");
+  printf("Testing simple one-to-one client server...\n"); fflush(stdout);
 
   IncrementServer server(port);
 
@@ -85,7 +87,7 @@ bool testSimpleClientServer() {
 }
 
 bool testMultiClientServer() {
-  printf("Testing multiple clients to one server...\n");
+  printf("Testing multiple clients to one server...\n"); fflush(stdout);
 
   IncrementServer server(port);
 
@@ -114,13 +116,12 @@ int main(int argc, char** argv) {
   int failed = 0;
 
   srand(time(NULL));
-  
 
   if (!testSimpleClientServer()) failed++;
-  printf("---\n");
+  printf("---\n"); fflush(stdout);
 
   if (!testMultiClientServer()) failed++;
-  printf("---\n");
+  printf("---\n"); fflush(stdout);
 
   if (failed) {
     printf("FAILED %d SOCKET TESTS\n\n", failed);

@@ -193,9 +193,9 @@ class SelectServerSocket : public Socket {
      *
      * This pure virtual function must be implemented in a derived class
      *
-     * @param client Socket object for incoming message
+     * @param sfd Socket file descriptor for incoming message
      **/
-    virtual bool HandleClientMessage(const Socket& client) = 0;
+    virtual bool HandleClientMessage(int sfd) = 0;
 }; // end class SelectServerSocket
 
 } // end namespace TCPB 

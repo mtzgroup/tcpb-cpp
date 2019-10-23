@@ -28,13 +28,13 @@ CXXFLAGS=-fPIC -std=c++11 -pthread -g -DSOCKETLOGS
 PROTOC=protoc
 LIBS=-lprotobuf
 
-TESTFLAGS=-std=c++11 -pthread -I$(SRCDIR) -L$(BUILDDIR) -g
+TESTFLAGS=-std=c++11 -pthread -g
 TESTLIBS=-lprotobuf -ltcpb
 
 ##################
 ## INSTALLATION ##
 ##################
-VER=0.4.0
+VER=1.0.0a1
 #PREFIX=/global/user_software/tcpb-client/$(VER)
 PREFIX=/home/sseritan/personal_modules/software/tcpb-cpp
 LIBPREFIX=$(PREFIX)/lib
