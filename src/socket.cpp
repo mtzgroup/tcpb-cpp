@@ -2,20 +2,20 @@
  *  \brief Implementation of Socket class
  */
 
-#include <cerrno>
-#include <cstdarg>
-#include <cstring>
-#include <ctime>
 #include <algorithm>
 using std::max;
+#include <errno.h>
 #include <functional>
 using std::function;
 #include <mutex>
 using std::lock_guard; using std::mutex;
+#include <stdarg.h>
 #include <stdexcept>
 using std::runtime_error;
+#include <string.h>
 #include <string>
 using std::string;
+#include <time.h>
 #include <thread>
 using std::thread;
 #include <utility>
@@ -30,9 +30,6 @@ using std::swap;
 #include <sys/time.h>
 
 #include "socket.h"
-
-//#define SOCKETLOGS
-#define MAX_STR_LEN 1024
 
 namespace TCPB {
 
@@ -91,23 +88,23 @@ bool Socket::HandleRecv(char* buf,
   nrecv = RecvN(buf, len);
   if (nrecv < 0) {
     if (errno == EINTR || errno == EAGAIN) {
-      SocketLog("Packet read for %s on socket %d was interrupted, trying again\n", log, socket_);
+      SocketLog("Packet read for %s on socket %d was interrupted, trying again", log, socket_);
       nrecv = RecvN(buf, len);
     }
   }
 
   if (nrecv < 0) {
-    SocketLog("Could not properly recv packet for %s on socket %d. Errno: %d (%s)\n", log, socket_, errno, strerror(errno));
+    SocketLog("Could not properly recv packet for %s on socket %d. Errno: %d (%s)", log, socket_, errno, strerror(errno));
     return false;
   } else if (nrecv == 0) {
-    SocketLog("Received shutdown signal for %s on socket %d\n", log, socket_);
+    SocketLog("Received shutdown signal for %s on socket %d", log, socket_);
     return false;
   } else if (nrecv != len) {
-    SocketLog("Only recv'd %d bytes of %d expected bytes for %s on socket %d,\n", nrecv, len, log, socket_);
+    SocketLog("Only recv'd %d bytes of %d expected bytes for %s on socket %d,", nrecv, len, log, socket_);
     return false;
   }
   
-  SocketLog("Successfully recv'd packet of %d bytes for %s on socket %d\n", nrecv, log, socket_);
+  SocketLog("Successfully recv'd packet of %d bytes for %s on socket %d", nrecv, log, socket_);
   return true;
 }
 
@@ -117,7 +114,7 @@ bool Socket::HandleSend(const char* buf,
   int nsent;
 
   if (len == 0) {
-    SocketLog("Trying to send packet of 0 length for %s on socket %d, skipping send\n", log, socket_);
+    SocketLog("Trying to send packet of 0 length for %s on socket %d, skipping send", log, socket_);
     return true;
   }
 
@@ -125,20 +122,20 @@ bool Socket::HandleSend(const char* buf,
   nsent = SendN(buf, len);
   if (nsent < 0) {
     if (errno == EINTR || errno == EAGAIN) {
-      SocketLog("Packet send for %s on socket %d was interrupted, trying again\n", log, socket_);
+      SocketLog("Packet send for %s on socket %d was interrupted, trying again", log, socket_);
       nsent = SendN(buf, len);
     }
   }
 
   if (nsent <= 0) {
-    SocketLog("Could not properly send packet for %s on socket %d. Errno: %d (%s)\n", log, socket_, errno, strerror(errno));
+    SocketLog("Could not properly send packet for %s on socket %d. Errno: %d (%s)", log, socket_, errno, strerror(errno));
     return false;
   } else if (nsent != len) {
-    SocketLog("Only sent %d bytes of %d expected bytes for %s on socket %d\n", nsent, len, log, socket_);
+    SocketLog("Only sent %d bytes of %d expected bytes for %s on socket %d", nsent, len, log, socket_);
     return false;
   }
   
-  SocketLog("Successfully sent packet of %d bytes for %s on socket %d\n", nsent, log, socket_);
+  SocketLog("Successfully sent packet of %d bytes for %s on socket %d", nsent, log, socket_);
   return true;
 }
 
@@ -245,7 +242,8 @@ ClientSocket::ClientSocket(const string& host, int port) :
 
 SelectServerSocket::SelectServerSocket(int port) :
   Socket(-1, "server.log", true),
-  exitFlag_(false)
+  exitFlag_(false),
+  selectSleep_(100000)
 {
   struct sockaddr_in listenaddr;
 
@@ -317,7 +315,7 @@ void SelectServerSocket::RunSelectLoop() {
 
     // Set timeout (useful to not block forever and check exitFlag_ eventually)
     tv.tv_sec = 0;
-    tv.tv_usec = 100000;
+    tv.tv_usec = selectSleep_;
 
     // Block until action on any socket
     if (select(maxfd, &readfds, NULL, NULL, &tv) < 0) {
@@ -328,7 +326,8 @@ void SelectServerSocket::RunSelectLoop() {
     // Loop through all sockets and handle reading and writing
     for (int i = 0; i < maxfd; i++) {
       if (FD_ISSET(i, &readfds)) {
-        lock_guard<mutex> guard(listenMutex_); // Generous guard for member variable touches
+        // Generous guard for member variable touches
+        lock_guard<mutex> guard(listenMutex_);
 
         if (i == socket_) { // We have activity on listening socket, must be a new connection
           size = sizeof(clientaddr);

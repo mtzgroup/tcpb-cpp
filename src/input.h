@@ -24,28 +24,27 @@ namespace TCPB {
 class Input {
   public:
     /**
-     * \brief Constructor for Input class
-     * 
-     * The following keywords are required in options:
-     * charge, spinmult, method, basis
+     * \brief Direct protobuf constructor for Input class
      *
-     * @param run TeraChem run type as defined in the JobInput_RunType enum (e.g. "energy", "gradient", etc.)
+     * @param pb JobInput protobuf object
+     **/
+    Input(const terachem_server::JobInput& pb) : pb_(pb) {};
+
+    /**
+     * \brief Constructor for Input class
+     *
      * @param atoms Atomic symbols
      * @param options Map of key-value pairs for TCPB or TeraChem options
-     * @param geom 1D array of atomic positions
-     * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
+     * @param geom 1D array of atomic positions in a.u.
+     * @param geom2 1D array of atomic positions in a.u. (default to NULL, needed for overlap jobs)
      **/
-    Input(std::string run,
-          const std::vector<std::string>& atoms,
+    Input(const std::vector<std::string>& atoms,
           const std::map<std::string, std::string>& options,
           const double* const geom,
           const double* const geom2 = NULL);
 
     /**
      * \brief Alternate file-based constructor for Input class
-     * 
-     * The following keywords are required in tcfile:
-     * run, charge, spinmult, method, basis
      *
      * @param tcfile Template TeraChem input deck
      * @param xyzfile Geometry file (default to "", will try to read coordinates option from input deck)
@@ -78,18 +77,13 @@ class Input {
     /**
      * \brief Helper function initialize protobuf object
      *
-     * The following keywords are required in options:
-     * charge, spinmult, method, basis
-     *
-     * @param run TeraChem run type as defined in the JobInput_RunType enum (e.g. "energy", "gradient", etc.)
      * @param atoms Atomic symbols
      * @param options Map of key-value pairs for TCPB or TeraChem options
      * @param geom 1D array of atomic positions
      * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
      * @return Initialized JobInput protobuf object
      **/
-    terachem_server::JobInput InitInputPB(std::string run,
-                                          const std::vector<std::string>& atoms,
+    terachem_server::JobInput InitInputPB(const std::vector<std::string>& atoms,
                                           const std::map<std::string, std::string>& options,
                                           const double* const geom,
                                           const double* const geom2 = NULL);

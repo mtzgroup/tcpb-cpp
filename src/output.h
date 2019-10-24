@@ -32,13 +32,6 @@ class Output {
     Output() : pb_(terachem_server::JobOutput()) {}
 
     /**
-     * \brief Destructor for TCPBClient
-     **/
-    ~Output() = default;
-
-    // TODO: Copy constructor for underlying object
-
-    /**
      * \brief Gets the energy from a JobOutput Protocol Buffer
      *
      * @param energy Double reference of computed energy

@@ -14,6 +14,8 @@
 #include <string>
 #include <thread>
 
+#define MAX_STR_LEN 1024
+
 namespace TCPB {
 
 /**
@@ -181,6 +183,7 @@ class SelectServerSocket : public Socket {
     fd_set activefds_;              //!< Set of active sockets in select() loop
     int maxfd_;                     //!< Largest file descriptor in activefds_
     std::atomic<bool> exitFlag_;    //!< Flag for exiting select() loop
+    const int selectSleep_;         //!< Microseconds for select() sleep
 
     /**
      * \brief Run the select() loop to multiplex the listening socket

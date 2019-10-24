@@ -2,8 +2,8 @@
  *  \brief Utility functions for TCPB C++ client
  */
 
-#include <cstdio> // For printf() debugging
-#include <cstdlib> // For atoi()
+#include <stdio.h> // For printf() debugging
+#include <stdlib.h> // For atoi()
 #include <fstream>
 using std::ifstream;
 #include <map>

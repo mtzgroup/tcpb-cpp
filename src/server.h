@@ -5,11 +5,13 @@
 #ifndef TCPB_SERVER_H_
 #define TCPB_SERVER_H_
 
+#include <atomic>
 #include <string>
 
 #include "socket.h"
 #include "input.h"
 #include "output.h"
+#include "terachem_server.pb.h"
 
 namespace TCPB {
 
@@ -19,7 +21,7 @@ namespace TCPB {
  * Server handles responding to clients passed on by select() multiplexing thread
  * Takes one active client for computing and responds with busy to all others
  **/
-class Server {
+class Server : public SelectServerSocket {
   public:
     //Constructor/Destructor
     /**
@@ -39,7 +41,7 @@ class Server {
      *
      * @return Input object for newly accepted job
      **/
-    const Input& GetJobInput() { return currInput_; }
+    const Input RecvJobInput();
 
     /**
      * \brief Blocking call for sending job output
@@ -49,28 +51,40 @@ class Server {
     void SendJobOutput(const Output& out);
 
   private:
-    SelectServerSocket* server_;
-    const Socket* activeClient_;
-    int currJobId_;
+    char serverDir_[MAX_STR_LEN];     //!< Server directory
+    int stdoutFD_;                    //!< File descriptor for stdout
 
-    // TODO: How to handle client died?
-    bool acceptJob_;  //!< Flag to indicate Server can set currInput_
-    bool jobCompleted_; //!< Flag to indicate we can send currOutput_ to activeClient_
-    bool clientNotified_; //!< Flag to indicate activeClient_ is ready for currOutput_
+    int currJobId_;                   //!< Current job id
+    char currJobDir_[MAX_STR_LEN];    //!< Current job subdirectory
+    std::atomic<int> currJobSFD_;     //!< Socket file descriptor for active client (-1 while no active job)
 
-    Input currInput_;
-    Output currOutput_;
+    // NOTE: Should probably use the listenMutex_ when touching these
+    // All other variables touched in both threads
+    Input* currInput_;                //!< Input object for current job
+    Output* currOutput_;              //!< Output object for current job
+
+    std::atomic<bool> acceptJob_;     //!< Flag to indicate Server can set currInput_
+    std::atomic<bool> jobCompleted_;  //!< Flag to indicate we can send currOutput_ to activeClient_
 
     /**
      * \brief Provide response to waiting clients
      *
-     * Usually accepts Status/Input and responds with Status busy
-     * If acceptJob_ == true, accepts Input and sets currInput_ and activeClient_
-     * If jobCompleted_, will accept Status and respond with Status + currOutput_ to activeClient_
+     * Developer note: This function is run on the select() thread. Be careful with
+     * member variable use (either use atomics or lock the listenMutex_)
      *
+     * @param sfd Socket file descriptor
      * @return Input object for newly accepted job
      **/
-    bool HandleMessage(const Socket& client);
+    bool HandleMessage(int sfd);
+
+    /**
+     * \brief Provide Status response to waiting clients
+     *
+     * @param client Socket for client
+     * @param code Status code to send (0/1 for ready/busy, 2-4 matching terachem_server::JobStatusCase for active client)
+     * @return True if successful send
+     **/
+    bool SendStatus(const Socket& client, int code);
 }; // end class Server
 
 } // end namespace TCPB

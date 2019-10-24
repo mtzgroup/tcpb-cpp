@@ -18,7 +18,7 @@ using terachem_server::JobInput; using terachem_server::JobOutput;
 namespace TCPB {
 
 Client::Client(string host,
-                       int port) {
+               int port) {
   host_ = host;
   port_ = port;
   socket_ = new ClientSocket(host, port);
@@ -261,7 +261,7 @@ const Output Client::ComputeJobSync(const Input& input) {
  *************************/
 
 const Output Client::ComputeEnergy(const Input& input,
-                                           double& energy) {
+                                   double& energy) {
   // Reset runtype to energy
   Input new_input(input);
   terachem_server::JobInput pb = new_input.GetInputPB();
@@ -275,8 +275,8 @@ const Output Client::ComputeEnergy(const Input& input,
 }
 
 const Output Client::ComputeGradient(const Input& input,
-                                             double& energy,
-                                             double* gradient) {
+                                     double& energy,
+                                     double* gradient) {
   // Reset runtype to gradient
   Input new_input(input);
   terachem_server::JobInput pb = new_input.GetInputPB();
@@ -291,8 +291,8 @@ const Output Client::ComputeGradient(const Input& input,
 }
 
 const Output Client::ComputeForces(const Input& input,
-                                           double& energy,
-                                           double* gradient) {
+                                   double& energy,
+                                   double* gradient) {
   // Compute energy and gradient
   Output output = ComputeGradient(input, energy, gradient);
 

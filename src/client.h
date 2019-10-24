@@ -30,7 +30,7 @@ class Client {
      * @param port Integer port of TCPB server
      **/
     Client(std::string host,
-               int port);
+           int port);
 
     /**
      * \brief Destructor for Client
@@ -112,7 +112,7 @@ class Client {
      * @return Copy of job Output data
      **/
     const Output ComputeEnergy(const Input& input,
-                                   double& energy);
+                               double& energy);
 
     /**
      * \brief Blocking wrapper for a gradient ComputeJobSync() call
@@ -128,8 +128,8 @@ class Client {
      * @return Copy of job Output data
      **/
     const Output ComputeGradient(const Input& input,
-                                     double& energy,
-                                     double* gradient);
+                                 double& energy,
+                                 double* gradient);
 
     /**
      * \brief Blocking wrapper for a gradient ComputeJobSync() call
@@ -144,8 +144,8 @@ class Client {
      * @return Copy of job Output data
      **/
     const Output ComputeForces(const Input& input,
-                                   double& energy,
-                                   double* forces);
+                               double& energy,
+                               double* forces);
 
   private:
     std::string host_;

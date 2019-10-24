@@ -22,12 +22,11 @@ using terachem_server::JobInput; using terachem_server::Mol;
 
 namespace TCPB {
 
-Input::Input(string run,
-             const vector<string>& atoms,
+Input::Input(const vector<string>& atoms,
              const map<string, string>& options,
              const double* const geom,
              const double* const geom2) {
-  pb_ = InitInputPB(run, atoms, options, geom, geom2);
+  pb_ = InitInputPB(atoms, options, geom, geom2);
 }
 
 Input::Input(string tcfile,
@@ -42,8 +41,6 @@ Input::Input(string tcfile,
   options = Utils::ReadTCFile(tcfile);
 
   // Preprocess some options
-  string run = options["run"];
-  options.erase("run");
   if (options.count("coordinates")) {
     xyzfile = options["coordinates"];
     options.erase("coordinates");
@@ -60,34 +57,22 @@ Input::Input(string tcfile,
   Utils::ReadXYZFile(xyzfile, atoms, geom, scale);
 
   if (xyzfile2.empty()) {
-    pb_ = InitInputPB(run, atoms, options, geom.data());
+    pb_ = InitInputPB(atoms, options, geom.data());
   } else {
     Utils::ReadXYZFile(xyzfile2, atoms, geom2, scale);
-    pb_ = InitInputPB(run, atoms, options, geom.data(), geom2.data());
+    pb_ = InitInputPB(atoms, options, geom.data(), geom2.data());
   }
 }
 
 // Convenience function to enable both constructors
-JobInput Input::InitInputPB(string run,
-                                const vector<string>& atoms,
-                                const map<string, string>& options,
-                                const double* const geom,
-                                const double* const geom2) {
+JobInput Input::InitInputPB(const vector<string>& atoms,
+                            const map<string, string>& options,
+                            const double* const geom,
+                            const double* const geom2) {
   JobInput pb = JobInput();
   Mol* mol = pb.mutable_mol();
   int numAtoms = atoms.size();
   map<string, string> parsed_options(options);
-
-  // Runtype
-  terachem_server::JobInput_RunType runtype;
-  bool valid = JobInput::RunType_Parse(ToUpper(run), &runtype);
-  if (!valid) {
-    printf("Runtype %s passed in SendJobAsync() is not valid.\n", run.c_str());
-    printf("Valid runtypes (case-insensitive):\n%s\n",
-           JobInput::RunType_descriptor()->DebugString().c_str());
-    exit(1);
-  }
-  pb.set_run(runtype);
 
   // Geometry and atoms
   mol->mutable_xyz()->Resize(3*numAtoms, 0.0);
@@ -97,24 +82,35 @@ JobInput Input::InitInputPB(string run,
     mol->add_atoms(atoms[i]);
   }
 
-  // Units (legacy, most interfaces are now designed for coordinates to be in bohr)
-  if (parsed_options.count("units")) {
-    terachem_server::Mol_UnitType units;
-    bool valid = Mol::UnitType_Parse(ToUpper(parsed_options["units"]), &units);
-    if (!valid) {
-      printf("Units %s passed in options map is not valid.\n", parsed_options["units"].c_str());
-      printf("Valid units (case-insensitive):\n%s\n",
-             Mol::UnitType_descriptor()->DebugString().c_str());
-      exit(1);
-    }
-    mol->set_units(units);
-
-  } else {
-    mol->set_units(Mol::BOHR);
+  // Units (legacy, internally we only use a.u. now)
+  string units;
+  try {
+    units = parsed_options.at("units");
+  } catch (const std::out_of_range& err) {
+    units = "BOHR";
   }
+  if (ToUpper(units).compare("ANGSTROM")) {
+    for (int i = 0; i < 3*numAtoms; ++i) {
+      double* g = mol->mutable_xyz()->mutable_data();
+      g[i] *= constants::ANGSTROM_TO_AU;
+    }
+  }
+  mol->set_units(Mol::BOHR);
 
   // Handle protocol-specific required keywords
   try {
+    // Runtype
+    string run = parsed_options["run"];
+    terachem_server::JobInput_RunType runtype;
+    bool valid = JobInput::RunType_Parse(ToUpper(run), &runtype);
+    if (!valid) {
+      printf("Runtype %s passed is not valid.\n", run.c_str());
+      printf("Valid runtypes (case-insensitive):\n%s\n",
+             JobInput::RunType_descriptor()->DebugString().c_str());
+      exit(1);
+    }
+    pb.set_run(runtype);
+
     int charge = stoi(parsed_options.at("charge"));
     mol->set_charge(charge);
     parsed_options.erase("charge");
@@ -128,7 +124,6 @@ JobInput Input::InitInputPB(string run,
     bool closed = true;
     bool restricted = true;
     Utils::ParseMethod(methodStr, closed, restricted);
-
     mol->set_closed(closed);
     mol->set_restricted(restricted);
 
@@ -149,7 +144,7 @@ JobInput Input::InitInputPB(string run,
   } catch (const std::out_of_range& oor) {
     // TODO: Should probably have some exception for this and other errors in this block
     printf("Missing a required keyword in options map:\n");
-    printf("charge, spinmult, closed_shell, restricted, method, basis\n");
+    printf("run, charge, spinmult, closed_shell, restricted, method, basis\n");
     exit(1);
   }
 
@@ -163,6 +158,13 @@ JobInput Input::InitInputPB(string run,
   if (geom2 != NULL) {
     pb.mutable_xyz2()->Resize(3*numAtoms, 0.0);
     memcpy(pb.mutable_xyz2()->mutable_data(), geom2, 3*numAtoms*sizeof(double));
+
+    if (ToUpper(units).compare("ANGSTROM")) {
+      for (int i = 0; i < 3*numAtoms; ++i) {
+        double* g2 = pb.mutable_xyz2()->mutable_data();
+        g2[i] *= constants::ANGSTROM_TO_AU;
+      }
+    }
   }
 
   // All other options are passed straight through to TeraChem
