@@ -62,7 +62,12 @@ map<string, string> ReadTCFile(string tcfile)
       value += " " + temp;
     }
 
-    options[key] = value;
+    if (options.count(key)) {
+      printf("WARNING: %s already read from TC input file, skipping %s: %s\n",
+        key.c_str(), key.c_str(), value.c_str());
+    } else {
+      options[key] = value;
+    }
   }
 
   return options;

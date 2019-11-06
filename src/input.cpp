@@ -172,10 +172,9 @@ JobInput Input::InitInputPB(const vector<string> &atoms,
     pb.set_basis(basis);
     parsed_options.erase("basis");
   } catch (const std::out_of_range &oor) {
-    // TODO: Should probably have some exception for this and other errors in this block
-    printf("Missing a required keyword in options map:\n");
-    printf("run, charge, spinmult, closed_shell, restricted, method, basis\n");
-    exit(1);
+    string errMsg = "Missing a required keyword in options map:\n";
+    errMsg += "run, charge, spinmult, closed_shell, restricted, method, basis\n";
+    throw std::runtime_error(errMsg.c_str());
   }
 
   // Optional protocol-specific keywords

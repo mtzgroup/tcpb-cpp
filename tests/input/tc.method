@@ -1,0 +1,12 @@
+# Some basic edge case testing
+
+run         gradient
+method      revpbe      # Should default to restricted but also rev prefix edge case
+method      b3lyp       # Should be skipped
+basis       6-31g**
+coordinates water.xyz
+charge      0
+spinmult    1
+guess       scr/ca0 scr/cb0 # Inherently tests comment and multiword value
+
+precision   double

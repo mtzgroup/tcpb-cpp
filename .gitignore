@@ -8,6 +8,7 @@ terachem_server.pb.*
 
 build/
 docs/latex-cpp
+docs/html
 
 tests/socket_test
 

@@ -16,7 +16,8 @@ using std::exception;
 #include <string>
 using std::string;
 #include <thread>
-using std::thread; using std::async;
+using std::thread;
+using std::async;
 #include <vector>
 using std::vector;
 
@@ -37,24 +38,29 @@ private:
     Socket client(sfd, "server_handle.log", false);
 
     int buf;
-    if (!client.HandleRecv((char*)&buf, sizeof(buf), "int from client")) return false;
+    if (!client.HandleRecv((char *)&buf, sizeof(buf), "int from client")) {
+      return false;
+    }
 
     buf++;
 
-    if (!client.HandleSend((char*)&buf, sizeof(buf), "int to client")) return false;
+    if (!client.HandleSend((char *)&buf, sizeof(buf), "int to client")) {
+      return false;
+    }
 
     return true;
   }
 };
 
 // Assume this will be called on std::async
-int ClientRun(int start, int loop) {
+int ClientRun(int start, int loop)
+{
   int buf;
   int val = start;
   ClientSocket client(host, port);
   for (int i = 0; i < loop; ++i) {
-    client.HandleSend((char*)&val, sizeof(int), "int to server");
-    client.HandleRecv((char*)&val, sizeof(int), "int from server");
+    client.HandleSend((char *)&val, sizeof(int), "int to server");
+    client.HandleRecv((char *)&val, sizeof(int), "int from server");
 
     // Sleep some short amount of time to mix up server requests
     usleep(rand() % 1000);
@@ -67,8 +73,10 @@ int ClientRun(int start, int loop) {
 // TESTS //
 /**********/
 
-bool testSimpleClientServer() {
-  printf("Testing simple one-to-one client server... "); fflush(stdout);
+bool testSimpleClientServer()
+{
+  printf("Testing simple one-to-one client server... ");
+  fflush(stdout);
 
   IncrementServer server(port);
 
@@ -86,8 +94,10 @@ bool testSimpleClientServer() {
   return true;
 }
 
-bool testMultiClientServer() {
-  printf("Testing multiple clients to one server... "); fflush(stdout);
+bool testMultiClientServer()
+{
+  printf("Testing multiple clients to one server... ");
+  fflush(stdout);
 
   IncrementServer server(port);
 
@@ -112,13 +122,18 @@ bool testMultiClientServer() {
   return true;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
   int failed = 0;
 
   srand(time(NULL));
 
-  if (!testSimpleClientServer()) failed++;
-  if (!testMultiClientServer()) failed++;
+  if (!testSimpleClientServer()) {
+    failed++;
+  }
+  if (!testMultiClientServer()) {
+    failed++;
+  }
 
   if (failed) {
     printf("FAILED %d SOCKET TESTS\n\n", failed);
