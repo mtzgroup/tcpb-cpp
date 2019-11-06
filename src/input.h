@@ -22,88 +22,94 @@ namespace TCPB {
  * and avoid developers needing to learn how to use protobufs.
  **/
 class Input {
-  public:
-    /**
-     * \brief Direct protobuf constructor for Input class
-     *
-     * @param pb JobInput protobuf object
-     **/
-    Input(const terachem_server::JobInput& pb) : pb_(pb) {};
+public:
+  /**
+   * \brief Direct protobuf constructor for Input class
+   *
+   * @param pb JobInput protobuf object
+   **/
+  Input(const terachem_server::JobInput &pb) : pb_(pb) {};
 
-    /**
-     * \brief Constructor for Input class
-     *
-     * @param atoms Atomic symbols
-     * @param options Map of key-value pairs for TCPB or TeraChem options
-     * @param geom 1D array of atomic positions in a.u.
-     * @param geom2 1D array of atomic positions in a.u. (default to NULL, needed for overlap jobs)
-     **/
-    Input(const std::vector<std::string>& atoms,
-          const std::map<std::string, std::string>& options,
-          const double* geom,
-          const double* geom2 = NULL);
+  /**
+   * \brief Constructor for Input class
+   *
+   * @param atoms Atomic symbols
+   * @param options Map of key-value pairs for TCPB or TeraChem options
+   * @param geom 1D array of atomic positions in a.u.
+   * @param geom2 1D array of atomic positions in a.u. (default to NULL, needed for overlap jobs)
+   **/
+  Input(const std::vector<std::string> &atoms,
+    const std::map<std::string, std::string> &options,
+    const double *geom,
+    const double *geom2 = NULL);
 
-    /**
-     * \brief Alternate file-based constructor for Input class
-     *
-     * @param tcfile Template TeraChem input deck
-     * @param xyzfile Geometry file (default to "", will try to read coordinates option from input deck)
-     * @param xyzfile2 Second geometry file for overlap jobs (default to "", will try to read old_coors option from input deck)
-     **/
-    Input(std::string tcfile,
-          std::string xyzfile = "",
-          std::string xyzfile2 = "");
+  /**
+   * \brief Alternate file-based constructor for Input class
+   *
+   * @param tcfile Template TeraChem input deck
+   * @param xyzfile Geometry file (default to "", will try to read coordinates option from input deck)
+   * @param xyzfile2 Second geometry file for overlap jobs (default to "", will try to read old_coors option from input deck)
+   **/
+  Input(std::string tcfile,
+    std::string xyzfile = "",
+    std::string xyzfile2 = "");
 
-    /**
-     * \brief Accessor for internal protobuf object
-     *
-     * @return Reference to internal protobuf object
-     **/
-    const terachem_server::JobInput& GetInputPB() const { return pb_; }
+  /**
+   * \brief Accessor for internal protobuf object
+   *
+   * @return Reference to internal protobuf object
+   **/
+  const terachem_server::JobInput &GetInputPB() const {
+    return pb_;
+  }
 
-    /**
-     * \brief Getter of protobuf string for debugging
-     *
-     * Note: This function does not print default values
-     * (e.g. method: HF or closed: false would not appear in the printout)
-     *
-     * @return Debug string of internal protobuf object
-     **/
-    std::string GetDebugString() const { return pb_.DebugString(); }
+  /**
+   * \brief Getter of protobuf string for debugging
+   *
+   * Note: This function does not print default values
+   * (e.g. method: HF or closed: false would not appear in the printout)
+   *
+   * @return Debug string of internal protobuf object
+   **/
+  std::string GetDebugString() const {
+    return pb_.DebugString();
+  }
 
-    /**
-     * \brief Check internal deserialized data is equivalent
-     *
-     * Uses fuzzy equality for numbers
-     *
-     * @return True if Input objects are equivalent
-     **/
-    bool IsApproxEqual(const Input& other) const;
+  /**
+   * \brief Build a TC input file and XYZ file
+   *
+   * @param tcfile TC input file to create
+   * @param xyzfile XYZ file to create
+   **/
+  void WriteTCFile(std::string tcfile,
+    std::string xyzfile = "coord.xyz") const;
 
-  private:
-    terachem_server::JobInput pb_; //!< Internal protobuf object for advanced manipulation
+  /**
+   * \brief Check internal deserialized data is equivalent
+   *
+   * Uses fuzzy equality for numbers
+   *
+   * @return True if Input objects are equivalent
+   **/
+  bool IsApproxEqual(const Input &other) const;
 
-    /**
-     * \brief Helper function initialize protobuf object
-     *
-     * @param atoms Atomic symbols
-     * @param options Map of key-value pairs for TCPB or TeraChem options
-     * @param geom 1D array of atomic positions
-     * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
-     * @return Initialized JobInput protobuf object
-     **/
-    terachem_server::JobInput InitInputPB(const std::vector<std::string>& atoms,
-                                          const std::map<std::string, std::string>& options,
-                                          const double* geom,
-                                          const double* geom2 = NULL);
+private:
+  terachem_server::JobInput
+  pb_; //!< Internal protobuf object for advanced manipulation
 
-    /**
-     * \brief Helper function to uppercase a C++ string
-     *
-     * @param str String to uppercase
-     * @return Uppercased string
-     **/
-    std::string ToUpper(const std::string& str);
+  /**
+   * \brief Helper function initialize protobuf object
+   *
+   * @param atoms Atomic symbols
+   * @param options Map of key-value pairs for TCPB or TeraChem options
+   * @param geom 1D array of atomic positions
+   * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
+   * @return Initialized JobInput protobuf object
+   **/
+  terachem_server::JobInput InitInputPB(const std::vector<std::string> &atoms,
+    const std::map<std::string, std::string> &options,
+    const double *geom,
+    const double *geom2 = NULL);
 }; // end class Input
 
 } // end namespace TCPB

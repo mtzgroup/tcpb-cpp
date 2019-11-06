@@ -4,7 +4,8 @@
 
 #include <arpa/inet.h> // For htonl()/ntohl()
 #include <mutex>
-using std::lock_guard; using std::mutex;
+using std::lock_guard;
+using std::mutex;
 #include <stdexcept>
 using std::runtime_error;
 #include <string>
@@ -39,17 +40,18 @@ Server::Server(int port) : SelectServerSocket(port),
   jobCompleted_(false)
 {
   time_t rawtime;
-  struct tm* timeinfo;
+  struct tm *timeinfo;
   time(&rawtime);
   timeinfo = localtime(&rawtime);
   char buffer[100];
   strftime(buffer, 80, "%F-%T", timeinfo);
-  
+
   char cwd[MAX_STR_LEN];
   getcwd(cwd, MAX_STR_LEN);
 
   snprintf(serverDir_, MAX_STR_LEN, "%s/server_%d_%s", cwd, port, buffer);
-  if (mkdir(serverDir_, S_IRWXU | S_IRWXG | S_IROTH | S_IWOTH | S_IXOTH) != 0) { // mkdir with 777 permissions
+  if (mkdir(serverDir_, S_IRWXU | S_IRWXG | S_IROTH | S_IWOTH | S_IXOTH) !=
+    0) { // mkdir with 777 permissions
     throw runtime_error("Failed to make server directory");
   }
 
@@ -62,13 +64,19 @@ Server::Server(int port) : SelectServerSocket(port),
 #endif
 }
 
-Server::~Server() {
-  if (currInput_ != NULL) delete currInput_;
-  if (currOutput_ != NULL) delete currOutput_;
+Server::~Server()
+{
+  if (currInput_ != NULL) {
+    delete currInput_;
+  }
+  if (currOutput_ != NULL) {
+    delete currOutput_;
+  }
 }
 
 
-const Input Server::RecvJobInput() {
+const Input Server::RecvJobInput()
+{
   // Wait for select() thread to populate currInput_
   acceptJob_ = true;
   while (acceptJob_) {
@@ -78,7 +86,8 @@ const Input Server::RecvJobInput() {
   // Make job directory
   currJobId_++;
   snprintf(currJobDir_, MAX_STR_LEN, "%s/job_%d", serverDir_, currJobId_);
-  if (mkdir(currJobDir_, S_IRWXU | S_IRWXG | S_IROTH | S_IWOTH | S_IXOTH) != 0) { // mkdir with 777 permissions
+  if (mkdir(currJobDir_, S_IRWXU | S_IRWXG | S_IROTH | S_IWOTH | S_IXOTH) !=
+    0) { // mkdir with 777 permissions
     throw runtime_error("Failed to make job directory");
   }
 
@@ -92,7 +101,8 @@ const Input Server::RecvJobInput() {
   return *currInput_;
 }
 
-void Server::SendJobOutput(const Output& out) {
+void Server::SendJobOutput(const Output &out)
+{
   {
     lock_guard<mutex> guard(listenMutex_);
     // Skip sending if client is no longer active
@@ -106,7 +116,9 @@ void Server::SendJobOutput(const Output& out) {
 
   // Wait for select() to send currOutput_
   jobCompleted_ = true;
-  while (currJobSFD_ != -1) usleep(selectSleep_);
+  while (currJobSFD_ != -1) {
+    usleep(selectSleep_);
+  }
 
   // Redirect stdout back
   fflush(stdout);
@@ -117,7 +129,8 @@ void Server::SendJobOutput(const Output& out) {
   currOutput_ == NULL;
 }
 
-bool Server::HandleMessage(int sfd) {
+bool Server::HandleMessage(int sfd)
+{
   char handleLog[MAX_STR_LEN];
   snprintf(handleLog, MAX_STR_LEN, "%s/server_handler.log", serverDir_);
   Socket client(sfd, handleLog, false);
@@ -126,24 +139,34 @@ bool Server::HandleMessage(int sfd) {
   terachem_server::MessageType msgType;
   int msgSize;
 
-  if (!client.HandleRecv((char *)header, sizeof(header), "HandleMessage() header")) return false;
+  if (!client.HandleRecv((char *)header, sizeof(header),
+      "HandleMessage() header")) {
+    return false;
+  }
   msgType = (terachem_server::MessageType)ntohl(header[0]);
   msgSize = ntohl(header[1]);
 
   char msg[msgSize];
-  if (!client.HandleRecv((char *)msg, sizeof(msg), "HandleMessage() protobuf")) return false;
+  if (!client.HandleRecv((char *)msg, sizeof(msg), "HandleMessage() protobuf")) {
+    return false;
+  }
 
   // Cast char* to string, but I want to avoid null character termination
   string msgStr;
   msgStr.resize(msgSize);
   memcpy((void *)msgStr.data(), msg, msgSize);
 
-  if (acceptJob_ && currJobSFD_ == -1 && msgType == terachem_server::MessageType::JOBINPUT) {
+  if (acceptJob_ && currJobSFD_ == -1
+    && msgType == terachem_server::MessageType::JOBINPUT) {
     terachem_server::JobInput input;
-    if (!input.ParseFromString(msgStr)) return false;
+    if (!input.ParseFromString(msgStr)) {
+      return false;
+    }
     {
       lock_guard<mutex> guard(listenMutex_);
-      if (currInput_ != NULL) delete currInput_;
+      if (currInput_ != NULL) {
+        delete currInput_;
+      }
       currInput_ = new Input(input);
     }
 
@@ -152,17 +175,23 @@ bool Server::HandleMessage(int sfd) {
     acceptJob_ = false;
 
     // Send back acceptance
-    if(!SendStatus(client, Status::kAcceptedFieldNumber)) return false;
+    if(!SendStatus(client, Status::kAcceptedFieldNumber)) {
+      return false;
+    }
   } else if (jobCompleted_ && currJobSFD_ == sfd) { // Send Output
     // Reset job, even if output send fails
     currJobSFD_ = -1;
     jobCompleted_ = false;
 
     Status status;
-    if (!status.ParseFromString(msgStr)) return false;
+    if (!status.ParseFromString(msgStr)) {
+      return false;
+    }
 
     // Send back status to get client ready
-    if (!SendStatus(client, Status::kCompletedFieldNumber)) return false;
+    if (!SendStatus(client, Status::kCompletedFieldNumber)) {
+      return false;
+    }
 
     // Send output
     const terachem_server::JobOutput output = currOutput_->GetOutputPB();
@@ -172,11 +201,15 @@ bool Server::HandleMessage(int sfd) {
     header[0] = htonl((uint32_t)terachem_server::JOBOUTPUT);
     header[1] = htonl((uint32_t)msgSize);
 
-    if (!client.HandleSend((char*)header, sizeof(header), "output header")) return false;
+    if (!client.HandleSend((char *)header, sizeof(header), "output header")) {
+      return false;
+    }
 
     char outMsg[msgSize];
     memcpy(outMsg, (void *)msgStr.data(), msgSize);
-    if (!client.HandleSend(outMsg, msgSize, "output protobuf")) return false;
+    if (!client.HandleSend(outMsg, msgSize, "output protobuf")) {
+      return false;
+    }
   } else {
     // Send a status message
     int status = 1; // Default busy
@@ -186,35 +219,38 @@ bool Server::HandleMessage(int sfd) {
       status = Status::kWorkingFieldNumber;
     }
 
-    if (!SendStatus(client, status)) return false;
+    if (!SendStatus(client, status)) {
+      return false;
+    }
   }
 
   return true;
 }
 
-bool Server::SendStatus(const Socket& client, int code) {
+bool Server::SendStatus(const Socket &client, int code)
+{
   Status status;
   string msgStr;
   int msgSize;
 
   status.set_busy(true);
   switch (code) {
-    case 0:
-      status.set_busy(false);
-      break;
-    case 1:
-      break;
-    case Status::kAcceptedFieldNumber:
-      status.set_accepted(true);
-      break;
-    case Status::kWorkingFieldNumber:
-      status.set_working(true);
-      break;
-    case Status::kCompletedFieldNumber:
-      status.set_completed(true);
-      break;
-    default:
-      throw runtime_error("Improper code to SendStatus");
+  case 0:
+    status.set_busy(false);
+    break;
+  case 1:
+    break;
+  case Status::kAcceptedFieldNumber:
+    status.set_accepted(true);
+    break;
+  case Status::kWorkingFieldNumber:
+    status.set_working(true);
+    break;
+  case Status::kCompletedFieldNumber:
+    status.set_completed(true);
+    break;
+  default:
+    throw runtime_error("Improper code to SendStatus");
   }
 
   if (code > 1) {
@@ -228,17 +264,21 @@ bool Server::SendStatus(const Socket& client, int code) {
 
   status.SerializeToString(&msgStr);
   msgSize = status.ByteSize();
-  
+
   // Send header
   uint32_t header[2];
   header[0] = htonl((uint32_t)terachem_server::STATUS);
   header[1] = htonl((uint32_t)msgSize);
-  if (!client.HandleSend((char *)header, 2*sizeof(uint32_t), "status header")) return false;
+  if (!client.HandleSend((char *)header, 2 * sizeof(uint32_t), "status header")) {
+    return false;
+  }
 
   // Send protobuf
   char msg[msgSize];
   memcpy(msg, (void *)msgStr.data(), msgSize);
-  if (!client.HandleSend(msg, msgSize, "status protobuf")) return false;
+  if (!client.HandleSend(msg, msgSize, "status protobuf")) {
+    return false;
+  }
 
   return true;
 }

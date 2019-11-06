@@ -8,7 +8,8 @@ using std::max;
 #include <functional>
 using std::function;
 #include <mutex>
-using std::lock_guard; using std::mutex;
+using std::lock_guard;
+using std::mutex;
 #include <stdarg.h>
 #include <stdexcept>
 using std::runtime_error;
@@ -35,7 +36,7 @@ namespace TCPB {
 
 Socket::Socket(
   int sfd,
-  const string& logName,
+  const string &logName,
   bool cleanOnDestroy) :
   socket_(sfd),
   logFile_(NULL),
@@ -50,7 +51,8 @@ Socket::Socket(
 #endif
 }
 
-Socket::~Socket() {
+Socket::~Socket()
+{
   if (cleanOnDestroy_) {
     shutdown(socket_, SHUT_RDWR);
     close(socket_);
@@ -63,58 +65,68 @@ Socket::~Socket() {
 }
 
 // Rule of 5 boiler plate
-void Socket::swap(Socket& other) noexcept {
+void Socket::swap(Socket &other) noexcept
+{
   using std::swap;
   swap(socket_, other.socket_);
   swap(logFile_, other.logFile_);
   swap(cleanOnDestroy_, other.cleanOnDestroy_);
 }
 
-Socket::Socket(Socket&& move) noexcept : Socket() { 
+Socket::Socket(Socket &&move) noexcept : Socket()
+{
   move.swap(*this);
 }
 
-Socket& Socket::operator=(Socket&& move) noexcept {
+Socket &Socket::operator=(Socket &&move) noexcept
+{
   move.swap(*this);
   return *this;
 }
 
-bool Socket::HandleRecv(char* buf,
-                        int len,
-                        const char* log) const {
+bool Socket::HandleRecv(char *buf,
+  int len,
+  const char *log) const
+{
   int nrecv;
 
   // Try to recv
   nrecv = RecvN(buf, len);
   if (nrecv < 0) {
     if (errno == EINTR || errno == EAGAIN) {
-      SocketLog("Packet read for %s on socket %d was interrupted, trying again", log, socket_);
+      SocketLog("Packet read for %s on socket %d was interrupted, trying again", log,
+        socket_);
       nrecv = RecvN(buf, len);
     }
   }
 
   if (nrecv < 0) {
-    SocketLog("Could not properly recv packet for %s on socket %d. Errno: %d (%s)", log, socket_, errno, strerror(errno));
+    SocketLog("Could not properly recv packet for %s on socket %d. Errno: %d (%s)",
+      log, socket_, errno, strerror(errno));
     return false;
   } else if (nrecv == 0) {
     SocketLog("Received shutdown signal for %s on socket %d", log, socket_);
     return false;
   } else if (nrecv != len) {
-    SocketLog("Only recv'd %d bytes of %d expected bytes for %s on socket %d,", nrecv, len, log, socket_);
+    SocketLog("Only recv'd %d bytes of %d expected bytes for %s on socket %d,",
+      nrecv, len, log, socket_);
     return false;
   }
-  
-  SocketLog("Successfully recv'd packet of %d bytes for %s on socket %d", nrecv, log, socket_);
+
+  SocketLog("Successfully recv'd packet of %d bytes for %s on socket %d", nrecv,
+    log, socket_);
   return true;
 }
 
-bool Socket::HandleSend(const char* buf,
-                        int len,
-                        const char* log) const {
+bool Socket::HandleSend(const char *buf,
+  int len,
+  const char *log) const
+{
   int nsent;
 
   if (len == 0) {
-    SocketLog("Trying to send packet of 0 length for %s on socket %d, skipping send", log, socket_);
+    SocketLog("Trying to send packet of 0 length for %s on socket %d, skipping send",
+      log, socket_);
     return true;
   }
 
@@ -122,62 +134,75 @@ bool Socket::HandleSend(const char* buf,
   nsent = SendN(buf, len);
   if (nsent < 0) {
     if (errno == EINTR || errno == EAGAIN) {
-      SocketLog("Packet send for %s on socket %d was interrupted, trying again", log, socket_);
+      SocketLog("Packet send for %s on socket %d was interrupted, trying again", log,
+        socket_);
       nsent = SendN(buf, len);
     }
   }
 
   if (nsent <= 0) {
-    SocketLog("Could not properly send packet for %s on socket %d. Errno: %d (%s)", log, socket_, errno, strerror(errno));
+    SocketLog("Could not properly send packet for %s on socket %d. Errno: %d (%s)",
+      log, socket_, errno, strerror(errno));
     return false;
   } else if (nsent != len) {
-    SocketLog("Only sent %d bytes of %d expected bytes for %s on socket %d", nsent, len, log, socket_);
+    SocketLog("Only sent %d bytes of %d expected bytes for %s on socket %d", nsent,
+      len, log, socket_);
     return false;
   }
-  
-  SocketLog("Successfully sent packet of %d bytes for %s on socket %d", nsent, log, socket_);
+
+  SocketLog("Successfully sent packet of %d bytes for %s on socket %d", nsent,
+    log, socket_);
   return true;
 }
 
-int Socket::RecvN(char* buf,
-                  int len) const {
+int Socket::RecvN(char *buf,
+  int len) const
+{
   int nleft, nrecv;
 
   nleft = len;
   while (nleft) {
     nrecv = recv(socket_, buf, len, 0);
-    if (nrecv < 0) return nrecv;
-    else if (nrecv == 0) break;
+    if (nrecv < 0) {
+      return nrecv;
+    } else if (nrecv == 0) {
+      break;
+    }
 
-    nleft -= nrecv; 
+    nleft -= nrecv;
     buf += nrecv;
   }
 
   return len - nleft;
 }
 
-int Socket::SendN(const char* buf,
-                  int len) const {
+int Socket::SendN(const char *buf,
+  int len) const
+{
   int nleft, nsent;
 
   nleft = len;
   while (nleft) {
     nsent = send(socket_, buf, len, 0);
-    if (nsent < 0) return nsent;
-    else if (nsent == 0) break;
+    if (nsent < 0) {
+      return nsent;
+    } else if (nsent == 0) {
+      break;
+    }
 
-    nleft -= nsent; 
+    nleft -= nsent;
     buf += nsent;
   }
 
   return len - nleft;
 }
 
-void Socket::SocketLog(const char* format, ...) const {
+void Socket::SocketLog(const char *format, ...) const
+{
 #ifdef SOCKETLOGS
   // Get time info
   time_t now = time(NULL);
-  struct tm* t = localtime(&now);
+  struct tm *t = localtime(&now);
 
   // Get full log string from variable arguments
   va_list args;
@@ -197,10 +222,10 @@ void Socket::SocketLog(const char* format, ...) const {
  * ClientSocket
  ***************/
 
-ClientSocket::ClientSocket(const string& host, int port) :
+ClientSocket::ClientSocket(const string &host, int port) :
   Socket(-1, "client.log", true)
 {
-  struct hostent* serverinfo;
+  struct hostent *serverinfo;
   struct sockaddr_in serveraddr;
   struct timeval tv;
 
@@ -224,16 +249,19 @@ ClientSocket::ClientSocket(const string& host, int port) :
   }
   memset(&serveraddr, 0, sizeof(serveraddr));
   serveraddr.sin_family = AF_INET;
-  memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)serverinfo->h_addr, serverinfo->h_length);
+  memcpy((char *)&serveraddr.sin_addr.s_addr, (char *)serverinfo->h_addr,
+    serverinfo->h_length);
   serveraddr.sin_port = htons(port);
 
   // Connect
-  if (connect(socket_, (struct sockaddr*)&serveraddr, sizeof(serveraddr)) < 0) {
-    SocketLog("Could not connect to host %s, port %d on socket %d", host.c_str(), port, socket_);
+  if (connect(socket_, (struct sockaddr *)&serveraddr, sizeof(serveraddr)) < 0) {
+    SocketLog("Could not connect to host %s, port %d on socket %d", host.c_str(),
+      port, socket_);
     throw runtime_error("Could not connect");
   }
 
-  SocketLog("Successfully connected to host %s, port %d on socket %d", host.c_str(), port, socket_);
+  SocketLog("Successfully connected to host %s, port %d on socket %d",
+    host.c_str(), port, socket_);
 }
 
 /***************
@@ -258,7 +286,7 @@ SelectServerSocket::SelectServerSocket(int port) :
   listenaddr.sin_family = AF_INET;
   listenaddr.sin_port = htons((uint16_t)port);
   listenaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  if (bind(socket_, (struct sockaddr*)&listenaddr, sizeof(listenaddr)) < 0) {
+  if (bind(socket_, (struct sockaddr *)&listenaddr, sizeof(listenaddr)) < 0) {
     SocketLog("Could not bind socket %d for connections on port %d", socket_, port);
     throw runtime_error("Could not bind socket for connections");
   }
@@ -269,7 +297,8 @@ SelectServerSocket::SelectServerSocket(int port) :
     throw runtime_error("Could not listen on socket for connections");
   }
 
-  SocketLog("Successfully bound and listening on port %d with socket %d", port, socket_);
+  SocketLog("Successfully bound and listening on port %d with socket %d", port,
+    socket_);
 
   // Set up file descriptor set
   FD_ZERO(&activefds_);
@@ -282,7 +311,8 @@ SelectServerSocket::SelectServerSocket(int port) :
   SocketLog("Successfully launched select() loop thread");
 }
 
-SelectServerSocket::~SelectServerSocket() {
+SelectServerSocket::~SelectServerSocket()
+{
   exitFlag_ = true;
   listenThread_.join();
 
@@ -295,7 +325,8 @@ SelectServerSocket::~SelectServerSocket() {
   }
 }
 
-void SelectServerSocket::RunSelectLoop() {
+void SelectServerSocket::RunSelectLoop()
+{
   int newsock; // Socket to listen for connections, and new socket for accepting connections
   struct sockaddr_in clientaddr; // Address for new active client
   size_t size; //Used for sizeof(clientaddr) in accept()
@@ -331,12 +362,15 @@ void SelectServerSocket::RunSelectLoop() {
 
         if (i == socket_) { // We have activity on listening socket, must be a new connection
           size = sizeof(clientaddr);
-          newsock = accept(socket_, (struct sockaddr*)&clientaddr, (socklen_t*)&size);
+          newsock = accept(socket_, (struct sockaddr *)&clientaddr, (socklen_t *)&size);
           if (newsock < 0) {
-            SocketLog("Error in accepting connection from host %s, port %d", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+            SocketLog("Error in accepting connection from host %s, port %d",
+              inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
           } else {
-            SocketLog("Accepting connection from host %s, port %d", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
-            FD_SET(newsock, &activefds_); //Set as active for next select, but do not read now
+            SocketLog("Accepting connection from host %s, port %d",
+              inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port));
+            FD_SET(newsock,
+              &activefds_); //Set as active for next select, but do not read now
             maxfd_ = max(maxfd_, newsock + 1);
           }
         } else { // We have activity on a client socket

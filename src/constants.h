@@ -2,7 +2,7 @@
  *  \brief Definition of constants
  */
 
-#ifndef TCPB_CONSTANTS_H_ 
+#ifndef TCPB_CONSTANTS_H_
 #define TCPB_CONSTANTS_H_
 
 namespace TCPB {

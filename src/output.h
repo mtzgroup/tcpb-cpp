@@ -18,52 +18,54 @@ namespace TCPB {
  * and avoid developers needing to learn how to use protobufs.
  **/
 class Output {
-  public:
-    /**
-     * \brief Constructor for Output class
-     *
-     * @param pb JobOutput protobuf to wrap
-     **/
-    Output(terachem_server::JobOutput pb) : pb_(pb) {}
+public:
+  /**
+   * \brief Constructor for Output class
+   *
+   * @param pb JobOutput protobuf to wrap
+   **/
+  Output(terachem_server::JobOutput pb) : pb_(pb) {}
 
-    /**
-     * \brief Alternate constructor for Output class
-     **/
-    Output() : pb_(terachem_server::JobOutput()) {}
+  /**
+   * \brief Alternate constructor for Output class
+   **/
+  Output() : pb_(terachem_server::JobOutput()) {}
 
-    /**
-     * \brief Gets the energy from a JobOutput Protocol Buffer
-     *
-     * @param energy Double reference of computed energy
-     * @param state State index (defaults to 0, ground state)
-     * @param mult Spin multiplicity (defaults to 1, singlet)
-     **/
-    void GetEnergy(double& energy,
-                   int state=0,
-                   int mult=1) const;
+  /**
+   * \brief Gets the energy from a JobOutput Protocol Buffer
+   *
+   * @param energy Double reference of computed energy
+   * @param state State index (defaults to 0, ground state)
+   * @param mult Spin multiplicity (defaults to 1, singlet)
+   **/
+  void GetEnergy(double &energy,
+    int state = 0,
+    int mult = 1) const;
 
-    /**
-     * \brief Gets the gradient from a JobOutput Protocol Buffer
-     *
-     * @param gradient Double array to store computed gradient (user-allocated)
-     * @param state State index (defaults to 0, ground state)
-     * @param mult Spin multiplicity (defaults to 1, singlet)
-     **/
-    void GetGradient(double* gradient,
-                     int state=0,
-                     int mult=1) const;
+  /**
+   * \brief Gets the gradient from a JobOutput Protocol Buffer
+   *
+   * @param gradient Double array to store computed gradient (user-allocated)
+   * @param state State index (defaults to 0, ground state)
+   * @param mult Spin multiplicity (defaults to 1, singlet)
+   **/
+  void GetGradient(double *gradient,
+    int state = 0,
+    int mult = 1) const;
 
-    /**
-     * \brief Accessor for internal protobuf object
-     *
-     * @return Reference to internal protobuf object
-     **/
-    const terachem_server::JobOutput& GetOutputPB() const { return pb_; }   
+  /**
+   * \brief Accessor for internal protobuf object
+   *
+   * @return Reference to internal protobuf object
+   **/
+  const terachem_server::JobOutput &GetOutputPB() const {
+    return pb_;
+  }
 
-  private:
-    terachem_server::JobOutput pb_; //!< Internal protobuf for advanced manipulation
+private:
+  terachem_server::JobOutput pb_; //!< Internal protobuf for advanced manipulation
 }; // end class Output
- 
+
 } // end namespace TCPB
 
 #endif
