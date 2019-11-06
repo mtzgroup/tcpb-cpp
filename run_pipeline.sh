@@ -6,7 +6,7 @@ sed -i 's/^PREFIX=.*/PREFIX=\/tmp\/install/' Makefile
 
 # Installation
 echo "Building and installing TCPB C++ interface..."
-make && make install
+make clean && make && make install
 export LD_LIBRARY_PATH=/tmp/install/lib:$LD_LIBRARY_PATH
 export LIBRARY_PATH=/tmp/install/lib:$LIBRARY_PATH
 export CPLUS_INCLUDE_PATH=/tmp/install/include:$CPLUS_INCLUDE_PATH

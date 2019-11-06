@@ -13,7 +13,9 @@ using std::string;
 #include "output.h"
 #include "socket.h"
 #include "terachem_server.pb.h"
-using terachem_server::JobInput; using terachem_server::JobOutput;
+using terachem_server::JobInput;
+using terachem_server::JobOutput;
+using terachem_server::Status;
 
 namespace TCPB {
 
@@ -74,7 +76,7 @@ bool Client::IsAvailable() {
       "IsAvailable: Did not get the expected status message",
       host_, port_, currJobDir_, currJobId_);
   
-  terachem_server::Status status;
+  Status status;
   if (msgSize > 0) status.ParseFromString(msg);
 
   return !status.busy();
@@ -129,10 +131,10 @@ bool Client::SendJobAsync(const Input& input) {
       "SendJobAsync: Did not get the expected status message",
       host_, port_, currJobDir_, currJobId_);
   
-  terachem_server::Status status;
+  Status status;
   if (msgSize > 0) status.ParseFromString(msg);
 
-  if (status.job_status_case() != terachem_server::Status::kAcceptedFieldNumber) {
+  if (status.job_status_case() != Status::JobStatusCase::kAccepted) {
     return false;
   }
 
@@ -181,12 +183,12 @@ bool Client::CheckJobComplete() {
     "CheckJobComplete:  Did not get the expected status message",
     host_, port_, currJobDir_, currJobId_);
   
-  terachem_server::Status status;
+  Status status;
   if (msgSize > 0) status.ParseFromString(msg);
 
-  if (status.job_status_case() == terachem_server::Status::kWorkingFieldNumber) {
+  if (status.job_status_case() == Status::JobStatusCase::kWorking) {
     return false;
-  } else if (status.job_status_case() != terachem_server::Status::kCompletedFieldNumber) {
+  } else if (status.job_status_case() != Status::JobStatusCase::kCompleted) {
     throw ServerCommError("CheckJobComplete: No valid job status was received",
       host_, port_, currJobDir_, currJobId_);
   }

@@ -17,7 +17,8 @@ TCPBSRC := 	$(SRCDIR)/exceptions.cpp \
 
 TCPBOBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
 
-TESTSRC := 	$(TESTDIR)/socket_test.cpp
+TESTSRC := 	$(TESTDIR)/input_test.cpp \
+		$(TESTDIR)/socket_test.cpp
 
 TESTBIN := $(patsubst $(TESTDIR)/%.cpp, $(TESTDIR)/%, $(TESTSRC))
 
@@ -66,7 +67,8 @@ uninstall:
 	@rm -rv $(INCPREFIX)
 
 tests: $(TESTBIN) $(BUILDDIR)/libtcpb.so.$(VER)
-	@$(TESTDIR)/socket_test
+	@cd $(TESTDIR) && ./input_test
+	@cd $(TESTDIR) && ./socket_test
 
 ###################
 ## COMPILE RULES ##

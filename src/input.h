@@ -40,8 +40,8 @@ class Input {
      **/
     Input(const std::vector<std::string>& atoms,
           const std::map<std::string, std::string>& options,
-          const double* const geom,
-          const double* const geom2 = NULL);
+          const double* geom,
+          const double* geom2 = NULL);
 
     /**
      * \brief Alternate file-based constructor for Input class
@@ -69,7 +69,16 @@ class Input {
      *
      * @return Debug string of internal protobuf object
      **/
-    std::string GetDebugString() { return pb_.DebugString(); }
+    std::string GetDebugString() const { return pb_.DebugString(); }
+
+    /**
+     * \brief Check internal deserialized data is equivalent
+     *
+     * Uses fuzzy equality for numbers
+     *
+     * @return True if Input objects are equivalent
+     **/
+    bool IsApproxEqual(const Input& other) const;
 
   private:
     terachem_server::JobInput pb_; //!< Internal protobuf object for advanced manipulation
@@ -85,8 +94,8 @@ class Input {
      **/
     terachem_server::JobInput InitInputPB(const std::vector<std::string>& atoms,
                                           const std::map<std::string, std::string>& options,
-                                          const double* const geom,
-                                          const double* const geom2 = NULL);
+                                          const double* geom,
+                                          const double* geom2 = NULL);
 
     /**
      * \brief Helper function to uppercase a C++ string

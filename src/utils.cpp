@@ -16,6 +16,7 @@ using std::string; using std::getline; using std::stoi;
 using std::vector;
 
 #include "utils.h"
+#include "constants.h"
 
 namespace TCPB {
 
@@ -34,10 +35,16 @@ map<string, string> ReadTCFile(string tcfile) {
     if (line.rfind("!", 0) == 0) continue;
 
     istringstream ss(line);
-    string key, value;
+    string key, value, temp;
+    size_t pos;
 
-    ss >> key >> value;
-    // TODO: Handle multiple options per line (e.g. unrestricted guess)
+    ss >> key;
+    ss >> value;
+    while (ss >> temp) {
+      if (temp[0] == '#' || temp[0] == '!') break;
+      value += " " + temp;
+    }
+
     options[key] = value;
   }
 

@@ -13,6 +13,8 @@ using std::string; using std::stoi;
 #include <vector>
 using std::vector;
 
+#include <google/protobuf/util/message_differencer.h>
+
 #include "input.h"
 
 #include "constants.h"
@@ -24,15 +26,15 @@ namespace TCPB {
 
 Input::Input(const vector<string>& atoms,
              const map<string, string>& options,
-             const double* const geom,
-             const double* const geom2) {
+             const double* geom,
+             const double* geom2) {
   pb_ = InitInputPB(atoms, options, geom, geom2);
 }
 
 Input::Input(string tcfile,
              string xyzfile,
              string xyzfile2) {
-  float scale = constants::ANGSTROM_TO_AU;
+  double scale = constants::ANGSTROM_TO_AU;
   vector<string> atoms;
   vector<double> geom;
   vector<double> geom2;
@@ -41,16 +43,26 @@ Input::Input(string tcfile,
   options = Utils::ReadTCFile(tcfile);
 
   // Preprocess some options
-  if (options.count("coordinates")) {
-    xyzfile = options["coordinates"];
-    options.erase("coordinates");
-  }
   if (options.count("units")) {
     if (ToUpper(options["units"]).compare("BOHR") == 0) scale = 1.0;
     options.erase("units");
   }
+  if (options.count("coordinates")) {
+    if (xyzfile.empty()) {
+      // Make sure to get relative path
+      size_t dirPos = tcfile.find_last_of('/');
+      string dir = tcfile.substr(0, dirPos);
+      xyzfile = dir + "/" + options["coordinates"];
+    }
+    options.erase("coordinates");
+  }
   if (options.count("old_coors")) {
-    xyzfile2 = options["old_coors"];
+    if (xyzfile2.empty()) {
+      // Make sure to get relative path
+      size_t dirPos = tcfile.find_last_of('/');
+      string dir = tcfile.substr(0, dirPos);
+      xyzfile2 = dir + "/" + options["old_coors"];
+    }
     options.erase("old_coors");
   }
 
@@ -64,11 +76,16 @@ Input::Input(string tcfile,
   }
 }
 
+bool Input::IsApproxEqual(const Input& other) const {
+  using namespace google::protobuf::util;
+  return MessageDifferencer::ApproximatelyEquals(pb_, other.pb_);
+}
+
 // Convenience function to enable both constructors
 JobInput Input::InitInputPB(const vector<string>& atoms,
                             const map<string, string>& options,
-                            const double* const geom,
-                            const double* const geom2) {
+                            const double* geom,
+                            const double* geom2) {
   JobInput pb = JobInput();
   Mol* mol = pb.mutable_mol();
   int numAtoms = atoms.size();
@@ -89,7 +106,7 @@ JobInput Input::InitInputPB(const vector<string>& atoms,
   } catch (const std::out_of_range& err) {
     units = "BOHR";
   }
-  if (ToUpper(units).compare("ANGSTROM")) {
+  if (!ToUpper(units).compare("ANGSTROM")) {
     for (int i = 0; i < 3*numAtoms; ++i) {
       double* g = mol->mutable_xyz()->mutable_data();
       g[i] *= constants::ANGSTROM_TO_AU;
@@ -110,6 +127,7 @@ JobInput Input::InitInputPB(const vector<string>& atoms,
       exit(1);
     }
     pb.set_run(runtype);
+    parsed_options.erase("run");
 
     int charge = stoi(parsed_options.at("charge"));
     mol->set_charge(charge);
@@ -159,7 +177,7 @@ JobInput Input::InitInputPB(const vector<string>& atoms,
     pb.mutable_xyz2()->Resize(3*numAtoms, 0.0);
     memcpy(pb.mutable_xyz2()->mutable_data(), geom2, 3*numAtoms*sizeof(double));
 
-    if (ToUpper(units).compare("ANGSTROM")) {
+    if (!ToUpper(units).compare("ANGSTROM")) {
       for (int i = 0; i < 3*numAtoms; ++i) {
         double* g2 = pb.mutable_xyz2()->mutable_data();
         g2[i] *= constants::ANGSTROM_TO_AU;
