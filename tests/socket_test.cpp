@@ -68,7 +68,7 @@ int ClientRun(int start, int loop) {
 /**********/
 
 bool testSimpleClientServer() {
-  printf("Testing simple one-to-one client server...\n"); fflush(stdout);
+  printf("Testing simple one-to-one client server... "); fflush(stdout);
 
   IncrementServer server(port);
 
@@ -87,7 +87,7 @@ bool testSimpleClientServer() {
 }
 
 bool testMultiClientServer() {
-  printf("Testing multiple clients to one server...\n"); fflush(stdout);
+  printf("Testing multiple clients to one server... "); fflush(stdout);
 
   IncrementServer server(port);
 
@@ -103,7 +103,7 @@ bool testMultiClientServer() {
   for (int i = 0; i < nthreads; ++i) {
     int val = vals[i].get();
     if (val != start + loops) {
-      printf("FAILED. buf value is %d\n for thread %d", val, i);
+      printf("FAILED. buf value is %d\n for thread %d\n", val, i);
       return false;
     }
   }
@@ -118,10 +118,7 @@ int main(int argc, char** argv) {
   srand(time(NULL));
 
   if (!testSimpleClientServer()) failed++;
-  printf("---\n"); fflush(stdout);
-
   if (!testMultiClientServer()) failed++;
-  printf("---\n"); fflush(stdout);
 
   if (failed) {
     printf("FAILED %d SOCKET TESTS\n\n", failed);

@@ -1,11 +1,13 @@
 *.pyc
 *.swp
 *~
+.DS_Store
 
 terachem_server.pb.*
 *.log
 
 build/
+docs/latex-cpp
 
 tests/socket_test
 
