@@ -3,6 +3,8 @@
  */
 
 
+#include <fstream>
+using std::ofstream;
 #include <map>
 using std::map;
 #include <string>
@@ -39,7 +41,7 @@ Input::Input(string tcfile,
   vector<string> atoms;
   vector<double> geom;
   vector<double> geom2;
-  map<string, string> options;
+  strmap options;
 
   options = Utils::ReadTCFile(tcfile);
 
@@ -81,7 +83,50 @@ Input::Input(string tcfile,
 
 void Input::WriteTCFile(string tcfile, string xyzfile) const
 {
+  ofstream f(tcfile);
+  int natoms = pb_.mol().atoms_size();
+  vector<string> atoms;
+  vector<double> geom, geom2;
 
+  // Pull required keywords from internal protobuf
+  f << "run " << Utils::ToLower(JobInput_RunType_Name(pb_.run())) << "\n";
+  f << "basis " << Utils::ToLower(pb_.basis()) << "\n";
+  f << "charge " << pb_.mol().charge() << "\n";
+  f << "spinmult " << pb_.mol().multiplicity() << "\n";
+
+  string method = "";
+  if (!pb_.mol().restricted()) {
+    method = "u";
+  } else if (pb_.mol().restricted() && !pb_.mol().closed()) {
+    method = "ro";
+  }
+  method += Utils::ToLower(JobInput_MethodType_Name(pb_.method()));
+  f << "method " << method << "\n";
+
+  //Handle coordinate dumps
+  for (int i = 0; i < natoms; ++i) {
+    atoms.push_back(pb_.mol().atoms(i));
+    geom.push_back(pb_.mol().xyz(3*i  ));
+    geom.push_back(pb_.mol().xyz(3*i+1));
+    geom.push_back(pb_.mol().xyz(3*i+2));
+  }
+  Utils::WriteXYZFile(xyzfile, atoms, geom);
+  f << "coordinates " << xyzfile << "\n";
+
+  if (pb_.xyz2_size()) {
+    for (int i = 0; i < natoms; ++i) {
+      geom2.push_back(pb_.xyz2(3*i  ));
+      geom2.push_back(pb_.xyz2(3*i+1));
+      geom2.push_back(pb_.xyz2(3*i+2));
+    }
+    Utils::WriteXYZFile(xyzfile + ".old", atoms, geom2);
+    f << "old_coors " << xyzfile << ".old" << "\n";
+  }
+
+  // Do all user options
+  for (int i = 0; i < pb_.user_options_size()/2; ++i) {
+    f << pb_.user_options(2*i) << " " << pb_.user_options(2*i+1) << "\n";
+  }
 }
 
 bool Input::IsApproxEqual(const Input &other) const
@@ -92,14 +137,14 @@ bool Input::IsApproxEqual(const Input &other) const
 
 // Convenience function to enable both constructors
 JobInput Input::InitInputPB(const vector<string> &atoms,
-  const map<string, string> &options,
+  const strmap &options,
   const double *geom,
   const double *geom2)
 {
   JobInput pb = JobInput();
   Mol *mol = pb.mutable_mol();
   int numAtoms = atoms.size();
-  map<string, string> parsed_options(options);
+  strmap parsed_options(options);
 
   // Geometry and atoms
   mol->mutable_xyz()->Resize(3 * numAtoms, 0.0);
@@ -131,10 +176,9 @@ JobInput Input::InitInputPB(const vector<string> &atoms,
     terachem_server::JobInput_RunType runtype;
     bool valid = JobInput::RunType_Parse(Utils::ToUpper(run), &runtype);
     if (!valid) {
-      printf("Runtype %s passed is not valid.\n", run.c_str());
-      printf("Valid runtypes (case-insensitive):\n%s\n",
-        JobInput::RunType_descriptor()->DebugString().c_str());
-      exit(1);
+      string errMsg = "Runtype '" + parsed_options.at("run") + "' is not valid.\n";
+      errMsg += "Valid runtypes (case-insensitive):\n" + JobInput::RunType_descriptor()->DebugString();
+      throw std::runtime_error(errMsg);
     }
     pb.set_run(runtype);
     parsed_options.erase("run");
@@ -159,11 +203,9 @@ JobInput Input::InitInputPB(const vector<string> &atoms,
     bool valid_method = JobInput::MethodType_Parse(Utils::ToUpper(methodStr),
         &method);
     if (!valid) {
-      printf("Method %s passed in options map is not valid.\n",
-        parsed_options.at("method").c_str());
-      printf("Valid methods (case-insensitive):\n%s\n",
-        JobInput::MethodType_descriptor()->DebugString().c_str());
-      exit(1);
+      string errMsg = "Method '" + parsed_options.at("method") + "' is not valid.\n";
+      errMsg += "Valid methods (case-insensitive):\n" + JobInput::MethodType_descriptor()->DebugString();
+      throw std::runtime_error(errMsg);
     }
     pb.set_method(method);
     parsed_options.erase("method");
@@ -197,7 +239,7 @@ JobInput Input::InitInputPB(const vector<string> &atoms,
   }
 
   // All other options are passed straight through to TeraChem
-  for (map<string, string>::iterator it = parsed_options.begin();
+  for (strmap::iterator it = parsed_options.begin();
     it != parsed_options.end(); ++it) {
     pb.add_user_options(it->first);
     pb.add_user_options(it->second);

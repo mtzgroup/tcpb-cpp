@@ -31,11 +31,11 @@ namespace TCPB {
 namespace Utils {
 
 // Based on https://stackoverflow.com/a/15206674/3052876
-map<string, string> ReadTCFile(string tcfile)
+strmap ReadTCFile(string tcfile)
 {
   ifstream f(tcfile.c_str());
   string line;
-  map<string, string> options;
+  strmap options;
 
   while (getline(f, line)) {
     if (line.empty()) {
@@ -74,7 +74,7 @@ map<string, string> ReadTCFile(string tcfile)
 }
 
 void WriteTCFile(string tcfile,
-  const map<string, string> &options)
+  const strmap &options)
 {
   ofstream f(tcfile.c_str());
 

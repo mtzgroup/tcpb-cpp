@@ -106,9 +106,7 @@ public:
    * Calls ComputeJobSync for an energy calculation,
    * and abstracts away the Protobuf-specific runtype/unit code
    *
-   * @param geom Double array of XYZs for each atom
-   * @param num_atoms Integer number of atoms stored in geom
-   * @param angstrom If True, geometry units are Angstrom instead of Bohr
+   * @param input Input with JobInput protocol buffer
    * @param energy Double for storing the computed energy
    * @return Copy of job Output data
    **/
@@ -121,9 +119,7 @@ public:
    * Calls ComputeJobSync for a gradient calculation,
    * and abstracts away the Protobuf-specific runtype/unit code
    *
-   * @param geom Double array of XYZs for each atom
-   * @param num_atoms Integer number of atoms stored in geom
-   * @param angstrom If True, geometry units are Angstrom instead of Bohr
+   * @param input Input with JobInput protocol buffer
    * @param energy Double for storing the computed energy
    * @param gradient Double array for storing the computed gradient (user-allocated)
    * @return Copy of job Output data
@@ -137,9 +133,7 @@ public:
    *
    * Exactly the same as ComputeGradient(), but returns -gradient as forces
    *
-   * @param geom Double array of XYZs for each atom
-   * @param num_atoms Integer number of atoms stored in geom
-   * @param angstrom If True, geometry units are Angstrom instead of Bohr
+   * @param input Input with JobInput protocol buffer
    * @param energy Double for storing the computed energy
    * @param forces Double array for storing the negative of the computed gradient (user-allocated)
    * @return Copy of job Output data

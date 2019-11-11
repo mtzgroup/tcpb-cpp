@@ -1,4 +1,4 @@
-/** \file tcpbsocket.h
+/** \file socket.h
  *  \brief Definition of Socket class
  */
 
@@ -166,7 +166,6 @@ public:
    * Launches select() loop in the background to handle multiple clients
    *
    * @param port Port to listen on
-   * @param respCB Function callback to handle unactive client responses in select() loop
    **/
   SelectServerSocket(int port);
 

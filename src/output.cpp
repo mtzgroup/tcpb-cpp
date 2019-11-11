@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include <google/protobuf/util/message_differencer.h>
+
 #include "output.h"
 
 #include "terachem_server.pb.h"
@@ -26,6 +28,12 @@ void Output::GetGradient(double *gradient,
   // TODO: Add state/mult logic
   int grad_size = pb_.gradient_size();
   memcpy(gradient, pb_.gradient().data(), grad_size * sizeof(double));
+}
+
+bool Output::IsApproxEqual(const Output &other) const
+{
+  using namespace google::protobuf::util;
+  return MessageDifferencer::ApproximatelyEquals(pb_, other.pb_);
 }
 
 } // end namespace TCPB

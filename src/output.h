@@ -34,6 +34,8 @@ public:
   /**
    * \brief Gets the energy from a JobOutput Protocol Buffer
    *
+   * For now, will assume either CIS or CAS being populated
+   *
    * @param energy Double reference of computed energy
    * @param state State index (defaults to 0, ground state)
    * @param mult Spin multiplicity (defaults to 1, singlet)
@@ -61,6 +63,15 @@ public:
   const terachem_server::JobOutput &GetOutputPB() const {
     return pb_;
   }
+
+  /**
+   * \brief Check internal deserialized data is equivalent
+   *
+   * Uses fuzzy equality for numbers
+   *
+   * @return True if Output objects are equivalent
+   **/
+  bool IsApproxEqual(const Output &other) const;
 
 private:
   terachem_server::JobOutput pb_; //!< Internal protobuf for advanced manipulation

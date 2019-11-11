@@ -46,7 +46,7 @@ public:
   /**
    * \brief Blocking call for sending job output
    *
-   * @param Output object for completed job
+   * @param out Output object for completed job
    **/
   void SendJobOutput(const Output &out);
 

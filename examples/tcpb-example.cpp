@@ -19,7 +19,6 @@ using std::vector;
 int main(int argc, char** argv) {
   string host("localhost");
   int port = 54321;
-  string xyzf("c2h4.xyz");
   string tcf("tc.template");
 
   TCPBClient TC(host, port);
@@ -32,8 +31,7 @@ int main(int argc, char** argv) {
   TCPBUtils::ReadXYZFile(xyzf, atoms, geom);
 
   map<string, string> options = TCPBUtils::ReadTCFile(tcf);
-  string run = options["run"];
-  options.erase("run");
+  string xyzf = options["coordinates"];
   options.erase("coordinates");
 
   TCPBInput input(run, atoms, options, geom.data());

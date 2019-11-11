@@ -11,9 +11,11 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#include "tcpb/constants.h"
 #include "tcpb/input.h"
 using TCPB::Input;
-#include "tcpb/constants.h"
+#include "tcpb/utils.h"
+using TCPB::strmap;
 
 /**********/
 // TESTS //
@@ -58,7 +60,7 @@ bool testTCFileLoadBroken(const Input &ref)
 
   try {
     Input input("input/tc.broken");
-  } catch (const runtime_error& err) {
+  } catch (const runtime_error &err) {
     printf("SUCCESS\n");
     return true;
   }
@@ -101,10 +103,31 @@ bool testTCFileLoadMethod(const Input &ref)
 
 bool testTCFileSave(const Input &ref)
 {
-  printf("Testing building Input from TC inputfile... ");
+  using namespace TCPB::Utils;
+
+  printf("Testing writing TC inputfile from Input... ");
   fflush(stdout);
 
+  ref.WriteTCFile("test.tc", "water.xyz");
+
+  strmap ref_opts = ReadTCFile("input/tc.template");
+  strmap out_opts = ReadTCFile("test.tc");
+
+  if (ref_opts != out_opts) {
+    printf("FAILED.\n");
+    printf("Reference:\n");
+    for (auto it = ref_opts.begin(); it != ref_opts.end(); ++it) {
+      printf("%s: %s\n", it->first.c_str(), it->second.c_str());
+    }
+    printf("Test:\n");
+    for (auto it = out_opts.begin(); it != out_opts.end(); ++it) {
+      printf("%s: %s\n", it->first.c_str(), it->second.c_str());
+    }
+    return false;
+  }
+
   printf("SUCCESS\n");
+  return true;
 }
 
 int main(int argc, char **argv)
@@ -127,7 +150,7 @@ int main(int argc, char **argv)
     geom[i] *= TCPB::constants::ANGSTROM_TO_AU;
   }
 
-  map<string, string> options = {
+  strmap options = {
     {"run", "gradient"}, {"method", "ub3lyp"}, {"basis", "6-31g**"},
     {"charge", "0"}, {"spinmult", "1"}, {"guess", "scr/ca0 scr/cb0"},
     {"precision", "double"}
@@ -145,10 +168,17 @@ int main(int argc, char **argv)
   if (!testTCFileLoadBohr(ref)) {
     failed++;
   }
+  if (!testTCFileLoadBroken(ref)) {
+    failed++;
+  }
 
   options["method"] = "revpbe";
   Input ref2(atoms, options, geom);
   if (!testTCFileLoadMethod(ref2)) {
+    failed++;
+  }
+
+  if (!testTCFileSave(ref)) {
     failed++;
   }
 

@@ -13,6 +13,8 @@
 
 namespace TCPB {
 
+typedef std::map<std::string, std::string> strmap;
+
 namespace Utils {
 
 /**
@@ -21,7 +23,7 @@ namespace Utils {
  * @param tcfile Filename of TeraChem input file
  * @return Key-value pairs of options
  **/
-std::map<std::string, std::string> ReadTCFile(std::string tcfile);
+strmap ReadTCFile(std::string tcfile);
 
 /**
  * \brief Write old-style TeraChem input file
@@ -30,7 +32,7 @@ std::map<std::string, std::string> ReadTCFile(std::string tcfile);
  * @param options Key-value pairs
  **/
 void WriteTCFile(std::string tcfile,
-  const std::map<std::string, std::string> &options);
+  const strmap &options);
 
 /**
  * \brief Convert between TC input and protobuf for closed/restricted
@@ -74,7 +76,7 @@ void ReadXYZFile(std::string xyzfile,
 void WriteXYZFile(std::string xyzfile,
   const std::vector<std::string> &atoms,
   const std::vector<double> &geom,
-  std::string comment,
+  std::string comment = "Written by TCPB::Utils",
   double scale = 1 / constants::ANGSTROM_TO_AU);
 
 /**
