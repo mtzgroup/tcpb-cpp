@@ -78,7 +78,7 @@ private:
    * @param sfd Socket file descriptor
    * @return Input object for newly accepted job
    **/
-  bool HandleMessage(int sfd);
+  bool HandleClientMessage(int sfd);
 
   /**
    * \brief Provide Status response to waiting clients

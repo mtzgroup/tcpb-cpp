@@ -129,7 +129,7 @@ void Server::SendJobOutput(const Output &out)
   currOutput_ == NULL;
 }
 
-bool Server::HandleMessage(int sfd)
+bool Server::HandleClientMessage(int sfd)
 {
   char handleLog[MAX_STR_LEN];
   snprintf(handleLog, MAX_STR_LEN, "%s/server_handler.log", serverDir_);
@@ -146,18 +146,19 @@ bool Server::HandleMessage(int sfd)
   msgType = (terachem_server::MessageType)ntohl(header[0]);
   msgSize = ntohl(header[1]);
 
-  char msg[msgSize];
-  if (!client.HandleRecv((char *)msg, sizeof(msg), "HandleMessage() protobuf")) {
-    return false;
-  }
-
-  // Cast char* to string, but I want to avoid null character termination
-  string msgStr;
-  msgStr.resize(msgSize);
-  memcpy((void *)msgStr.data(), msg, msgSize);
-
   if (acceptJob_ && currJobSFD_ == -1
     && msgType == terachem_server::MessageType::JOBINPUT) {
+
+    char msg[msgSize];
+    if (!client.HandleRecv((char *)msg, sizeof(msg), "HandleMessage() protobuf")) {
+      return false;
+    }
+
+    // Cast char* to string, but I want to avoid null character termination
+    string msgStr;
+    msgStr.resize(msgSize);
+    memcpy((void *)msgStr.data(), msg, msgSize);
+
     terachem_server::JobInput input;
     if (!input.ParseFromString(msgStr)) {
       return false;
@@ -183,17 +184,14 @@ bool Server::HandleMessage(int sfd)
     currJobSFD_ = -1;
     jobCompleted_ = false;
 
-    Status status;
-    if (!status.ParseFromString(msgStr)) {
-      return false;
-    }
-
     // Send back status to get client ready
+    Status status;
     if (!SendStatus(client, Status::kCompletedFieldNumber)) {
       return false;
     }
 
     // Send output
+    string msgStr;
     const terachem_server::JobOutput output = currOutput_->GetOutputPB();
     output.SerializeToString(&msgStr);
     msgSize = output.ByteSize();

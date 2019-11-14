@@ -21,6 +21,14 @@ void Output::GetEnergy(double &energy,
   energy = pb_.energy(0);
 }
 
+void Output::SetEnergy(double energy,
+  int state,
+  int mult)
+{
+  // TODO: Add state/mult logic
+  pb_.add_energy(energy);
+}
+
 void Output::GetGradient(double *gradient,
   int state,
   int mult) const

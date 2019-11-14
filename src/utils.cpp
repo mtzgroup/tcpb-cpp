@@ -10,8 +10,6 @@ using std::tolower;
 #include <stdio.h> // For printf() debugging
 #include <fstream>
 using std::ifstream;
-using std::ofstream;
-using std::endl;
 #include <map>
 using std::map;
 #include <sstream>
@@ -76,11 +74,13 @@ strmap ReadTCFile(string tcfile)
 void WriteTCFile(string tcfile,
   const strmap &options)
 {
-  ofstream f(tcfile.c_str());
+  FILE *fh = fopen(tcfile.c_str(), "w");
 
   for (auto it = options.begin(); it != options.end(); ++it) {
-    f << it->first << " " << it->second << endl;
+    fprintf(fh, "%s %s\n", it->first.c_str(), it->second.c_str());
   }
+
+  fclose(fh);
 }
 
 void ReadXYZFile(string xyzfile,
@@ -118,16 +118,18 @@ void WriteXYZFile(string xyzfile,
   string comment,
   double scale)
 {
-  ofstream f(xyzfile.c_str());
+  FILE *fh = fopen(xyzfile.c_str(), "w");
+  double x, y, z;
 
-  f << atoms.size() << endl;
-  f << comment << endl;
+  fprintf(fh, "%d\n%s\n", atoms.size(), comment.c_str());
   for (int i = 0; i < atoms.size(); ++i) {
-    f << atoms[i] << " ";
-    f << geom[3 * i  ]*scale << " ";
-    f << geom[3 * i + 1]*scale << " ";
-    f << geom[3 * i + 2]*scale << endl;
+    x = geom[3 * i  ] * scale;
+    y = geom[3 * i + 1] * scale;
+    z = geom[3 * i + 2] * scale;
+    fprintf(fh, "%3s\t% .10lf % .10lf % .10lf\n", atoms[i].c_str(), x, y, z);
   }
+
+  fclose(fh);
 }
 
 // Code to check string start from https://stackoverflow.com/a/40441240/3052876

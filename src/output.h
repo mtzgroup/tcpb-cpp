@@ -34,7 +34,7 @@ public:
   /**
    * \brief Gets the energy from a JobOutput Protocol Buffer
    *
-   * For now, will assume either CIS or CAS being populated
+   * For now, will assume EITHER CIS or CAS being populated, with CIS checked first
    *
    * @param energy Double reference of computed energy
    * @param state State index (defaults to 0, ground state)
@@ -43,6 +43,19 @@ public:
   void GetEnergy(double &energy,
     int state = 0,
     int mult = 1) const;
+
+  /**
+  * \brief Add an energy and state/mult pair into a JobOutput Protocol Buffer
+  *
+  * For now, will assume EITHER CIS or CAS being populated, with CIS checked first
+  *
+  * @param energy Double reference of computed energy
+  * @param state State index (defaults to 0, ground state)
+  * @param mult Spin multiplicity (defaults to 1, singlet)
+  **/
+  void SetEnergy(double energy,
+    int state = 0,
+    int mult = 1);
 
   /**
    * \brief Gets the gradient from a JobOutput Protocol Buffer
@@ -62,6 +75,18 @@ public:
    **/
   const terachem_server::JobOutput &GetOutputPB() const {
     return pb_;
+  }
+
+  /**
+   * \brief Getter of protobuf string for debugging
+   *
+   * Note: This function does not print default values
+   * (e.g. method: HF or closed: false would not appear in the printout)
+   *
+   * @return Debug string of internal protobuf object
+   **/
+  std::string GetDebugString() const {
+    return pb_.DebugString();
   }
 
   /**
