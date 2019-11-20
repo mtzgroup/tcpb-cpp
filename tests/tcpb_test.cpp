@@ -9,6 +9,7 @@ using std::runtime_error;
 using std::string;
 #include <thread>
 using std::thread;
+#include <unistd.h> //For sleep()
 
 #include "tcpb/client.h"
 using TCPB::Client;
@@ -34,6 +35,8 @@ void RunServer(const Input &ref_in,
   while (true) {
     const Input in = server.RecvJobInput();
 
+    sleep(1);
+
     // TODO: Figure out how to verify server side
     // if (!ref_in.IsApproxEqual(in)) {
     //   string errMsg = "FAILED. Ref Input:\n" + ref_in.GetDebugString();
@@ -42,6 +45,8 @@ void RunServer(const Input &ref_in,
     // }
 
     server.SendJobOutput(ref_out);
+    printf("Past SendJobOutput\n");
+    fflush(stdout);
   }
 }
 
@@ -95,6 +100,8 @@ int main(int argc, char **argv)
   out.SetEnergy(42.0);
 
   thread sthread = thread(&RunServer, in, out, port);
+  sthread.detach();
+  sleep(1);
 
   // Run tests
   if (!testAvailable()) {
@@ -104,14 +111,12 @@ int main(int argc, char **argv)
     failed++;
   }
 
-  // Manually kill server
-  sthread.std::thread::~thread();
-
   if (failed) {
     printf("FAILED %d TCPB CLIENT/SERVER TESTS\n\n", failed);
   } else {
     printf("PASSED ALL TCPB CLIENT/SERVER TESTS\n\n");
   }
+  fflush(stdout);
 
   return failed;
 }

@@ -5,8 +5,6 @@
 #include <algorithm>
 using std::max;
 #include <errno.h>
-#include <functional>
-using std::function;
 #include <mutex>
 using std::lock_guard;
 using std::mutex;

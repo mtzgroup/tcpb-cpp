@@ -8,7 +8,6 @@
 #include <sys/time.h> // for fd_set
 
 #include <atomic>
-#include <functional>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -157,6 +156,8 @@ public:
  *
  * This is an abstract class: You must inherit this class and implement the HandleClientMessage()
  * function, which is called in the select() loop, in order to use this.
+ *
+ * Note that Server no longer uses this class directly, but it is still used for testing purposes.
  **/
 class SelectServerSocket : public Socket {
 public:
