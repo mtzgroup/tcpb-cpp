@@ -87,8 +87,8 @@ message JobInput {
     SVWN3 = 4;
     SVWN5 = 5;
     SVWN = 5;
-    B3LYP1 = 6;
     B3LYP = 6;
+    B3LYP1 = 6;
     B3LYP3 = 7;
     B3LYP5 = 8;
     BLYP = 9;

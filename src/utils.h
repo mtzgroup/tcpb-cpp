@@ -2,8 +2,8 @@
  *  \brief Definition of TCPBUtils functions
  */
 
-#ifndef UTILS_H_
-#define UTILS_H_
+#ifndef TCPB_UTILS_H_
+#define TCPB_UTILS_H_
 
 #include <map>
 #include <string>
@@ -11,7 +11,11 @@
 
 #include "constants.h"
 
-namespace TCPBUtils {
+namespace TCPB {
+
+typedef std::map<std::string, std::string> strmap;
+
+namespace Utils {
 
 /**
  * \brief Read old-style TeraChem input file
@@ -19,7 +23,16 @@ namespace TCPBUtils {
  * @param tcfile Filename of TeraChem input file
  * @return Key-value pairs of options
  **/
-std::map<std::string, std::string> ReadTCFile(std::string tcfile);
+strmap ReadTCFile(std::string tcfile);
+
+/**
+ * \brief Write old-style TeraChem input file
+ *
+ * @param tcfile Filename of TeraChem input file
+ * @param options Key-value pairs
+ **/
+void WriteTCFile(std::string tcfile,
+  const strmap &options);
 
 /**
  * \brief Convert between TC input and protobuf for closed/restricted
@@ -34,9 +47,9 @@ std::map<std::string, std::string> ReadTCFile(std::string tcfile);
  * @param closed Whether or not orbitals are closed-shell
  * @param restricted Whether or not orbitals are restricted
  **/
-void ParseMethod(std::string& method,
-                 bool& closed,
-                 bool& restricted);
+void ParseMethod(std::string &method,
+  bool &closed,
+  bool &restricted);
 
 /**
  * \brief Read XYZ file
@@ -47,10 +60,43 @@ void ParseMethod(std::string& method,
  * @param scale Unit conversion to use (defaults to ANGSTROM_TO_AU)
  **/
 void ReadXYZFile(std::string xyzfile,
-                 std::vector<std::string>& atoms,
-                 std::vector<double>& geom,
-                 double scale = constants::ANGSTROM_TO_AU);
+  std::vector<std::string> &atoms,
+  std::vector<double> &geom,
+  double scale = constants::ANGSTROM_TO_AU);
 
-} // end namespace TCPBUtils
+/**
+ * \brief Write XYZ file
+ *
+ * @param xyzfile Filename of XYZ file
+ * @param atoms Array of atom symbols to be filled
+ * @param geom Array of xyz positions to be filled
+ * @param comment Comment line
+ * @param scale Unit conversion to use (defaults to 1/ANGSTROM_TO_AU)
+ **/
+void WriteXYZFile(std::string xyzfile,
+  const std::vector<std::string> &atoms,
+  const std::vector<double> &geom,
+  std::string comment = "Written by TCPB::Utils",
+  double scale = 1 / constants::ANGSTROM_TO_AU);
+
+/**
+ * \brief Helper function to uppercase a C++ string
+ *
+ * @param str String to uppercase
+ * @return Uppercased string
+ **/
+std::string ToUpper(const std::string &str);
+
+/**
+ * \brief Helper function to lowercase a C++ string
+ *
+ * @param str String to lowercase
+ * @return Lowercased string
+ **/
+std::string ToLower(const std::string &str);
+
+} // end namespace Utils
+
+} // end namespace TCPB
 
 #endif

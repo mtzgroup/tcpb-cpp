@@ -1,0 +1,12 @@
+run         gradient
+method      ub3lyp
+basis       6-31g**
+coordinates water.xyz
+charge      0
+spinmult    1
+guess       scr/ca0 scr/cb0
+
+precision   double  # Post value comment
+
+# comment line
+! comment line
