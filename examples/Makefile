@@ -2,7 +2,7 @@
 # and added the lib and include folders to your environment
 
 CXX=g++
-CXXFLAGS=
+CXXFLAGS=-fPIC -std=c++11 -pthread -g
 LIBS=-lprotobuf -ltcpb
 
 tcpb-example: tcpb-example.cpp
