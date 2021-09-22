@@ -27,7 +27,7 @@ TESTBIN := $(patsubst $(TESTDIR)/%.cpp, $(TESTDIR)/%, $(TESTSRC))
 ## COMPILERS ##
 ###############
 CXX=g++
-CXXFLAGS=-fPIC -std=c++11 -pthread -g -DSOCKETLOGS
+CXXFLAGS=-fPIC -std=c++11 -pthread -g
 PROTOC=protoc
 LIBS=-lprotobuf
 
@@ -39,7 +39,7 @@ TESTLIBS=-lprotobuf -ltcpb
 ##################
 VER=1.0.0a1
 #PREFIX=/global/user_software/tcpb-client/$(VER)
-PREFIX=/home/sseritan/personal_modules/software/tcpb-cpp
+PREFIX=/u/cruzeiro/tcpb-cpp
 LIBPREFIX=$(PREFIX)/lib
 INCPREFIX=$(PREFIX)/include/tcpb
 
