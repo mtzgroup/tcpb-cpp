@@ -10,6 +10,7 @@ using std::map;
 using std::string;
 #include <vector>
 using std::vector;
+#include <unistd.h>
 
 #include "tcpb/client.h"
 #include "tcpb/input.h"
@@ -54,27 +55,26 @@ int main(int argc, char** argv) {
   // Compute call
   const TCPB::Output output = TC.ComputeGradient(input, energy, grad);
 
-  // Convenience accessors after job
-  //output.GetEnergy(energy);
-  //output.GetGradient(grad);
+  printf("From ComputeGradient 'input' getters:\n");
+  printf("Energy: %lf\n", energy);
 
-  //printf("From TCPB::Output getters:\n");
-  //printf("Energy: %lf\n", energy);
-
-  //printf("Gradient:\n");
-  //for (int i = 0; i < 3*num_atoms; i++) {
-  //  printf("%lf ", grad[i]);
-  //  if ((i+1)%3 == 0) printf("\n");
-  //}
-  //printf("\nDone with TCPB::Output getters.\n\n");
+  printf("Gradient:\n");
+  for (int i = 0; i < 3*num_atoms; i++) {
+    printf("%lf ", grad[i]);
+    if ((i+1)%3 == 0) printf("\n");
+  }
+  printf("\nDone with 'input'.\n\n");
 
   // Convenience compute calls to pull base properties out
   energy = 0.0;
   memset(grad, 0.0, 3*num_atoms*sizeof(double));
 
+  // Sleep a bit to ensure the server will receive the next ComputeGradient call
+  usleep(100000);
+
   const TCPB::Output output2 = TC.ComputeGradient(input2, energy, grad);
 
-  printf("From ComputeGradient call:\n");
+  printf("From ComputeGradient 'input2' call:\n");
   printf("Energy: %lf\n", energy);
 
   printf("Gradient:\n");
