@@ -73,7 +73,9 @@ message JobInput {
     ENERGY = 0;
     GRADIENT = 1;
     COUPLING = 14;
+    TDCI = 16;
     CI_VEC_OVERLAP = 19;
+
   }
   RunType run = 2; // Defaults to 0 (ENERGY) in proto3
 
@@ -87,8 +89,8 @@ message JobInput {
     SVWN3 = 4;
     SVWN5 = 5;
     SVWN = 5;
-    B3LYP = 6;
     B3LYP1 = 6;
+    B3LYP = 6;
     B3LYP3 = 7;
     B3LYP5 = 8;
     BLYP = 9;
@@ -105,20 +107,27 @@ message JobInput {
     B97 = 20;
     WB97 = 21;
     WB97X = 22;
+    WB97XD3 = 23;
+    GFNXTB = 24;
+    GFN2XTB =25;
   }
   MethodType method = 3; // Defaults to 0 (HF) in proto3
 
   // Basis
   string basis = 4;
 
+  // User specified TeraChem options
+  // Will be stored just as "key", "value" sequentially
+  repeated string user_options = 7;
+
   // MO Guess
   // Tags 5&6 were used for guess_mo_coeffs_a/b in r0.2.0 and earlier
   string orb1afile = 8; // If restricted, only fill this one
   string orb1bfile = 9;
 
-  // User specified TeraChem options
-  // Will be stored just as "key", "value" sequentially
-  repeated string user_options = 7;
+  // OUTPUT REQUESTS
+  bool return_bond_order = 16; // Want Meyer bond order matrix in output
+  bool return_gradients = 29; // Want derivative quantities written to output
 
   // Job specific inputs
   // CI_VEC_OVERLAP
@@ -130,8 +139,38 @@ message JobInput {
   // CAS specific options
   // Tags 18 & 19 were used to specify target state and mults, now I just report everything
 
-  // OUTPUT REQUESTS
-  bool return_bond_order = 16; // Want Meyer bond order matrix in output
+  // IMD specific
+  enum ImdType {
+    NOT_IMD = 0;
+    IMD_NEW_CONDITION = 1;
+    IMD_CONTINUE = 2;
+    IMD_HESSIAN = 3;
+  }
+  ImdType imd_type = 20; // Defaults to 0 (NOT_IMD) in proto3
+  int32 imd_initial_orbital = 21;
+  enum ImdOrbitalType {
+    NO_ORBITAL = 0;
+    ALPHA_ORBITAL = 1;
+    BETA_ORBITAL = 2;
+    ALPHA_DENSITY = 3;
+    BETA_DENSITY = 4;
+    WHOLE_C = 5;
+  }
+  ImdOrbitalType imd_orbital_type = 27;
+  repeated double imd_xyz_previous = 22;
+  repeated float imd_mo_previous = 23;
+  repeated float imd_mmatom_position = 24;
+  repeated float imd_mmatom_info = 25; // Array of { atomic number, charge, mass }
+  enum ImdAdditionalOption {
+    IMD_NORMAL_MD = 0;
+    IMD_MECI_OPT_GRADIENT = 1;
+  }
+  ImdAdditionalOption imd_additional_option = 26;
+
+  string prmtop_path = 30;
+  string prmtop_content = 31;
+  repeated int32 qm_indices = 32;
+  repeated double mmatom_position = 33;
 }
 
 message JobOutput {
@@ -153,27 +192,19 @@ message JobOutput {
   //Dipoles, packed as Dx,Dy,Dz,|D|
   repeated double dipoles = 6;
 
+  //Job directory, so the user can go get more info if they want
+  string job_dir = 9;
+  string job_scr_dir = 10;
+  int32 server_job_id = 11;
+
   //MO coefficients
   // Tags 7 & 8 were used for mo_coeffs_a/b in r0.2.0 and earlier
   string orb1afile = 12; //If restricted, only fill this one
   string orb1bfile = 13;
   int32 orb_size = 14;
 
-  //MO energies and coefficients
-  // Tags 23 & 24 were used for orb_energies/occupations in an earlier commit
-  repeated double orba_energies = 25;
-  repeated double orbb_energies = 26;
-  repeated double orba_occupations = 27;
-  repeated double orbb_occupations = 28;
-
-  //Job directory, so the user can go get more info if they want
-  string job_dir = 9;
-  string job_scr_dir = 10;
-  int32 server_job_id = 11;
-
-  //Job specific output
-  // COUPLING
-  repeated double nacme = 21;
+  //Bond order matrix
+  repeated double bond_order = 16;
 
   // CI_VEC_OVERLAP
   repeated double ci_overlaps = 17;
@@ -185,12 +216,36 @@ message JobOutput {
   repeated int32 cas_energy_mults = 20;
   repeated double cas_transition_dipole = 22;
 
+  //Job specific output
+  // COUPLING
+  repeated double nacme = 21;
+
+  //MO energies and coefficients
+  // Tags 23 & 24 were used for orb_energies/occupations in an earlier commit
+  repeated double orba_energies = 25;
+  repeated double orbb_energies = 26;
+  repeated double orba_occupations = 27;
+  repeated double orbb_occupations = 28;
+
   // CIS specific output
   int32 cis_states = 29;
   repeated double cis_unrelaxed_dipoles = 30;
   repeated double cis_relaxed_dipoles = 31;
   repeated double cis_transition_dipoles = 32;
+  repeated double cis_dipole_deriv = 41;
+  repeated double cis_trans_dipole_deriv = 42;
 
-  //Bond order matrix
-  repeated double bond_order = 16;
+  // TDCI specific output
+  repeated double ci_vec_re = 33;
+  repeated double ci_vec_im = 34;
+
+  // IMD specific
+  repeated uint32 compressed_bond_order = 35; // lower triangular, multiplied by 50
+  repeated float compressed_hessian = 36;
+  repeated float compressed_ao_data = 37; // Array of { angular component indicator, number of primitives, atom index }
+  repeated float compressed_primitive_data = 38; // Array of { exponent, contraction coefficient }
+  repeated float compressed_mo_vector = 39;
+  repeated float imd_mmatom_gradient = 40;
+
+  repeated double mmatom_gradient = 43;
 }
