@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     -4.6456000,         -4.4223000,          7.4705000,
     -3.6650000,         -4.5356000,          7.1235000,
     -4.9759000,         -3.5580000,          7.3041000 };
-  for (int i = 0; i<numMMAtoms; i++) {
+  for (int i = 0; i<3*numMMAtoms; i++) {
     mmpositions[i] /= BohrToAng;
   }
   double mmcharges[15] { -0.834	,
@@ -109,6 +109,7 @@ int main(int argc, char** argv) {
 
   // Compute call
   const TCPB::Output output = TC->ComputeGradient(input, energy, qmgrad, mmgrad);
+  //const TCPB::Output output = TC->ComputeJobSync(input);
 
   printf("Debug protobuf output string:\n%s\n", output.GetDebugString().c_str());
 
@@ -127,7 +128,7 @@ int main(int argc, char** argv) {
     if ((i+1)%3 == 0) printf("\n");
   }
 
-  printf("\nDone!.\n\n");
+  printf("\nDone!\n\n");
 
   // Convenience compute calls to pull base properties out
   energy = 0.0;
