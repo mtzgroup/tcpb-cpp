@@ -45,7 +45,7 @@ message Mol {
 
   // Coordinates
   repeated double xyz = 2;
-  
+
   // Unit type, matching current params.cpp definition
   enum UnitType {
     ANGSTROM = 0;
@@ -167,10 +167,17 @@ message JobInput {
   }
   ImdAdditionalOption imd_additional_option = 26;
 
+  enum QmmmType {
+    NO_QMMM = 0;
+    POINT_CHARGE = 1;
+    TC_OPENMM = 2;
+  }
+  QmmmType qmmm_type = 35;
   string prmtop_path = 30;
   string prmtop_content = 31;
   repeated int32 qm_indices = 32;
   repeated double mmatom_position = 33;
+  repeated double mmatom_charges = 34;
 }
 
 message JobOutput {
