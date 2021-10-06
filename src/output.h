@@ -60,11 +60,13 @@ public:
   /**
    * \brief Gets the gradient from a JobOutput Protocol Buffer
    *
-   * @param gradient Double array to store computed gradient (user-allocated)
+   * @param qmgradient Double array to store computed gradient of the QM region (user-allocated)
+   * @param mmgradient Double array to store computed gradient of the MM region (user-allocated)
    * @param state State index (defaults to 0, ground state)
    * @param mult Spin multiplicity (defaults to 1, singlet)
    **/
-  void GetGradient(double *gradient,
+  void GetGradient(double *qmgradient,
+    double *mmgradient = nullptr,
     int state = 0,
     int mult = 1) const;
 

@@ -37,11 +37,17 @@ public:
    * @param options Map of key-value pairs for TCPB or TeraChem options
    * @param geom 1D array of atomic positions in a.u.
    * @param geom2 1D array of atomic positions in a.u. (default to NULL, needed for overlap jobs)
+   * @param mmpositions 1D array of atomic positions in a.u. in the MM region (default to NULL)
+   * @param mmcharges 1D array of atomic charges in a.u. in the MM region (default to NULL)
+   * @param numMMAtoms integer with number of atoms in the MM region (default to 0)
    **/
   Input(const std::vector<std::string> &atoms,
     const std::map<std::string, std::string> &options,
     const double *geom,
-    const double *geom2 = NULL);
+    const double *geom2 = nullptr,
+    const double *mmpositions = nullptr,
+    const double *mmcharges = nullptr,
+    const int numMMAtoms = 0);
 
   /**
    * \brief Alternate file-based constructor for Input class
@@ -104,12 +110,18 @@ private:
    * @param options Map of key-value pairs for TCPB or TeraChem options
    * @param geom 1D array of atomic positions
    * @param geom2 1D array of atomic positions (default to NULL, needed for overlap jobs)
+   * @param mmpositions 1D array of atomic positions in the MM region (default to NULL)
+   * @param mmcharges 1D array of atomic charges in the MM region (default to NULL)
+   * @param numMMAtoms integer with number of atoms in the MM region (default to 0)
    * @return Initialized JobInput protobuf object
    **/
   terachem_server::JobInput InitInputPB(const std::vector<std::string> &atoms,
     const std::map<std::string, std::string> &options,
     const double *geom,
-    const double *geom2 = NULL);
+    const double *geom2 = nullptr,
+    const double *mmpositions = nullptr,
+    const double *mmcharges = nullptr,
+    const int numMMAtoms = 0);
 }; // end class Input
 
 } // end namespace TCPB

@@ -304,7 +304,8 @@ const Output Client::ComputeEnergy(const Input &input,
 
 const Output Client::ComputeGradient(const Input &input,
   double &energy,
-  double *gradient)
+  double *qmgradient,
+  double *mmgradient)
 {
   // Reset runtype to gradient
   Input new_input(input);
@@ -314,23 +315,28 @@ const Output Client::ComputeGradient(const Input &input,
   Output output = ComputeJobSync(new_input);
 
   output.GetEnergy(energy);
-  output.GetGradient(gradient);
+  output.GetGradient(qmgradient,mmgradient);
 
   return output;
 }
 
 const Output Client::ComputeForces(const Input &input,
   double &energy,
-  double *gradient)
+  double *qmgradient,
+  double *mmgradient)
 {
   // Compute energy and gradient
-  Output output = ComputeGradient(input, energy, gradient);
+  Output output = ComputeGradient(input, energy, qmgradient, mmgradient);
 
   // Flip sign on gradient
   const JobInput pb = input.GetInputPB();
-  int num_atoms = pb.mol().atoms().size();
-  for (int i = 0; i < 3 * num_atoms; i++) {
-    gradient[i] *= -1.0;
+  int num_qm_atoms = pb.mol().atoms().size();
+  for (int i = 0; i < 3 * num_qm_atoms; i++) {
+    qmgradient[i] *= -1.0;
+  }
+  int num_mm_atoms = pb.mmatom_charges().size();
+  for (int i = 0; i < 3 * num_mm_atoms; i++) {
+    mmgradient[i] *= -1.0;
   }
 
   return output;

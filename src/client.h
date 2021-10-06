@@ -121,12 +121,14 @@ public:
    *
    * @param input Input with JobInput protocol buffer
    * @param energy Double for storing the computed energy
-   * @param gradient Double array for storing the computed gradient (user-allocated)
+   * @param qmgradient Double array for storing the computed gradient in the QM region (user-allocated)
+   * @param mmgradient Double array for storing the computed gradient in the MM region (user-allocated)
    * @return Copy of job Output data
    **/
   const Output ComputeGradient(const Input &input,
     double &energy,
-    double *gradient);
+    double *qmgradient,
+    double *mmgradient = nullptr);
 
   /**
    * \brief Blocking wrapper for a gradient ComputeJobSync() call
@@ -135,12 +137,14 @@ public:
    *
    * @param input Input with JobInput protocol buffer
    * @param energy Double for storing the computed energy
-   * @param forces Double array for storing the negative of the computed gradient (user-allocated)
+   * @param qmforces Double array for storing the negative of the computed gradient of the QM region (user-allocated)
+   * @param mmforces Double array for storing the negative of the computed gradient of the MM region (user-allocated)
    * @return Copy of job Output data
    **/
   const Output ComputeForces(const Input &input,
     double &energy,
-    double *forces);
+    double *qmforces,
+    double *mmforces = nullptr);
 
 private:
   std::string host_;
