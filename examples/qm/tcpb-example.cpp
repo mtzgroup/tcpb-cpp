@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
   // Parameters can be pulled out of protobuf directly
   // In this case, we are using the repeated field's <field>_size() function
   // For more docs, check out https://developers.google.com/protocol-buffers/docs/reference/cpp-generated
-  int num_atoms = input.GetInputPB().mol().atoms_size();
+  int num_atoms = input.GetPB().mol().atoms_size();
 
   double energy;
   double* grad = new double[3*num_atoms];

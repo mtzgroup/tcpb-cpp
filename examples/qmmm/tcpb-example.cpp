@@ -95,13 +95,16 @@ int main(int argc, char** argv) {
   //}
 
   TCPB::Input input(qmattypes, options, qmcoords, nullptr, mmpositions, mmcharges, numMMAtoms);
+
+  input.GetPB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_NEW_CONDITION);
+
   printf("Debug protobuf input string:\n%s\n", input.GetDebugString().c_str());
 
   // Parameters can be pulled out of protobuf directly
   // In this case, we are using the repeated field's <field>_size() function
   // For more docs, check out https://developers.google.com/protocol-buffers/docs/reference/cpp-generated
-  int num_qm_atoms = input.GetInputPB().mol().atoms_size();
-  int num_mm_atoms = input.GetInputPB().mmatom_charges_size();
+  int num_qm_atoms = input.GetPB().mol().atoms_size();
+  int num_mm_atoms = input.GetPB().mmatom_charges_size();
 
   double energy;
   double* qmgrad = new double[3*num_qm_atoms];

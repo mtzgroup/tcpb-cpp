@@ -65,7 +65,7 @@ public:
    *
    * @return Reference to internal protobuf object
    **/
-  const terachem_server::JobInput &GetInputPB() const {
+  const terachem_server::JobInput &GetPB() const {
     return pb_;
   }
 
