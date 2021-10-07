@@ -70,6 +70,15 @@ public:
   }
 
   /**
+   * \brief Accessor for internal protobuf object, but allows for modifications to be done on it
+   *
+   * @return Reference to internal protobuf object
+   **/
+  terachem_server::JobInput &GetMutablePB() {
+    return pb_;
+  }
+
+  /**
    * \brief Getter of protobuf string for debugging
    *
    * Note: This function does not print default values
