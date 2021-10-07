@@ -1,5 +1,5 @@
 run         gradient
-method      ub3lyp
+method      ub3lyp1
 basis       6-31g**
 coordinates water.xyz
 charge      0
