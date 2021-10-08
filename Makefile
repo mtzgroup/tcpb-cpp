@@ -13,7 +13,8 @@ TCPBSRC := 	$(SRCDIR)/exceptions.cpp \
 		$(SRCDIR)/server.cpp \
 		$(SRCDIR)/socket.cpp \
 		$(SRCDIR)/terachem_server.pb.cpp \
-		$(SRCDIR)/utils.cpp
+		$(SRCDIR)/utils.cpp \
+		$(SRCDIR)/api.cpp
 
 TCPBOBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
 
