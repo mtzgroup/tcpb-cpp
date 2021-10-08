@@ -12,10 +12,10 @@ using std::string;
 using std::vector;
 #include <unistd.h>
 
-#include "tcpb/client.h"
-#include "tcpb/input.h"
-#include "tcpb/output.h"
-#include "tcpb/utils.h"
+#include "client.h"
+#include "input.h"
+#include "output.h"
+#include "utils.h"
 
 #define BohrToAng 0.52917724924
 
