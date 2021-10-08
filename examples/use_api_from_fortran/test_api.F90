@@ -13,6 +13,7 @@ integer :: port, status
 ! Set information about the server
 host = "localhost"
 port = 12345
+status = -1
 
 ! Attempts to connect to the TeraChem server
 write (*,*) "Attempting to connect to TeraChem server using host ", &
