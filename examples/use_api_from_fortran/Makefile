@@ -3,10 +3,10 @@
 
 FC=gfortran
 FFLAGS=-fPIC
-LIBS=-ltcpb
+LIBS=-L/u/cruzeiro/tcpb-cpp/lib -ltcpb
 
 test_api: test_api.F90
-	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
+	$(FC) $(FFLAGS) $(LIBS) -o $@ $<
 
 .PHONY: clean
 clean:
