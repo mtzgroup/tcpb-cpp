@@ -71,11 +71,9 @@ extern "C" {
     options.erase("pointcharges");
     options.erase("run");
     options.emplace("run","gradient");
-    options.erase("pointcharges_self_interaction");
-    options.emplace("pointcharges_self_interaction","false");
     // Since this is just a setup call, set all QM coordinates to zero
     double qmcoords[3*(*numqmatoms)];
-    memset(qmcoords, 0.0, 3*(*numqmatoms)*sizeof(double));
+    memset(qmcoords, 0, 3*(*numqmatoms)*sizeof(double));
     // Change type of array containing atom types
     vector<string> qmatomtypes;
     int i;
