@@ -36,6 +36,7 @@ extern "C" {
     }
     catch (...) {
       (*status) = 1;
+      return;
     }
     bool avail = TC->IsAvailable();
     if (!avail)
