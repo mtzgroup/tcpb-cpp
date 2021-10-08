@@ -47,7 +47,7 @@ endif()
 # on Windows, make MSVC auto-create import libraries just like MinGW does
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
-#add_subdirectory(src)
+add_subdirectory(src)
 if (INSTALL_TESTS)
   add_subdirectory(test)
 endif()
