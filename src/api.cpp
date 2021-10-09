@@ -24,6 +24,7 @@ extern "C" {
   // Variables to be used/modified by all function calls, and to be active in between function calls
   TCPB::Client* TC = nullptr;
   TCPB::Input*  pb_input = nullptr;
+  int old_numqmatoms = -1;
 
   /**
    * \brief Connects to TeraChem server
@@ -119,6 +120,18 @@ extern "C" {
       (*status) = 1;
       return;
     }
+    // Sleep a bit to ensure the server will receive the next ComputeGradient call
+    if (old_numqmatoms > 0) {
+      usleep(100000);
+    }
+    // Set initial condition
+    if (old_numqmatoms < 1 || old_numqmatoms !=  (*numqmatoms)) {
+      pb_input->GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_NEW_CONDITION);
+      old_numqmatoms = (*numqmatoms);
+    } else {
+      pb_input->GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_NEW_CONDITION);
+      //pb_input->GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_CONTINUE);
+    }
     // Handle atom types
     pb_input->GetMutablePB().mutable_mol()->clear_atoms();
     for (i = 0; i<(*numqmatoms); i++) {
@@ -127,6 +140,7 @@ extern "C" {
     // Handle coordinates of the QM region
     pb_input->GetMutablePB().mutable_mol()->mutable_xyz()->Resize(3*(*numqmatoms), 0.0);
     for (i = 0; i<3*(*numqmatoms); i++) {
+      //std::cout << "QM atom " << i+1 << ": " << qmcoords[i] << "\n";
       pb_input->GetMutablePB().mutable_mol()->mutable_xyz()->mutable_data()[i] = qmcoords[i];
     }
     // Handle coordinates of the MM region
@@ -135,6 +149,7 @@ extern "C" {
     } else {
       pb_input->GetMutablePB().mutable_mmatom_position()->Resize(3*(*nummmatoms), 0.0);
       for (i = 0; i<3*(*nummmatoms); i++) {
+        //std::cout << "MM atom " << i+1 << ": " << mmcoords[i] << "\n";
         pb_input->GetMutablePB().mutable_mmatom_position()->mutable_data()[i] = mmcoords[i];
       }
     }
@@ -147,6 +162,7 @@ extern "C" {
         pb_input->GetMutablePB().mutable_mmatom_charges()->mutable_data()[i] = mmcharges[i];
       }
     }
+    //printf("Debug protobuf input string:\n%s\n", pb_input->GetDebugString().c_str());
     // Attempt to create the PB input variable
     try {
       TCPB::Output pb_output = TC->ComputeGradient((*pb_input), (*totenergy), qmgrad, mmgrad);
