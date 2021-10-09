@@ -125,15 +125,18 @@ bool testMultiClientServer()
 int main(int argc, char **argv)
 {
   int failed = 0;
+  printf("TEST1: %d\n",failed);
 
   srand(time(NULL));
 
   if (!testSimpleClientServer()) {
     failed++;
   }
+  printf("TEST2: %d\n",failed);
   if (!testMultiClientServer()) {
     failed++;
   }
+  printf("TEST3: %d\n",failed);
 
   if (failed) {
     printf("FAILED %d SOCKET TESTS\n\n", failed);
