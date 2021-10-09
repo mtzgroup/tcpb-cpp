@@ -101,6 +101,15 @@ make_pic_if_needed(tcpb_common_obj)
 
 #normally this would be applied by target_link_libraries, but since we use that intermediary object library, we have to apply it manually
 
+
+#-------------------------------------------------------------------------------------
+# Run protoc to generate CPP and H files from the proto file
+
+execute_process(COMMAND protoc proto/terachem_server.proto --proto_path=proto --cpp_out=.)
+execute_process(COMMAND mv terachem_server.pb.cc src/terachem_server.pb.cpp)
+execute_process(COMMAND mv terachem_server.pb.h src/terachem_server.pb.h)
+
+
 # NOTE: there is a CMake bug where if we were to set these as a directory-scope includes, the CUDA build would fail on some platforms with old versions of CMake
 # it turns out that CMake's cuda library passes the include paths after the first one from each of these generator expressions to nvcc without the -I flag
 # This causes the error "A single input file is required for a non-link phase when an outputfile is specified"
