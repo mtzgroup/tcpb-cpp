@@ -93,6 +93,73 @@ extern "C" {
   }
 
   /**
+   * \brief Compute energy and gradient using TeraChem
+   *\
+   * @param[in] qmattypes List of atomic types in the QM region
+   * @param[in] qmcoords Coordinates of the atoms in the QM region (unit: Bohrs)
+   * @param[in] numqmatoms Number of atoms in the QM region
+   * @param[out] totenergy Total energy of the QM in the presence of the MM region (unit: Hartrees)
+   * @param[out] qmgrad Gradient of the atoms in the QM region (unit: Hartree/Bohr)
+   * @param[out] status Status of execution: 0, all is good
+   *                                         1, mismatch in the variables passed to the function
+   *                                         2, calculation failed
+   * @param[in] mmcoords Coordinates of the atoms in the MM region, optional (unit: Bohrs)
+   * @param[in] nummmatoms Number of atoms in the MM region, optional
+   * @param[out] mmgrad Gradient of the atoms in the MM region, optional (unit: Hartree/Bohr)
+   **/
+  void tc_compute_energy_gradient_(const char qmattypes[][5], const double* qmcoords, const int* numqmatoms,
+    double* totenergy, double* qmgrad, const double* mmcoords, const double* mmcharges,
+    const int* nummmatoms, double* mmgrad, int* status) {
+    int i;
+    bool ConsiderMM = (nummmatoms != nullptr && (*nummmatoms) > 0);
+    // Check for mistakes in the varibles passed to the function
+    if (qmcoords == nullptr || numqmatoms == nullptr || (*numqmatoms) <= 0 || totenergy == nullptr ||
+        qmgrad == nullptr || (ConsiderMM && (mmcoords == nullptr || mmcharges == nullptr ||
+        mmgrad == nullptr) )) {
+      (*status) = 1;
+      return;
+    }
+    // Handle atom types
+    pb_input->GetMutablePB().mutable_mol()->clear_atoms();
+    for (i = 0; i<(*numqmatoms); i++) {
+      pb_input->GetMutablePB().mutable_mol()->add_atoms(std::string(qmattypes[i]));
+    }
+    // Handle coordinates of the QM region
+    pb_input->GetMutablePB().mutable_mol()->mutable_xyz()->Resize(3*(*numqmatoms), 0.0);
+    for (i = 0; i<3*(*numqmatoms); i++) {
+      pb_input->GetMutablePB().mutable_mol()->mutable_xyz()->mutable_data()[i] = qmcoords[i];
+    }
+    // Handle coordinates of the MM region
+    if (mmcoords == nullptr || !ConsiderMM) {
+      pb_input->GetMutablePB().clear_mmatom_position();
+    } else {
+      pb_input->GetMutablePB().mutable_mmatom_position()->Resize(3*(*nummmatoms), 0.0);
+      for (i = 0; i<3*(*nummmatoms); i++) {
+        pb_input->GetMutablePB().mutable_mmatom_position()->mutable_data()[i] = mmcoords[i];
+      }
+    }
+    // Handle charges of the MM region
+    if (mmcharges == nullptr || !ConsiderMM) {
+      pb_input->GetMutablePB().clear_mmatom_charges();
+    } else {
+      pb_input->GetMutablePB().mutable_mmatom_charges()->Resize((*nummmatoms), 0.0);
+      for (i = 0; i<(*nummmatoms); i++) {
+        pb_input->GetMutablePB().mutable_mmatom_charges()->mutable_data()[i] = mmcharges[i];
+      }
+    }
+    // Attempt to create the PB input variable
+    try {
+      TCPB::Output pb_output = TC->ComputeGradient((*pb_input), (*totenergy), qmgrad, mmgrad);
+    }
+    catch (...) {
+      (*status) = 2;
+      return;
+    }
+    // If all is gone, then done
+    (*status) = 0;
+  }
+
+  /**
    * \brief Deletes from memory variables that are open
    **/
   void tc_finalize_() {
