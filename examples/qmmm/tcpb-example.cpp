@@ -98,6 +98,7 @@ int main(int argc, char** argv) {
   TCPB::Input input(qmattypes, options, qmcoords, nullptr, mmpositions, mmcharges, numMMAtoms);
 
   // This is a new condition, so an initial guess for the wavefunction will be done
+  input.GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
   input.GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
 
   printf("Debug protobuf 1st input string:\n%s\n", input.GetDebugString().c_str());
@@ -141,6 +142,7 @@ int main(int argc, char** argv) {
   memset(mmgrad, 0.0, 3*num_mm_atoms*sizeof(double));
 
   // Repeat the previous calculation, but using the previous wavefunction as a guess
+  input.GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
   input.GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_CONTINUE);
 
   printf("Debug protobuf 2nd input string:\n%s\n", input.GetDebugString().c_str());
@@ -259,6 +261,7 @@ int main(int argc, char** argv) {
   	0.417	 };
 
   // Changing variables in the input object
+  input.GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
   input.GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
   input.GetMutablePB().mutable_mol()->clear_atoms();
   for (i = 0; i<numQMAtoms3; i++) {

@@ -125,6 +125,7 @@ extern "C" {
       usleep(100000);
     }
     // Set initial condition
+    pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
     if (old_numqmatoms < 1 || old_numqmatoms !=  (*numqmatoms)) {
       pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
       old_numqmatoms = (*numqmatoms);
