@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
   TCPB::Input input(qmattypes, options, qmcoords, nullptr, mmpositions, mmcharges, numMMAtoms);
 
   // This is a new condition, so an initial guess for the wavefunction will be done
-  input.GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_NEW_CONDITION);
+  input.GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
 
   printf("Debug protobuf 1st input string:\n%s\n", input.GetDebugString().c_str());
 
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
   // In this case, we are using the repeated field's <field>_size() function
   // For more docs, check out https://developers.google.com/protocol-buffers/docs/reference/cpp-generated
   int num_qm_atoms = input.GetPB().mol().atoms_size();
-  int num_mm_atoms = input.GetPB().mmatom_charges_size();
+  int num_mm_atoms = input.GetPB().mmatom_charge_size();
 
   double energy;
   double* qmgrad = new double[3*num_qm_atoms];
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
   memset(mmgrad, 0.0, 3*num_mm_atoms*sizeof(double));
 
   // Repeat the previous calculation, but using the previous wavefunction as a guess
-  input.GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_CONTINUE);
+  input.GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_CONTINUE);
 
   printf("Debug protobuf 2nd input string:\n%s\n", input.GetDebugString().c_str());
 
@@ -259,7 +259,7 @@ int main(int argc, char** argv) {
   	0.417	 };
 
   // Changing variables in the input object
-  input.GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_NEW_CONDITION);
+  input.GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
   input.GetMutablePB().mutable_mol()->clear_atoms();
   for (i = 0; i<numQMAtoms3; i++) {
     input.GetMutablePB().mutable_mol()->add_atoms(qmattypes3[i]);
@@ -268,9 +268,9 @@ int main(int argc, char** argv) {
   for (i = 0; i<3*numQMAtoms3; i++) {
     input.GetMutablePB().mutable_mol()->mutable_xyz()->mutable_data()[i] = qmcoords3[i];
   }
-  input.GetMutablePB().mutable_mmatom_charges()->Resize(numMMAtoms3, 0.0);
+  input.GetMutablePB().mutable_mmatom_charge()->Resize(numMMAtoms3, 0.0);
   for (i = 0; i<numMMAtoms3; i++) {
-    input.GetMutablePB().mutable_mmatom_charges()->mutable_data()[i] = mmcharges3[i];
+    input.GetMutablePB().mutable_mmatom_charge()->mutable_data()[i] = mmcharges3[i];
   }
   input.GetMutablePB().mutable_mmatom_position()->Resize(3*numMMAtoms3, 0.0);
   for (i = 0; i<3*numMMAtoms3; i++) {
@@ -283,7 +283,7 @@ int main(int argc, char** argv) {
   mmgrad = nullptr;
 
   num_qm_atoms = input.GetPB().mol().atoms_size();
-  num_mm_atoms = input.GetPB().mmatom_charges_size();
+  num_mm_atoms = input.GetPB().mmatom_charge_size();
 
   qmgrad = new double[3*num_qm_atoms];
   mmgrad = new double[3*num_mm_atoms];

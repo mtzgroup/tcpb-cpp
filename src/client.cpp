@@ -334,7 +334,7 @@ const Output Client::ComputeForces(const Input &input,
   for (int i = 0; i < 3 * num_qm_atoms; i++) {
     qmgradient[i] *= -1.0;
   }
-  int num_mm_atoms = pb.mmatom_charges().size();
+  int num_mm_atoms = pb.mmatom_charge().size();
   for (int i = 0; i < 3 * num_mm_atoms; i++) {
     mmgradient[i] *= -1.0;
   }

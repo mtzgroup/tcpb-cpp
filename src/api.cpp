@@ -126,11 +126,10 @@ extern "C" {
     }
     // Set initial condition
     if (old_numqmatoms < 1 || old_numqmatoms !=  (*numqmatoms)) {
-      pb_input->GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_NEW_CONDITION);
+      pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
       old_numqmatoms = (*numqmatoms);
     } else {
-      pb_input->GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_NEW_CONDITION);
-      //pb_input->GetMutablePB().set_imd_type(terachem_server::JobInput_ImdType::JobInput_ImdType_IMD_CONTINUE);
+      pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_CONTINUE);
     }
     // Handle atom types
     pb_input->GetMutablePB().mutable_mol()->clear_atoms();
@@ -155,11 +154,11 @@ extern "C" {
     }
     // Handle charges of the MM region
     if (mmcharges == nullptr || !ConsiderMM) {
-      pb_input->GetMutablePB().clear_mmatom_charges();
+      pb_input->GetMutablePB().clear_mmatom_charge();
     } else {
-      pb_input->GetMutablePB().mutable_mmatom_charges()->Resize((*nummmatoms), 0.0);
+      pb_input->GetMutablePB().mutable_mmatom_charge()->Resize((*nummmatoms), 0.0);
       for (i = 0; i<(*nummmatoms); i++) {
-        pb_input->GetMutablePB().mutable_mmatom_charges()->mutable_data()[i] = mmcharges[i];
+        pb_input->GetMutablePB().mutable_mmatom_charge()->mutable_data()[i] = mmcharges[i];
       }
     }
     //printf("Debug protobuf input string:\n%s\n", pb_input->GetDebugString().c_str());

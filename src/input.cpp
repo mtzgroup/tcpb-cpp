@@ -248,8 +248,8 @@ JobInput Input::InitInputPB(const vector<string> &atoms,
 
   // MM region information
   if (numMMAtoms > 0) {
-    pb.mutable_mmatom_charges()->Resize(numMMAtoms, 0.0);
-    memcpy(pb.mutable_mmatom_charges()->mutable_data(), mmcharges, numMMAtoms * sizeof(double));
+    pb.mutable_mmatom_charge()->Resize(numMMAtoms, 0.0);
+    memcpy(pb.mutable_mmatom_charge()->mutable_data(), mmcharges, numMMAtoms * sizeof(double));
 
     pb.mutable_mmatom_position()->Resize(3 * numMMAtoms, 0.0);
     memcpy(pb.mutable_mmatom_position()->mutable_data(), mmpositions, 3 * numMMAtoms * sizeof(double));
