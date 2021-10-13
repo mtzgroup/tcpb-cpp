@@ -99,9 +99,9 @@ end if
 
 ! Print results
 write (*,*) "Results from 1st calculation (only one water molecule in the QM region)"
-write (*,*) "E = ", totenergy, " Hartrees"
+write (*,'(a,f16.10,a)') "E = ", totenergy, " Hartrees"
 do i =1, numqmatoms
-  write (*,*) "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
 ! We now add an MM region
@@ -160,12 +160,12 @@ end if
 
 ! Print results
 write (*,*) "Results from 2nd calculation (one water molecule in the QM region and five in the MM region)"
-write (*,*) "E = ", totenergy, " Hartrees"
+write (*,'(a,f16.10,a)') "E = ", totenergy, " Hartrees"
 do i =1, numqmatoms
-  write (*,*) "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 do i =1, nummmatoms
-  write (*,*) "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
 ! Compute energy and gradient
@@ -187,12 +187,12 @@ end if
 
 ! Print results
 write (*,*) "Results from 3rd calculation (just repeating the 2nd calculation)"
-write (*,*) "E = ", totenergy, " Hartrees"
+write (*,'(a,f16.10,a)') "E = ", totenergy, " Hartrees"
 do i =1, numqmatoms
-  write (*,*) "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 do i =1, nummmatoms
-  write (*,*) "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
 ! Change coordinates of the QM region
@@ -222,12 +222,12 @@ end if
 
 ! Print results
 write (*,*) "Results from 4th calculation (changed coordinates of the QM region)"
-write (*,*) "E = ", totenergy, " Hartrees"
+write (*,'(a,f16.10,a)') "E = ", totenergy, " Hartrees"
 do i =1, numqmatoms
-  write (*,*) "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 do i =1, nummmatoms
-  write (*,*) "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
 ! Move one water molecule from the MM region to the QM region
@@ -296,12 +296,12 @@ end if
 
 ! Print results
 write (*,*) "Results from 5th calculation (moved one molecule from the MM to the QM region)"
-write (*,*) "E = ", totenergy, " Hartrees"
+write (*,'(a,f16.10,a)') "E = ", totenergy, " Hartrees"
 do i =1, numqmatoms
-  write (*,*) "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 do i =1, nummmatoms
-  write (*,*) "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), "Hartree/Bohr"
+  write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
 ! Finalizes variables on the TeraChem side
