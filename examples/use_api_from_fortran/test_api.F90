@@ -35,7 +35,7 @@ end do
 
 ! Attempts to connect to the TeraChem server
 write (*,*) "Attempting to connect to TeraChem server using host ", &
-  trim(host)//CHAR(0), " and port ", port, "."
+  trim(host), " and port ", port, "."
 status = -1
 call tc_connect(trim(host)//CHAR(0), port, status)
 if (status == 0) then
