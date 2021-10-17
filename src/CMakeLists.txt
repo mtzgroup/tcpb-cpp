@@ -78,7 +78,6 @@ make_pic_if_needed(tcpb_common_obj)
 
 #normally this would be applied by target_link_libraries, but since we use that intermediary object library, we have to apply it manually
 
-
 #-------------------------------------------------------------------------------------
 # Run protoc to generate CPP and H files from the proto file
 
@@ -86,28 +85,13 @@ make_pic_if_needed(tcpb_common_obj)
 #execute_process(COMMAND mv terachem_server.pb.cc ../src/terachem_server.pb.cpp)
 #execute_process(COMMAND mv terachem_server.pb.h ../src/terachem_server.pb.h)
 
-string(REPLACE ":" ";" _lib_path "$ENV{LD_LIBRARY_PATH}")
-set( CMAKE_LIBRARY_PATH ${_lib_path} )
-
-string(REPLACE ":" ";" _inc_path "$ENV{CPATH}")
-set( CMAKE_INCLUDE_PATH ${_inc_path} )
-
-find_library(PROTOBUF_LIB protobuf)
-find_path(PROTOBUF_INCLUDES google)
-
-# NOTE: there is a CMake bug where if we were to set these as a directory-scope includes, the CUDA build would fail on some platforms with old versions of CMake
-# it turns out that CMake's cuda library passes the include paths after the first one from each of these generator expressions to nvcc without the -I flag
-# This causes the error "A single input file is required for a non-link phase when an outputfile is specified"
-#target_include_directories(tcpb_common_obj PRIVATE $<TARGET_PROPERTY:protobuf,INTERFACE_INCLUDE_DIRECTORIES>)
-
 #------------------------------------------------------------------------------------------
 # libtcpb library
 
 add_library(libtcpb $<TARGET_OBJECTS:tcpb_common_obj> ${OBJECTS})
 set_property(TARGET libtcpb PROPERTY COMPILE_DEFINITIONS LIBTCPB)
 
-#target_link_libraries(libtcpb protobuf)
-target_link_libraries(libtcpb PRIVATE "${PROTOBUF_LIB}")
+target_link_libraries(libtcpb PUBLIC protobuf PRIVATE "${PROTOBUF_LIB}" Threads::Threads)
 target_include_directories(libtcpb PRIVATE "${PROTOBUF_INCLUDES}")
 remove_prefix(libtcpb)
 install_libraries(libtcpb)
