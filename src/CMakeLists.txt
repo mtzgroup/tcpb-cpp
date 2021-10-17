@@ -78,13 +78,6 @@ make_pic_if_needed(tcpb_common_obj)
 
 #normally this would be applied by target_link_libraries, but since we use that intermediary object library, we have to apply it manually
 
-#-------------------------------------------------------------------------------------
-# Run protoc to generate CPP and H files from the proto file
-
-#execute_process(COMMAND protoc ../proto/terachem_server.proto --proto_path=proto --cpp_out=.)
-#execute_process(COMMAND mv terachem_server.pb.cc ../src/terachem_server.pb.cpp)
-#execute_process(COMMAND mv terachem_server.pb.h ../src/terachem_server.pb.h)
-
 #------------------------------------------------------------------------------------------
 # libtcpb library
 

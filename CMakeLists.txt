@@ -51,20 +51,38 @@ else()
 	set(INSTALL_TESTS FALSE)
 endif()
 
-# Ensure that protobuf and its include folder are found
+# Ensure that protobuf library, include folder, and executable are found
 find_library(PROTOBUF_LIB protobuf)
+if(NOT PROTOBUF_LIB)
+    message(FATAL_ERROR "The protobuf library was not found!")
+endif()
 find_path(PROTOBUF_INCLUDES google)
+if(NOT PROTOBUF_INCLUDES)
+    message(FATAL_ERROR "The protobuf include folder was not found!")
+endif()
+find_program(PROTOBUF_PROGRAM protoc)
+if(NOT PROTOBUF_PROGRAM)
+    message(FATAL_ERROR "The program protoc was not found!")
+endif()
 
 # Ensure that Threads is in the environment
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+
+# Run protoc to generate CPP and H files from the proto file and place them on the src folder
+# Note: CMAKE_CURRENT_SOURCE_DIR is the location of this CMakeLists.txt file
+#       CMAKE_CURRENT_BINARY_DIR is the directory where I am building from
+execute_process(COMMAND ${PROTOBUF_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/proto/terachem_server.proto --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/proto --cpp_out=.)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
+file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.cc ${CMAKE_CURRENT_BINARY_DIR}/src/terachem_server.pb.cpp)
+file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.h ${CMAKE_CURRENT_BINARY_DIR}/src/terachem_server.pb.h)
 
 # on Windows, make MSVC auto-create import libraries just like MinGW does
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
 add_subdirectory(src)
 if (INSTALL_TESTS)
-  add_subdirectory(test)
+  add_subdirectory(tests)
 endif()
 
 #--------------------------------------------------------------
