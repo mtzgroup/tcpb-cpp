@@ -38,7 +38,7 @@ if(NOT INSIDE_AMBER)
 	# build options
 	option(INSTALL_HEADERS "Copy headers to the include/tcpb folder of the install directory." TRUE)
 
-	option(INSTALL_TESTS "Compile tests in the tests folder of the install directory" FALSE)
+	option(INSTALL_TESTS "Compile tests in the tests folder of the install directory" TRUE)
 
 	# Ensure that protobuf will be read from the environment
 	string(REPLACE ":" ";" _lib_path "$ENV{LD_LIBRARY_PATH}")
@@ -74,8 +74,8 @@ find_package(Threads REQUIRED)
 #       CMAKE_CURRENT_BINARY_DIR is the directory where I am building from
 execute_process(COMMAND ${PROTOBUF_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/proto/terachem_server.proto --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/proto --cpp_out=.)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src)
-file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.cc ${CMAKE_CURRENT_BINARY_DIR}/src/terachem_server.pb.cpp)
-file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.h ${CMAKE_CURRENT_BINARY_DIR}/src/terachem_server.pb.h)
+file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.cc ${CMAKE_CURRENT_SOURCE_DIR}/src/terachem_server.pb.cpp)
+file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.h ${CMAKE_CURRENT_SOURCE_DIR}/src/terachem_server.pb.h)
 
 # on Windows, make MSVC auto-create import libraries just like MinGW does
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)

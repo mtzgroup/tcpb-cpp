@@ -68,7 +68,11 @@ endif()
 # all sources should use optimized compile flags
 set_property(SOURCE ${SOURCES} ${OBJECTS} PROPERTY COMPILE_FLAGS "${OPT_CXXFLAGS_SPC} ${OPT_CFLAGS_SPC} ${FP_SOURCE_FLAG}")
 
-include_directories(${AMBERTOOLS_INC_DIR})
+if(INSIDE_AMBER)
+  include_directories(${AMBERTOOLS_INC_DIR})
+else()
+  include_directories(${INCDIR})
+endif()
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #add the common object library
