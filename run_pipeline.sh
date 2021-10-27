@@ -1,9 +1,6 @@
 #!/bin/bash
 # Designed to build and run tests inside the sseritan/tcpb-client-docker container
 
-# Makefile modifications
-sed -i 's/^PREFIX=.*/PREFIX=\/tmp\/install/' Makefile
-
 # Installation
 echo "Building and installing TCPB C++ interface..."
 ./configure --prefix=/tmp/install gnu
