@@ -102,8 +102,8 @@ else:
    # Intel compilers
    cpp = 'icpc'
    f90 = 'ifort'
-   ldflags = ['-nofor_main','-lprotobuf']
-   tests_ldflags = ['-nofor_main','-lprotobuf','-ltcpb']
+   ldflags = ['-lprotobuf']
+   tests_ldflags = ['-lprotobuf','-ltcpb']
    cppflags = ['-fPIC -std=c++11 -pthread -Wall']
    f90flags = ['-warn', 'all']
 
