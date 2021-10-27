@@ -27,7 +27,7 @@ all: src/terachem_server.pb.cpp $(LIBNAME).so
 
 $(LIBNAME).so: $(LIBOBJS)
 	@echo "[TCPB]  CXX $@"
-	$(VB)$(CXX) -shared -o $(LIBNAME).so $(LIBOBJS) $(LDFLAGS)
+	$(VB)$(CXX) -shared -o $(LIBNAME).so $(LIBOBJS) $(TCPB_LDFLAGS)
 
 install: src/terachem_server.pb.cpp $(LIBNAME).so
 	@mkdir -p $(LIBDIR)

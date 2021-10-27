@@ -134,7 +134,7 @@ PROTOC = protoc
 # Flags
 FCFLAGS = %(f90flags)s
 TCPB_CXXFLAGS = %(cppflags)s
-LDFLAGS = %(ldflags)s
+TCPB_LDFLAGS = %(ldflags)s
 TESTS_LDFLAGS = %(tests_ldflags)s
 
 # Where program gets installed
