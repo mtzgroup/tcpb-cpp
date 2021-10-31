@@ -44,8 +44,8 @@ else if (status == 1) then
   write (*,*) "ERROR: Connection to TeraChem server failed!"
   STOP
 else if (status == 2) then
-  write (*,*) "ERROR: Connection to TeraChem server succeed, but the &
-    server is not available!"
+  write (*,*) "ERROR: Connection to TeraChem server succeed, but the ", &
+              "       server is not available!"
   STOP
 else
   write (*,*) "ERROR: Status on tc_connect function is not recognized!"
