@@ -94,8 +94,11 @@ endif()
 remove_prefix(libtcpb)
 install_libraries(libtcpb)
 
-#tell others where to find the tcpb includes
-target_include_directories(libtcpb INTERFACE .)
+# Create the headers inside the build folder, just to serve to other tools
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/tcpb)
+file(GLOB TCPB_HEADERS "*.h")
+file(COPY ${TCPB_HEADERS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/tcpb)
+target_include_directories(libtcpb INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 #------------------------------------------------------------------------------------------
 # DLL exports/imports
@@ -109,8 +112,6 @@ endif()
 # Header installation
 
 if(INSTALL_HEADERS)
-	# grab all .h files from the main directory.
-	file(GLOB TCPB_HEADERS "*.h")
 
     if(INSIDE_AMBER)
         install(FILES ${TCPB_HEADERS} DESTINATION ${AMBERTOOLS_INC_DIR}/tcpb)
