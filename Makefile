@@ -27,7 +27,7 @@ all: src/terachem_server.pb.cpp $(LIBNAME).so
 
 $(LIBNAME).so: $(LIBOBJS)
 	@echo "[TCPB]  CXX $@"
-	$(VB)$(CXX) -shared -o $(LIBNAME).so $(LIBOBJS) -I$(INCDIR) -L$(LIBDIR) $(TCPB_LDFLAGS)
+	$(VB)$(CXX) $(TCPB_CXXFLAGS) -shared -o $(LIBNAME).so $(LIBOBJS) -L$(LIBDIR) $(TCPB_LDFLAGS)
 
 install: src/terachem_server.pb.cpp $(LIBNAME).so
 	@mkdir -p $(LIBDIR)
@@ -46,7 +46,7 @@ uninstall:
 
 .cpp.o:
 	@echo "[TCPB]  CXX $<"
-	$(VB)$(CXX) $(TCPB_CXXFLAGS) -c $*.cpp -o $*.o
+	$(VB)$(CXX) $(TCPB_CXXFLAGS) -c $*.cpp -o $*.o -I$(INCDIR)
 
 src/terachem_server.pb.cpp: proto/terachem_server.proto
 	@echo "[TCPB]  PROTOC $<"
