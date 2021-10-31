@@ -11,8 +11,8 @@ parser.add_option('-d', '--debug', dest='debug', default=False,
                   action='store_true', help='Trigger the debug flags.')
 parser.add_option('-n', '--no-opt', dest='opt', default=True,
                   action='store_false', help='Disable compiler optimizations.')
-parser.add_option('--prefix', dest='prefix', default='.',
-                  help='Installation destination. Default is current directory')
+parser.add_option('--prefix', dest='prefix', default=os.getcwd(),
+                  help='Installation destination. Default: current directory')
 
 
 opt, arg = parser.parse_args()
@@ -57,7 +57,7 @@ if arg[0].lower() in ('gnu', 'gcc'):
    ldflags = ['-lprotobuf']
    tests_ldflags = ['-lprotobuf','-ltcpb']
    cppflags = ['-fPIC -std=c++11 -pthread -Wall']
-   f90flags = ['-Wall']
+   f90flags = ['-fPIC', '-Wall']
 
    if opt.opt:
       cppflags.extend(['-O3', '-mtune=native'])
@@ -82,7 +82,7 @@ elif arg[0].lower() == 'clang':
    tests_ldflags = ['-lprotobuf','-ltcpb']
 
    cppflags = ['-fPIC -std=c++11 -pthread -Wall']
-   f90flags = ['-Wall']
+   f90flags = ['-fPIC', '-Wall']
 
    if opt.opt:
       cppflags.extend(['-O3'])
@@ -105,7 +105,7 @@ else:
    ldflags = ['-lprotobuf']
    tests_ldflags = ['-lprotobuf','-ltcpb']
    cppflags = ['-fPIC -std=c++11 -pthread -Wall']
-   f90flags = ['-warn', 'all']
+   f90flags = ['-fPIC', '-warn', 'all']
 
    if opt.opt:
       cppflags.extend(['-O3', '-xHost', '-ipo'])
@@ -132,7 +132,7 @@ FC = %(f90)s
 PROTOC = protoc
 
 # Flags
-FCFLAGS = %(f90flags)s
+FFLAGS = %(f90flags)s
 TCPB_CXXFLAGS = %(cppflags)s
 TCPB_LDFLAGS = %(ldflags)s
 TESTS_LDFLAGS = %(tests_ldflags)s
