@@ -66,30 +66,31 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
 endif()
 
 # all sources should use optimized compile flags
-set_property(SOURCE ${SOURCES} ${OBJECTS} PROPERTY COMPILE_FLAGS "${OPT_CXXFLAGS_SPC} ${OPT_CFLAGS_SPC} ${FP_SOURCE_FLAG}")
+set_property(SOURCE ${SOURCES} PROPERTY COMPILE_FLAGS "${OPT_CXXFLAGS_SPC} ${OPT_CFLAGS_SPC} ${FP_SOURCE_FLAG}")
 
-if(INSIDE_AMBER)
-  include_directories(${AMBERTOOLS_INC_DIR})
-else()
-  include_directories(${INCDIR})
-endif()
-
-#---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#add the common object library
-
-add_library(tcpb_common_obj OBJECT ${SOURCES})
-make_pic_if_needed(tcpb_common_obj)
-
-#normally this would be applied by target_link_libraries, but since we use that intermediary object library, we have to apply it manually
+#-----------------------------------------------------------------------------------------------------
+# Run protoc to generate CPP and header files from the proto file and place them on the src folder
+# Note: CMAKE_CURRENT_SOURCE_DIR is the location of this CMakeLists.txt file
+#       CMAKE_CURRENT_BINARY_DIR is the directory where I am building from
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.h
+                   COMMAND protobuf::protoc ${CMAKE_CURRENT_SOURCE_DIR}/../proto/terachem_server.proto --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/../proto --cpp_out=.
+				   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.cc ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.cpp
+				   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.h  ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.h
+				   DEPENDS protobuf::protoc)
 
 #------------------------------------------------------------------------------------------
 # libtcpb library
 
-add_library(libtcpb $<TARGET_OBJECTS:tcpb_common_obj> ${OBJECTS})
-set_property(TARGET libtcpb PROPERTY COMPILE_DEFINITIONS LIBTCPB)
+add_library(libtcpb ${SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.h)
 
-target_link_libraries(libtcpb PUBLIC protobuf PRIVATE "${PROTOBUF_LIB}" Threads::Threads)
-target_include_directories(libtcpb PRIVATE "${PROTOBUF_INCLUDES}")
+target_link_libraries(libtcpb PUBLIC protobuf::libprotobuf PRIVATE Threads::Threads)
+if(Protobuf_INCLUDE_DIRS)
+	target_include_directories(libtcpb PRIVATE ${Protobuf_INCLUDE_DIRS})
+endif()
+if(INSIDE_AMBER)
+    get_target_property(libprotobuf_SOURCE_DIR protobuf::libprotobuf SOURCE_DIR)
+	target_include_directories(libtcpb PRIVATE ${libprotobuf_SOURCE_DIR}/../src)
+endif()
 remove_prefix(libtcpb)
 install_libraries(libtcpb)
 
@@ -100,10 +101,6 @@ target_include_directories(libtcpb INTERFACE .)
 # DLL exports/imports
 
 if(SHARED)
-	# CMake automatically sets up the libtcpb_EXPORTS definition for libtcpb.
-	# We just have to apply it to the common obj as well.
-	target_compile_definitions(tcpb_common_obj PRIVATE libtcpb_EXPORTS)
-
 	# now set up the definition for other people to use
 	target_compile_definitions(libtcpb INTERFACE TCPB_USE_DLL)
 endif()
@@ -115,13 +112,10 @@ if(INSTALL_HEADERS)
 	# grab all .h files from the main directory.
 	file(GLOB TCPB_HEADERS "*.h")
 
-	install(FILES ${TCPB_HEADERS} DESTINATION ${INCDIR}/tcpb)
-
-	# configure SymbolExporting.h specially for the current install type
-	if(SHARED)
-		set(TCPB_IS_SHARED 1)
-	else()
-		set(TCPB_IS_SHARED 0)
-	endif()
+    if(INSIDE_AMBER)
+        install(FILES ${TCPB_HEADERS} DESTINATION ${AMBERTOOLS_INC_DIR}/tcpb)
+    else()
+        install(FILES ${TCPB_HEADERS} DESTINATION ${INCDIR}/tcpb)
+    endif()
 
 endif()
