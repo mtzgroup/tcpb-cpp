@@ -72,7 +72,7 @@ set_property(SOURCE ${SOURCES} PROPERTY COMPILE_FLAGS "${OPT_CXXFLAGS_SPC} ${OPT
 # Run protoc to generate CPP and header files from the proto file and place them on the src folder
 # Note: CMAKE_CURRENT_SOURCE_DIR is the location of this CMakeLists.txt file
 #       CMAKE_CURRENT_BINARY_DIR is the directory where I am building from
-add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.h
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/terachem_server.pb.cpp ${CMAKE_CURRENT_SOURCE_DIR}/terachem_server.pb.h
                    COMMAND protobuf::protoc ${CMAKE_CURRENT_SOURCE_DIR}/../proto/terachem_server.proto --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/../proto --cpp_out=.
 				   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.cc ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.cpp
 				   COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_BINARY_DIR}/terachem_server.pb.h  ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.h
@@ -81,7 +81,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.
 #------------------------------------------------------------------------------------------
 # libtcpb library
 
-add_library(libtcpb ${SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../src/terachem_server.pb.h)
+add_library(libtcpb ${SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/terachem_server.pb.cpp ${CMAKE_CURRENT_SOURCE_DIR}/terachem_server.pb.h)
 
 target_link_libraries(libtcpb PUBLIC protobuf::libprotobuf PRIVATE Threads::Threads)
 if(Protobuf_INCLUDE_DIRS)
@@ -96,8 +96,9 @@ install_libraries(libtcpb)
 
 # Create the headers inside the build folder, just to serve to other tools
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/tcpb)
-file(GLOB TCPB_HEADERS "*.h")
-file(COPY ${TCPB_HEADERS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/include/tcpb)
+file(GLOB TCPB_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+add_custom_command(TARGET libtcpb POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy ${TCPB_HEADERS} "${CMAKE_CURRENT_SOURCE_DIR}/terachem_server.pb.h" ${CMAKE_CURRENT_BINARY_DIR}/include/tcpb)
 target_include_directories(libtcpb INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 #------------------------------------------------------------------------------------------
