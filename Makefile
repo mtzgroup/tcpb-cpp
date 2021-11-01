@@ -57,6 +57,11 @@ src/terachem_server.pb.cpp: proto/terachem_server.proto
 clean:
 	/bin/rm -f $(LIBOBJS)
 
+example:
+	@cd examples/qm && make
+	@cd examples/qmmm && make
+	@cd examples/use_api_from_fortran && make
+
 ifdef TESTDIR
 test: $(TESTBIN) $(LIBDIR)/$(LIBNAME).so
 	@echo "TCPB: Running input_test"
