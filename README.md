@@ -10,7 +10,7 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Protocol Buffers >= 3.2.0 (`protoc` and `libprotobuf.so` for C++)
 
-## Installation
+## Installation (with configure script)
 
 * Ensure `protoc` and `libprotobuf.so` are in your `PATH` and `LD_LIBRARY_PATH`, respectively
 
@@ -18,13 +18,27 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Run `make install`
 
-* Add `include` to `CPLUS_INCLUDE_PATH` (for C++)
+* Add the absolute path to `lib` into `LD_LIBRARY_PATH`
 
-* Add `lib` to `LD_LIBRARY_PATH` (for linking) and `LIBRARY_PATH` (for runtime)
+## Installation (with CMake)
+
+* Ensure you have CMake version 3.8.0 or higher
+
+* Run `mkdir build && cd build`
+
+* To install, for example, with GNU compilers at /usr/local, run `cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCOMPILER=GNU`
+
+* Run `make install`
+
+* Add the absolute path to `lib` into `LD_LIBRARY_PATH`
 
 ## Tests
 
-* After installation, run `make test`
+* After installation with configure script, run `make test`. With CMake, the tests are automatically compiled and placed at the folder `tests`
+
+## Examples
+
+* After installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
 
 ## Notes for TeraChem Developers
 
