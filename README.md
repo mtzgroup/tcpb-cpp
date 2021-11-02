@@ -6,8 +6,6 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 ## Requirements
 
-* C++11 compiler
-
 * Protocol Buffers >= 3.2.0 (`protoc` and `libprotobuf.so` for C++)
 
 ## Installation (with configure script)
@@ -30,7 +28,7 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Run `make install`
 
-* Add the absolute path to `lib` into `LD_LIBRARY_PATH`
+* Add the absolute path to `../lib` into `LD_LIBRARY_PATH`
 
 ## Tests
 
