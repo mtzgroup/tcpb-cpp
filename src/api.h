@@ -51,7 +51,7 @@ extern "C" {
     const int* nummmatoms, double* mmgrad, int* status);
 
   /**
-   * \brief Deletes from memory variables that are open
+   * \brief Deletes from memory variables that are allocated
    **/
   void tc_finalize_();
 
