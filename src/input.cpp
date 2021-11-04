@@ -28,9 +28,12 @@ namespace TCPB {
 Input::Input(const vector<string> &atoms,
   const map<string, string> &options,
   const double *geom,
-  const double *geom2)
+  const double *geom2,
+  const double *mmpositions,
+  const double *mmcharges,
+  const int numMMAtoms)
 {
-  pb_ = InitInputPB(atoms, options, geom, geom2);
+  pb_ = InitInputPB(atoms, options, geom, geom2, mmpositions, mmcharges, numMMAtoms);
 }
 
 Input::Input(string tcfile,
@@ -139,18 +142,21 @@ bool Input::IsApproxEqual(const Input &other) const
 JobInput Input::InitInputPB(const vector<string> &atoms,
   const strmap &options,
   const double *geom,
-  const double *geom2)
+  const double *geom2,
+  const double *mmpositions,
+  const double *mmcharges,
+  const int numMMAtoms)
 {
   JobInput pb = JobInput();
   Mol *mol = pb.mutable_mol();
-  int numAtoms = atoms.size();
+  int numQMAtoms = atoms.size();
   strmap parsed_options(options);
 
   // Geometry and atoms
-  mol->mutable_xyz()->Resize(3 * numAtoms, 0.0);
-  memcpy(mol->mutable_xyz()->mutable_data(), geom, 3 * numAtoms * sizeof(double));
+  mol->mutable_xyz()->Resize(3 * numQMAtoms, 0.0);
+  memcpy(mol->mutable_xyz()->mutable_data(), geom, 3 * numQMAtoms * sizeof(double));
 
-  for (int i = 0; i < numAtoms; i++) {
+  for (int i = 0; i < numQMAtoms; i++) {
     mol->add_atoms(atoms[i]);
   }
 
@@ -162,7 +168,7 @@ JobInput Input::InitInputPB(const vector<string> &atoms,
     units = "BOHR";
   }
   if (!Utils::ToUpper(units).compare("ANGSTROM")) {
-    for (int i = 0; i < 3 * numAtoms; ++i) {
+    for (int i = 0; i < 3 * numQMAtoms; ++i) {
       double *g = mol->mutable_xyz()->mutable_data();
       g[i] *= constants::ANGSTROM_TO_AU;
     }
@@ -226,14 +232,32 @@ JobInput Input::InitInputPB(const vector<string> &atoms,
     }
     parsed_options.erase("bond_order");
   }
+
+  // Second geometry
   if (geom2 != NULL) {
-    pb.mutable_xyz2()->Resize(3 * numAtoms, 0.0);
-    memcpy(pb.mutable_xyz2()->mutable_data(), geom2, 3 * numAtoms * sizeof(double));
+    pb.mutable_xyz2()->Resize(3 * numQMAtoms, 0.0);
+    memcpy(pb.mutable_xyz2()->mutable_data(), geom2, 3 * numQMAtoms * sizeof(double));
 
     if (!Utils::ToUpper(units).compare("ANGSTROM")) {
-      for (int i = 0; i < 3 * numAtoms; ++i) {
+      for (int i = 0; i < 3 * numQMAtoms; ++i) {
         double *g2 = pb.mutable_xyz2()->mutable_data();
         g2[i] *= constants::ANGSTROM_TO_AU;
+      }
+    }
+  }
+
+  // MM region information
+  if (numMMAtoms > 0) {
+    pb.mutable_mmatom_charge()->Resize(numMMAtoms, 0.0);
+    memcpy(pb.mutable_mmatom_charge()->mutable_data(), mmcharges, numMMAtoms * sizeof(double));
+
+    pb.mutable_mmatom_position()->Resize(3 * numMMAtoms, 0.0);
+    memcpy(pb.mutable_mmatom_position()->mutable_data(), mmpositions, 3 * numMMAtoms * sizeof(double));
+
+    if (!Utils::ToUpper(units).compare("ANGSTROM")) {
+      for (int i = 0; i < 3 * numMMAtoms; ++i) {
+        double *mmp = pb.mutable_mmatom_position()->mutable_data();
+        mmp[i] *= constants::ANGSTROM_TO_AU;
       }
     }
   }

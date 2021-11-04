@@ -1,91 +1,79 @@
-#################
-## DIRECTORIES ##
-#################
-SRCDIR=./src
-PROTODIR=./proto
-BUILDDIR=./build
-TESTDIR=./tests
+include config.h
 
-TCPBSRC := 	$(SRCDIR)/exceptions.cpp \
-		$(SRCDIR)/client.cpp \
-		$(SRCDIR)/input.cpp \
-		$(SRCDIR)/output.cpp \
-		$(SRCDIR)/server.cpp \
-		$(SRCDIR)/socket.cpp \
-		$(SRCDIR)/terachem_server.pb.cpp \
-		$(SRCDIR)/utils.cpp
+.NOTPARALLEL:clean install all
+.PHONY: test
 
-TCPBOBJS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(TCPBSRC))
+LIBSRC := src/exceptions.cpp \
+	src/client.cpp \
+	src/input.cpp \
+	src/output.cpp \
+	src/server.cpp \
+	src/socket.cpp \
+	src/terachem_server.pb.cpp \
+	src/utils.cpp \
+	src/api.cpp
 
-TESTSRC := 	$(TESTDIR)/input_test.cpp \
-		$(TESTDIR)/socket_test.cpp \
-		$(TESTDIR)/tcpb_test.cpp
+LIBOBJS := $(patsubst src/%.cpp, src/%.o, $(LIBSRC))
+       
+LIBNAME  = libtcpb
 
-TESTBIN := $(patsubst $(TESTDIR)/%.cpp, $(TESTDIR)/%, $(TESTSRC))
+TESTSRC := 	tests/input_test.cpp \
+		tests/socket_test.cpp \
+		tests/tcpb_test.cpp
 
-###############
-## COMPILERS ##
-###############
-CXX=g++
-CXXFLAGS=-fPIC -std=c++11 -pthread -g -DSOCKETLOGS
-PROTOC=protoc
-LIBS=-lprotobuf
+TESTBIN := $(patsubst tests/%.cpp, tests/%, $(TESTSRC))
 
-TESTFLAGS=-std=c++11 -pthread -g
-TESTLIBS=-lprotobuf -ltcpb
+all: src/terachem_server.pb.cpp $(LIBNAME).so
 
-##################
-## INSTALLATION ##
-##################
-VER=1.0.0a1
-#PREFIX=/global/user_software/tcpb-client/$(VER)
-PREFIX=/home/sseritan/personal_modules/software/tcpb-cpp
-LIBPREFIX=$(PREFIX)/lib
-INCPREFIX=$(PREFIX)/include/tcpb
+$(LIBNAME).so: $(LIBOBJS)
+	@echo "[TCPB]  CXX $@"
+	$(VB)$(CXX) $(TCPB_CXXFLAGS) -shared -o $(LIBNAME).so $(LIBOBJS) -L$(LIBDIR) $(TCPB_LDFLAGS)
 
-################
-## MAKE RULES ##
-################
-.PHONY: all clean install uninstall tests
-all: $(SRCDIR)/terachem_server.pb.cpp $(BUILDDIR)/libtcpb.so.$(VER)
-
-clean:
-	@rm -rf $(BUILDDIR)
-	@rm -f $(SRCDIR)/terachem_server.pb.*
-	@rm -f $(TESTBIN) $(TESTDIR)/*.log
-
-install:
-	@echo "Installing TCPB C++ library into $(PREFIX)"
-	@mkdir -p $(LIBPREFIX)
-	@cp -v $(BUILDDIR)/libtcpb.so.$(VER) $(LIBPREFIX)
-	@ln -sfn $(LIBPREFIX)/libtcpb.so.$(VER) $(LIBPREFIX)/libtcpb.so
-	@mkdir -p $(INCPREFIX)
-	@cp -v $(SRCDIR)/*.h $(INCPREFIX)
+install: src/terachem_server.pb.cpp $(LIBNAME).so
+	@mkdir -p $(LIBDIR)
+	/bin/mv $(LIBNAME).so $(LIBDIR)
+	@mkdir -p $(INCDIR)/tcpb
+	@cp -v src/*.h $(INCDIR)/tcpb
 
 uninstall:
-	@echo "Uninstalling TCPB C++ library from $(PREFIX)"
-	@rm -v $(LIBPREFIX)/{libtcpb.so.$(VER),libtcpb.so}
-	@rm -rv $(INCPREFIX)
+	/bin/rm -Rf "$(INCDIR)/tcpb" "$(LIBDIR)/$(LIBNAME).so" "config.h"
 
-tests: $(TESTBIN) $(BUILDDIR)/libtcpb.so.$(VER)
-	@cd $(TESTDIR) && ./input_test
-	@cd $(TESTDIR) && ./socket_test
-	@cd $(TESTDIR) && ./tcpb_test
+.SUFFIXES: .F90 .cpp .o
 
-###################
-## COMPILE RULES ##
-###################
-$(BUILDDIR)/libtcpb.so.$(VER): $(TCPBOBJS)
-	$(CXX) $(CXXFLAGS) -shared -o $@ $^ $(LIBS)
+.F90.o:
+	@echo "[TCPB]  FC $<"
+	$(VB)$(FC) $(FCFLAGS) -c $*.F90 -o $*.o
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(BUILDDIR)
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+.cpp.o:
+	@echo "[TCPB]  CXX $<"
+	$(VB)$(CXX) $(TCPB_CXXFLAGS) -c $*.cpp -o $*.o -I$(INCDIR)
 
-$(SRCDIR)/terachem_server.pb.cpp: $(PROTODIR)/terachem_server.proto
-	$(PROTOC) $< --proto_path=$(PROTODIR) --cpp_out=.
-	@mv terachem_server.pb.cc $(SRCDIR)/terachem_server.pb.cpp
-	@mv terachem_server.pb.h $(SRCDIR)
+src/terachem_server.pb.cpp: proto/terachem_server.proto
+	@echo "[TCPB]  PROTOC $<"
+	$(PROTOC) $< --proto_path=proto --cpp_out=.
+	@mv terachem_server.pb.cc src/terachem_server.pb.cpp
+	@mv terachem_server.pb.h src
 
-$(TESTDIR)/%: $(TESTDIR)/%.cpp
-	$(CXX) $(TESTFLAGS) -o $@ $< $(TESTLIBS)
+clean:
+	/bin/rm -f $(LIBOBJS)
+
+example:
+	@cd examples/qm && make
+	@cd examples/qmmm && make
+	@cd examples/use_api_from_fortran && make
+
+ifdef TESTDIR
+test: $(TESTBIN) $(LIBDIR)/$(LIBNAME).so
+	@echo "TCPB: Running input_test"
+	@cd tests && ./input_test
+	@echo "TCPB: Running socket_test"
+	@cd tests && ./socket_test
+	@echo "TCPB: Running tcpb_test"
+	@cd tests && ./tcpb_test
+
+test-clean:
+	/bin/rm -f $(TESTBIN)
+
+tests/%: tests/%.cpp
+	$(CXX) $(TCPB_CXXFLAGS) -o $@ $< $(TESTS_LDFLAGS) -I$(INCDIR) -L$(LIBDIR)
+endif

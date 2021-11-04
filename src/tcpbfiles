@@ -1,0 +1,14 @@
+# The files below are used by libtcpb
+SOURCES=\
+        api.cpp \
+        client.cpp \
+        exceptions.cpp \
+        input.cpp \
+        output.cpp \
+        server.cpp \
+        socket.cpp \
+        terachem_server.pb.cpp \
+        utils.cpp
+
+# These objects are used by libtcpb
+OBJECTS=$(SOURCES:.cpp=.o)

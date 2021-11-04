@@ -96,7 +96,7 @@ bool Client::SendJobAsync(const Input &input)
   bool sendSuccess, recvSuccess;
   int msgType, msgSize;
   string msgStr;
-  const JobInput pb = input.GetInputPB();
+  const JobInput pb = input.GetPB();
 
   msgType = terachem_server::JOBINPUT;
   msgSize = pb.ByteSize();
@@ -292,7 +292,7 @@ const Output Client::ComputeEnergy(const Input &input,
 {
   // Reset runtype to energy
   Input new_input(input);
-  terachem_server::JobInput pb = new_input.GetInputPB();
+  terachem_server::JobInput pb = new_input.GetPB();
   pb.set_run(terachem_server::JobInput::ENERGY);
 
   Output output = ComputeJobSync(new_input);
@@ -304,33 +304,39 @@ const Output Client::ComputeEnergy(const Input &input,
 
 const Output Client::ComputeGradient(const Input &input,
   double &energy,
-  double *gradient)
+  double *qmgradient,
+  double *mmgradient)
 {
   // Reset runtype to gradient
   Input new_input(input);
-  terachem_server::JobInput pb = new_input.GetInputPB();
+  terachem_server::JobInput pb = new_input.GetPB();
   pb.set_run(terachem_server::JobInput::GRADIENT);
 
   Output output = ComputeJobSync(new_input);
 
   output.GetEnergy(energy);
-  output.GetGradient(gradient);
+  output.GetGradient(qmgradient,mmgradient);
 
   return output;
 }
 
 const Output Client::ComputeForces(const Input &input,
   double &energy,
-  double *gradient)
+  double *qmgradient,
+  double *mmgradient)
 {
   // Compute energy and gradient
-  Output output = ComputeGradient(input, energy, gradient);
+  Output output = ComputeGradient(input, energy, qmgradient, mmgradient);
 
   // Flip sign on gradient
-  const JobInput pb = input.GetInputPB();
-  int num_atoms = pb.mol().atoms().size();
-  for (int i = 0; i < 3 * num_atoms; i++) {
-    gradient[i] *= -1.0;
+  const JobInput pb = input.GetPB();
+  int num_qm_atoms = pb.mol().atoms().size();
+  for (int i = 0; i < 3 * num_qm_atoms; i++) {
+    qmgradient[i] *= -1.0;
+  }
+  int num_mm_atoms = pb.mmatom_charge().size();
+  for (int i = 0; i < 3 * num_mm_atoms; i++) {
+    mmgradient[i] *= -1.0;
   }
 
   return output;

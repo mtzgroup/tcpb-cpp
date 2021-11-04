@@ -1,0 +1,145 @@
+#!/usr/bin/env python
+
+from optparse import OptionParser
+import sys
+import os
+
+epilog = '<compiler> must be either "gnu", "intel", or "clang"'
+
+parser = OptionParser(usage='%prog [Options] <compiler>', epilog=epilog)
+parser.add_option('-d', '--debug', dest='debug', default=False,
+                  action='store_true', help='Trigger the debug flags.')
+parser.add_option('-n', '--no-opt', dest='opt', default=True,
+                  action='store_false', help='Disable compiler optimizations.')
+parser.add_option('--prefix', dest='prefix', default=os.getcwd(),
+                  help='Installation destination. Default: current directory')
+
+
+opt, arg = parser.parse_args()
+
+if len(arg) < 1 and not 'CC' in os.environ and not 'CXX' in os.environ:
+   sys.stderr.write("No compiler found! Must specify gnu or intel. Use the -h flag for help.\n")
+   sys.exit(1)
+elif 'CXX' in os.environ:
+   if 'clang++' in os.environ['CXX']:
+      arg.append('clang')
+   elif 'g++' in os.environ['CXX']:
+      arg.append('gcc')
+   elif 'icpc' in os.environ['CXX']:
+      arg.append('intel')
+   else:
+      sys.stderr.write('Unrecognized C++ compiler %s' % os.environ['CXX'])
+elif 'CC' in os.environ:
+   if 'gcc' in os.environ['CC']:
+      arg.append('gcc')
+   elif 'clang' in os.environ['CC']:
+      arg.append('clang')
+   elif 'icc' in os.environ['CC']:
+      arg.append('intel')
+   else:
+      sys.stderr.write('Unrecognized C compiler %s' % os.environ['CXX'])
+elif len(arg) < 1:
+   sys.stderr.write('No compiler provided or detected from the environment.\n')
+
+if len(arg) > 1:
+   sys.stderr.write("Too many command-line arguments found. Use the -h flag for help.\n")
+   sys.exit(1)
+
+if not arg[0].lower() in ('gnu', 'intel', 'gcc', 'clang'):
+   sys.exit("Unrecognized compiler [%s]. Choose 'gnu' 'intel' or 'clang'.\n" % arg[0])
+
+f = open('config.h', 'w')
+
+if arg[0].lower() in ('gnu', 'gcc'):
+   # GNU compilers
+   cpp = 'g++'
+   f90 = 'gfortran'
+   ldflags = ['-lprotobuf']
+   tests_ldflags = ['-lprotobuf','-ltcpb']
+   cppflags = ['-fPIC -std=c++11 -pthread -Wall']
+   f90flags = ['-fPIC', '-Wall']
+
+   if opt.opt:
+      cppflags.extend(['-O3', '-mtune=native'])
+      f90flags.extend(['-O3', '-mtune=native'])
+      ldflags.extend(['-O3', '-mtune=native'])
+   else:
+      cppflags.append('-O0')
+      f90flags.append('-O0')
+      ldflags.append('-O0')
+
+   if opt.debug:
+      cppflags.append('-g')
+      f90flags.append('-g')
+      ldflags.append('-g')
+
+elif arg[0].lower() == 'clang':
+
+   # clang compilers
+   cpp = 'clang++'
+   f90 = 'gfortran'
+   ldflags = ['-lprotobuf']
+   tests_ldflags = ['-lprotobuf','-ltcpb']
+
+   cppflags = ['-fPIC -std=c++11 -pthread -Wall']
+   f90flags = ['-fPIC', '-Wall']
+
+   if opt.opt:
+      cppflags.extend(['-O3'])
+      f90flags.extend(['-O3'])
+      ldflags.extend(['-O3'])
+   else:
+      cppflags.append('-O0')
+      f90flags.append('-O0')
+      ldflags.append('-O0')
+
+   if opt.debug:
+      cppflags.append('-g')
+      f90flags.append('-g')
+      ldflags.append('-g')
+
+else:
+   # Intel compilers
+   cpp = 'icpc'
+   f90 = 'ifort'
+   ldflags = ['-lprotobuf']
+   tests_ldflags = ['-lprotobuf','-ltcpb']
+   cppflags = ['-fPIC -std=c++11 -pthread -Wall']
+   f90flags = ['-fPIC', '-warn', 'all']
+
+   if opt.opt:
+      cppflags.extend(['-O3', '-xHost', '-ipo'])
+      f90flags.extend(['-O3', '-xHost', '-ipo'])
+      ldflags.extend(['-O3', '-xHost', '-ipo'])
+   else:
+      cppflags.append('-O0')
+      f90flags.append('-O0')
+      ldflags.append('-O0')
+
+   if opt.debug:
+      cppflags.extend(['-g', '-debug'])
+      f90flags.extend(['-g', '-debug'])
+      ldflags.extend(['-g', '-debug'])
+
+confighopts = dict(cpp=cpp, f90=f90, ldflags=' '.join(ldflags), tests_ldflags=' '.join(tests_ldflags),
+                   cppflags=' '.join(cppflags), f90flags=' '.join(f90flags),
+                   confline=' '.join(sys.argv), prefix=opt.prefix)
+f.write("""# configured with [[ %(confline)s ]]
+
+# Compilers
+CXX = %(cpp)s
+FC = %(f90)s
+PROTOC = protoc
+
+# Flags
+FFLAGS = %(f90flags)s
+TCPB_CXXFLAGS = %(cppflags)s
+TCPB_LDFLAGS = %(ldflags)s
+TESTS_LDFLAGS = %(tests_ldflags)s
+
+# Where program gets installed
+LIBDIR = %(prefix)s/lib
+INCDIR = %(prefix)s/include
+TESTDIR = %(prefix)s/tests
+""" % confighopts)
+f.close()

@@ -1,30 +1,42 @@
-# C++ TeraChem Protocol Buffer (TCPB) Client & Server #
+# C++ TeraChem Protocol Buffer (TCPB) Client #
 
-This repository is designed to facilitate the development a TCP-based interface for TeraChem.
+This repository is designed to facilitate the communication between TeraChem and third party software.
 
-The client and server use C-style sockets for communication, and Protocol Buffers for a clean, well-defined way to serialize TeraChem input & output.
-
-As of v1.0, the client and server are both included here and share wrappers (i.e. TCPB::Input, TCPB::Output) over the underlying serialization protocols (currently just Protocol Buffers, but may be extended to include MsgPack for larger data).
+The client and server (set by the TeraChem executable) use C-style sockets for communication, and Protocol Buffers for a clean, well-defined way to serialize TeraChem input & output.
 
 ## Requirements
 
-* C++11 compiler (g++ is fine, icpc not yet tested)
-
 * Protocol Buffers >= 3.2.0 (`protoc` and `libprotobuf.so` for C++)
 
-## Installation
+## Installation (with configure script)
 
 * Ensure `protoc` and `libprotobuf.so` are in your `PATH` and `LD_LIBRARY_PATH`, respectively
 
-* Add or remove the `-DSOCKETLOGS` flag based on whether you want verbose output (off by default)
+* Run `./configure gnu`. Other compiler options are intel and clang (not tested). To pick another install location, like /usr/local, run `./configure --prefix=/usr/local gnu`
 
-* Change `PREFIX` in the Makefile to point to your install location
+* Run `make install`
 
-* Run `make` and `make install`
+* Add the absolute path to `lib` into `LD_LIBRARY_PATH`
 
-* Add `$PREFIX/include` to `CPLUS_INCLUDE_PATH` (for C++)
+## Installation (with CMake)
 
-* Add `$PREFIX/lib` to `LD_LIBRARY_PATH` (for linking) and `LIBRARY_PATH` (for runtime)
+* Ensure you have CMake version 3.8.0 or higher
+
+* Run `mkdir build && cd build`
+
+* To install, for example, with GNU compilers at /usr/local, run `cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCOMPILER=GNU`
+
+* Run `make install`
+
+* Add the absolute path to `../lib` into `LD_LIBRARY_PATH`
+
+## Tests
+
+* After installation with configure script, run `make test`. With CMake, the tests are automatically compiled and placed at the folder `tests`
+
+## Examples
+
+* After installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
 
 ## Notes for TeraChem Developers
 
@@ -55,3 +67,4 @@ The `run_docker_tests.sh` script wraps the magic Docker lines to do this with th
 ## Contact
 
 * Stefan Seritan <sseritan@stanford.edu>
+* Vinicius Wilian D. Cruzeiro <vwcruz@stanford.edu>
