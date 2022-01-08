@@ -34,41 +34,27 @@ public:
   /**
    * \brief Gets the energy from a JobOutput Protocol Buffer
    *
-   * For now, will assume EITHER CIS or CAS being populated, with CIS checked first
-   *
    * @param energy Double reference of computed energy
    * @param state State index (defaults to 0, ground state)
-   * @param mult Spin multiplicity (defaults to 1, singlet)
    **/
   void GetEnergy(double &energy,
-    int state = 0,
-    int mult = 1) const;
+    int state = 0) const;
 
   /**
-  * \brief Add an energy and state/mult pair into a JobOutput Protocol Buffer
-  *
-  * For now, will assume EITHER CIS or CAS being populated, with CIS checked first
+  * \brief Add an energy into a JobOutput Protocol Buffer
   *
   * @param energy Double reference of computed energy
-  * @param state State index (defaults to 0, ground state)
-  * @param mult Spin multiplicity (defaults to 1, singlet)
   **/
-  void SetEnergy(double energy,
-    int state = 0,
-    int mult = 1);
+  void SetEnergy(double energy);
 
   /**
    * \brief Gets the gradient from a JobOutput Protocol Buffer
    *
    * @param qmgradient Double array to store computed gradient of the QM region (user-allocated)
    * @param mmgradient Double array to store computed gradient of the MM region (user-allocated)
-   * @param state State index (defaults to 0, ground state)
-   * @param mult Spin multiplicity (defaults to 1, singlet)
    **/
   void GetGradient(double *qmgradient,
-    double *mmgradient = nullptr,
-    int state = 0,
-    int mult = 1) const;
+    double *mmgradient = nullptr) const;
 
   /**
    * \brief Accessor for internal protobuf object

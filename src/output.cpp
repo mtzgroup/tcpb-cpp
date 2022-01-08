@@ -14,27 +14,19 @@ using terachem_server::JobOutput;
 namespace TCPB {
 
 void Output::GetEnergy(double &energy,
-  int state,
-  int mult) const
+  int state) const
 {
-  // TODO: Add state/mult logic
-  energy = pb_.energy(0);
+  energy = pb_.energy(state);
 }
 
-void Output::SetEnergy(double energy,
-  int state,
-  int mult)
+void Output::SetEnergy(double energy)
 {
-  // TODO: Add state/mult logic
   pb_.add_energy(energy);
 }
 
 void Output::GetGradient(double *qmgradient,
-  double *mmgradient,
-  int state,
-  int mult) const
+  double *mmgradient) const
 {
-  // TODO: Add state/mult logic
   int qmgrad_size = pb_.gradient_size();
   memcpy(qmgradient, pb_.gradient().data(), qmgrad_size * sizeof(double));
   if (mmgradient != nullptr) {
