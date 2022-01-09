@@ -312,9 +312,31 @@ const Output Client::ComputeGradient(const Input &input,
   terachem_server::JobInput pb = new_input.GetPB();
   pb.set_run(terachem_server::JobInput::GRADIENT);
 
+  // Get target state, if needed
+  int state = 0;
+  std::string targetkeyword = "";
+  for (int i = 0; i < pb.user_options_size()/2; ++i) {
+    //printf(" %d: %s = %s\n", i, pb.user_options(2*i).c_str(), pb.user_options(2*i+1).c_str());
+    if ((pb.user_options(2*i) == "casscf" || pb.user_options(2*i) == "casci") && pb.user_options(2*i+1) == "yes") {
+      targetkeyword = "castarget";
+      break;
+    } else if (pb.user_options(2*i) == "cis" && pb.user_options(2*i+1) == "yes") {
+      targetkeyword = "cistarget";
+      break;
+    }
+  }
+  if (targetkeyword.size() > 0) {
+    for (int i = 0; i < pb.user_options_size()/2; ++i) {
+      if (pb.user_options(2*i) == targetkeyword) {
+        state = std::stoi(pb.user_options(2*i+1));
+        break;
+      }
+    }
+  }
+
   Output output = ComputeJobSync(new_input);
 
-  output.GetEnergy(energy);
+  output.GetEnergy(energy,state);
   output.GetGradient(qmgradient,mmgradient);
 
   return output;

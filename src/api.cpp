@@ -132,6 +132,7 @@ extern "C" {
     // Attempt to create the PB input variable
     try {
       TCPB::Output pb_output = TC->ComputeGradient((*pb_input), (*totenergy), qmgrad, mmgrad);
+      //printf("Debug protobuf output string:\n%s\n", pb_output.GetDebugString().c_str());
     }
     catch (...) {
       (*status) = 2;
