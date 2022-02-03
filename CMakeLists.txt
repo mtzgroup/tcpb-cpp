@@ -73,6 +73,7 @@ if (INSTALL_TESTS)
 endif()
 if (INSTALL_EXAMPLES)
   add_subdirectory(examples)
+  add_subdirectory(api_examples)
 endif()
 
 #--------------------------------------------------------------
