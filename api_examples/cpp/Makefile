@@ -3,11 +3,11 @@
 
 include ../../config.h
 
-LIBS=-L$(LIBDIR) -ltcpb
+LIBS=-L$(LIBDIR) -lprotobuf -ltcpb
 
-test_api_fortran: test_api.F90
-	$(FC) $(FFLAGS) $(LIBS) -o $@ $<
+test_api_cpp: test_api.cpp
+	$(CXX) $(TCPB_CXXFLAGS) -o $@ $< -I$(INCDIR) $(LIBS)
 
 .PHONY: clean
 clean:
-	@rm -v test_api_fortran
+	@rm -v test_api_cpp

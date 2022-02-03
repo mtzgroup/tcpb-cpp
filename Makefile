@@ -60,7 +60,10 @@ clean:
 example:
 	@cd examples/qm && make
 	@cd examples/qmmm && make
-	@cd examples/use_api_from_fortran && make
+
+api_example:
+	@cd api_examples/fortran && make
+	@cd api_examples/cpp && make
 
 ifdef TESTDIR
 test: $(TESTBIN) $(LIBDIR)/$(LIBNAME).so

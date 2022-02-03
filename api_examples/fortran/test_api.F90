@@ -9,7 +9,7 @@ implicit none
 
 character(len=80)  :: host
 character(len=256) :: tcfile
-integer :: port, status
+integer :: port, status, globaltreatment
 integer :: numqmatoms, nummmatoms
 integer :: i
 double precision :: totenergy
@@ -24,6 +24,9 @@ port = 12345
 ! Other input variables
 tcfile = "terachem.inp"
 tcfile = trim(tcfile)//CHAR(0)
+
+! Set global treatment
+globaltreatment = 0
 
 ! Information about initial QM and MM region
 numqmatoms = 3
@@ -83,7 +86,7 @@ nummmatoms = 0
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,0,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -144,7 +147,7 @@ mmcharges = (/ -0.834,&
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,0,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -171,7 +174,7 @@ end do
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,0,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -206,7 +209,7 @@ end do
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,0,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -280,7 +283,7 @@ mmcharges = (/ -0.834,&
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,0,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -306,5 +309,8 @@ end do
 
 ! Finalizes variables on the TeraChem side
 call tc_finalize()
+
+! Deallocate variables that have been allocated
+deallocate(qmattypes,qmcoords,qmgrad,mmcoords,mmcharges,mmgrad)
 
 end program test_api
