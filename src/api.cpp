@@ -88,7 +88,7 @@ extern "C" {
     }
     // Sleep a bit to ensure the server will receive the next ComputeGradient call
     if (old_numqmatoms > 0) {
-      usleep(100000);
+      usleep(110000);
     }
     // Set initial condition
     pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
