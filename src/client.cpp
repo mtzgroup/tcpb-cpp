@@ -46,6 +46,7 @@ bool Client::IsAvailable()
 {
   uint32_t header[2];
   int msgType, msgSize;
+  string msgStr;
   bool sendSuccess, recvSuccess;
 
   // Send Status Protocol Buffer
@@ -84,7 +85,9 @@ bool Client::IsAvailable()
 
   Status status;
   if (msgSize > 0) {
-    status.ParseFromString(msg);
+    msgStr.resize(msgSize);
+    memcpy((void *)msgStr.data(), msg, msgSize);
+    status.ParseFromString(msgStr);
   }
 
   return !status.busy();
@@ -146,7 +149,9 @@ bool Client::SendJobAsync(const Input &input)
 
   Status status;
   if (msgSize > 0) {
-    status.ParseFromString(msg);
+    msgStr.resize(msgSize);
+    memcpy((void *)msgStr.data(), msg, msgSize);
+    status.ParseFromString(msgStr);
   }
 
   if (status.job_status_case() != Status::JobStatusCase::kAccepted) {
@@ -204,7 +209,9 @@ bool Client::CheckJobComplete()
 
   Status status;
   if (msgSize > 0) {
-    status.ParseFromString(msg);
+    msgStr.resize(msgSize);
+    memcpy((void *)msgStr.data(), msg, msgSize);
+    status.ParseFromString(msgStr);
   }
 
   if (status.job_status_case() == Status::JobStatusCase::kWorking) {
