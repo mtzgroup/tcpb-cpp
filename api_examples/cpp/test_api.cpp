@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
   // Set global treatment
   int globaltreatment = 0;
 
-  // Information about initial QM and MM region
+  // Information about initial QM region
   int numqmatoms = 3;
   char (*qmattypes)[5] = new char[numqmatoms][5] {"O","H","H"};
 
