@@ -70,33 +70,43 @@ extern "C" {
       (*status) = 2;
       return;
     }
-    // If all is gone, then done
+    //printf("Debug protobuf input string:\n%s\n", pb_input->GetDebugString().c_str());
+    // If all is done, then done
     (*status) = 0;
   }
 
   void tc_compute_energy_gradient_(const char qmattypes[][5], const double* qmcoords, const int* numqmatoms,
     double* totenergy, double* qmgrad, const double* mmcoords, const double* mmcharges,
-    const int* nummmatoms, double* mmgrad, int* status) {
+    const int* nummmatoms, double* mmgrad, const int* globaltreatment, int* status) {
     int i;
     bool ConsiderMM = (nummmatoms != nullptr && (*nummmatoms) > 0);
     // Check for mistakes in the varibles passed to the function
     if (qmcoords == nullptr || numqmatoms == nullptr || (*numqmatoms) <= 0 || totenergy == nullptr ||
         qmgrad == nullptr || (ConsiderMM && (mmcoords == nullptr || mmcharges == nullptr ||
-        mmgrad == nullptr) )) {
+        mmgrad == nullptr) ) || (globaltreatment != nullptr && ((*globaltreatment) < 0 || (*globaltreatment) > 2))) {
       (*status) = 1;
       return;
     }
     // Sleep a bit to ensure the server will receive the next ComputeGradient call
     if (old_numqmatoms > 0) {
-      usleep(100000);
+      usleep(110000);
     }
     // Set initial condition
     pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
-    if (old_numqmatoms < 1 || old_numqmatoms !=  (*numqmatoms)) {
+    if (globaltreatment == nullptr || (*globaltreatment) == 0) {
+      if (old_numqmatoms < 1 || old_numqmatoms !=  (*numqmatoms)) {
+        pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
+        old_numqmatoms = (*numqmatoms);
+      } else {
+        pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_CONTINUE);
+      }
+    } else if ((*globaltreatment) == 1) {
       pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
-      old_numqmatoms = (*numqmatoms);
+    } else if ((*globaltreatment) == 2) {
+      pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NORMAL);
     } else {
-      pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_CONTINUE);
+      (*status) = 1;
+      return;
     }
     // Handle atom types
     pb_input->GetMutablePB().mutable_mol()->clear_atoms();
@@ -138,7 +148,7 @@ extern "C" {
       (*status) = 2;
       return;
     }
-    // If all is gone, then done
+    // If all is done, then done
     (*status) = 0;
   }
 

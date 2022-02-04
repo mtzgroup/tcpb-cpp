@@ -84,6 +84,10 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/terachem_server.pb.cpp ${C
 add_library(libtcpb ${SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/terachem_server.pb.cpp ${CMAKE_CURRENT_SOURCE_DIR}/terachem_server.pb.h)
 
 target_link_libraries(libtcpb PUBLIC protobuf::libprotobuf PRIVATE Threads::Threads)
+
+# The following definition might be useful when linking to certain protocol buffers compilations
+#add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+
 if(Protobuf_INCLUDE_DIRS)
 	target_include_directories(libtcpb PRIVATE ${Protobuf_INCLUDE_DIRS})
 endif()

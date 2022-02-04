@@ -9,13 +9,13 @@ implicit none
 
 character(len=80)  :: host
 character(len=256) :: tcfile
-integer :: port, status
+integer :: port, status, globaltreatment
 integer :: numqmatoms, nummmatoms
 integer :: i
 double precision :: totenergy
 character(len=5), allocatable :: qmattypes(:)
 double precision, allocatable :: qmcoords(:), mmcoords(:), mmcharges(:), qmgrad(:), mmgrad(:)
-double precision, parameter :: BohrToAng = 0.52917724924
+double precision, parameter :: BohrToAng = 0.52917724924d0
 
 ! Set information about the server
 host = "localhost"
@@ -25,7 +25,10 @@ port = 12345
 tcfile = "terachem.inp"
 tcfile = trim(tcfile)//CHAR(0)
 
-! Information about initial QM and MM region
+! Set global treatment
+globaltreatment = 0
+
+! Information about initial QM region
 numqmatoms = 3
 allocate(qmattypes(numqmatoms))
 qmattypes = (/ "O","H","H" /)
@@ -70,9 +73,9 @@ end if
 
 ! Set QM region coordinates
 allocate(qmcoords(3*numqmatoms),qmgrad(3*numqmatoms))
-qmcoords = (/ -4.4798000,  -2.8400000,   4.2456000,&
-              -4.8525000,  -3.7649000,   4.3951000,&
-              -3.6050000,  -2.7568000,   4.9264000 /)
+qmcoords = (/ -4.4798000d0,  -2.8400000d0,   4.2456000d0,&
+              -4.8525000d0,  -3.7649000d0,   4.3951000d0,&
+              -3.6050000d0,  -2.7568000d0,   4.9264000d0 /)
 do i =1, 3*numqmatoms
   qmcoords(i)=qmcoords(i)/BohrToAng
 end do
@@ -83,7 +86,7 @@ nummmatoms = 0
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -107,44 +110,44 @@ end do
 ! We now add an MM region
 nummmatoms = 15
 allocate(mmcoords(3*nummmatoms),mmcharges(nummmatoms),mmgrad(3*nummmatoms))
-mmcoords = (/ -2.6793000,  -2.1596000,   5.9264000,&
-              -1.7944000,  -2.5941000,   6.0208000,&
-              -2.4543000,  -1.2247000,   5.9247000,&
-              -6.0739000,  -0.8812700,   5.2104000,&
-              -5.3910000,  -1.5014000,   4.7942000,&
-              -5.4189000,  -0.3240900,   5.9375000,&
-              -4.0898000,  -5.6279000,   2.9956000,&
-              -4.6091000,  -5.6876000,   2.2341000,&
-              -4.1166000,  -6.5262000,   3.2888000,&
-              -2.3448000,  -2.6425000,   1.8190000,&
-              -2.7846000,  -3.1506000,   2.6164000,&
-              -1.5986000,  -3.2938000,   1.7252000,&
-              -4.6456000,  -4.4223000,   7.4705000,&
-              -3.6650000,  -4.5356000,   7.1235000,&
-              -4.9759000,  -3.5580000,   7.3041000 /)
+mmcoords = (/ -2.6793000d0,  -2.1596000d0,   5.9264000d0,&
+              -1.7944000d0,  -2.5941000d0,   6.0208000d0,&
+              -2.4543000d0,  -1.2247000d0,   5.9247000d0,&
+              -6.0739000d0,  -0.8812700d0,   5.2104000d0,&
+              -5.3910000d0,  -1.5014000d0,   4.7942000d0,&
+              -5.4189000d0,  -0.3240900d0,   5.9375000d0,&
+              -4.0898000d0,  -5.6279000d0,   2.9956000d0,&
+              -4.6091000d0,  -5.6876000d0,   2.2341000d0,&
+              -4.1166000d0,  -6.5262000d0,   3.2888000d0,&
+              -2.3448000d0,  -2.6425000d0,   1.8190000d0,&
+              -2.7846000d0,  -3.1506000d0,   2.6164000d0,&
+              -1.5986000d0,  -3.2938000d0,   1.7252000d0,&
+              -4.6456000d0,  -4.4223000d0,   7.4705000d0,&
+              -3.6650000d0,  -4.5356000d0,   7.1235000d0,&
+              -4.9759000d0,  -3.5580000d0,   7.3041000d0 /)
 do i =1, 3*nummmatoms
   mmcoords(i)=mmcoords(i)/BohrToAng
 end do
-mmcharges = (/ -0.834,&
-                0.417,&
-                0.417,&
-               -0.834,&
-                0.417,&
-                0.417,&
-               -0.834,&
-                0.417,&
-                0.417,&
-               -0.834,&
-                0.417,&
-                0.417,&
-               -0.834,&
-                0.417,&
-                0.417 /)
+mmcharges = (/ -0.834d0,&
+                0.417d0,&
+                0.417d0,&
+               -0.834d0,&
+                0.417d0,&
+                0.417d0,&
+               -0.834d0,&
+                0.417d0,&
+                0.417d0,&
+               -0.834d0,&
+                0.417d0,&
+                0.417d0,&
+               -0.834d0,&
+                0.417d0,&
+                0.417d0 /)
 
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -171,7 +174,7 @@ end do
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -196,9 +199,9 @@ do i =1, nummmatoms
 end do
 
 ! Change coordinates of the QM region
-qmcoords = (/ -4.4748000,  -2.8700000,   4.5456000,&
-              -4.8525000,  -3.7649000,   4.3951000,&
-              -3.6050000,  -2.7568000,   4.9264000 /)
+qmcoords = (/ -4.4748000d0,  -2.8700000d0,   4.5456000d0,&
+              -4.8525000d0,  -3.7649000d0,   4.3951000d0,&
+              -3.6050000d0,  -2.7568000d0,   4.9264000d0 /)
 do i =1, 3*numqmatoms
   qmcoords(i)=qmcoords(i)/BohrToAng
 end do
@@ -206,7 +209,7 @@ end do
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -238,49 +241,49 @@ qmattypes = (/ "O","H","H","O","H","H" /)
 do i =1, numqmatoms
   qmattypes(i)=trim(qmattypes(i))//CHAR(0)
 end do
-qmcoords = (/ -4.4798000,  -2.8400000,   4.2456000,&
-              -4.8525000,  -3.7649000,   4.3951000,&
-              -3.6050000,  -2.7568000,   4.9264000,&
-              -2.6793000,  -2.1596000,   5.9264000,&
-              -1.7944000,  -2.5941000,   6.0208000,&
-              -2.4543000,  -1.2247000,   5.9247000 /)
+qmcoords = (/ -4.4798000d0,  -2.8400000d0,   4.2456000d0,&
+              -4.8525000d0,  -3.7649000d0,   4.3951000d0,&
+              -3.6050000d0,  -2.7568000d0,   4.9264000d0,&
+              -2.6793000d0,  -2.1596000d0,   5.9264000d0,&
+              -1.7944000d0,  -2.5941000d0,   6.0208000d0,&
+              -2.4543000d0,  -1.2247000d0,   5.9247000d0 /)
 do i =1, 3*numqmatoms
   qmcoords(i)=qmcoords(i)/BohrToAng
 end do
 nummmatoms = 12
 allocate(mmcoords(3*nummmatoms),mmcharges(nummmatoms),mmgrad(3*nummmatoms))
-mmcoords = (/ -6.0739000,  -0.8812700,   5.2104000,&
-              -5.3910000,  -1.5014000,   4.7942000,&
-              -5.4189000,  -0.3240900,   5.9375000,&
-              -4.0898000,  -5.6279000,   2.9956000,&
-              -4.6091000,  -5.6876000,   2.2341000,&
-              -4.1166000,  -6.5262000,   3.2888000,&
-              -2.3448000,  -2.6425000,   1.8190000,&
-              -2.7846000,  -3.1506000,   2.6164000,&
-              -1.5986000,  -3.2938000,   1.7252000,&
-              -4.6456000,  -4.4223000,   7.4705000,&
-              -3.6650000,  -4.5356000,   7.1235000,&
-              -4.9759000,  -3.5580000,   7.3041000 /)
+mmcoords = (/ -6.0739000d0,  -0.8812700d0,   5.2104000d0,&
+              -5.3910000d0,  -1.5014000d0,   4.7942000d0,&
+              -5.4189000d0,  -0.3240900d0,   5.9375000d0,&
+              -4.0898000d0,  -5.6279000d0,   2.9956000d0,&
+              -4.6091000d0,  -5.6876000d0,   2.2341000d0,&
+              -4.1166000d0,  -6.5262000d0,   3.2888000d0,&
+              -2.3448000d0,  -2.6425000d0,   1.8190000d0,&
+              -2.7846000d0,  -3.1506000d0,   2.6164000d0,&
+              -1.5986000d0,  -3.2938000d0,   1.7252000d0,&
+              -4.6456000d0,  -4.4223000d0,   7.4705000d0,&
+              -3.6650000d0,  -4.5356000d0,   7.1235000d0,&
+              -4.9759000d0,  -3.5580000d0,   7.3041000d0 /)
 do i =1, 3*nummmatoms
   mmcoords(i)=mmcoords(i)/BohrToAng
 end do
-mmcharges = (/ -0.834,&
-                0.417,&
-                0.417,&
-               -0.834,&
-                0.417,&
-                0.417,&
-               -0.834,&
-                0.417,&
-                0.417,&
-               -0.834,&
-                0.417,&
-                0.417 /)
+mmcharges = (/ -0.834d0,&
+                0.417d0,&
+                0.417d0,&
+               -0.834d0,&
+                0.417d0,&
+                0.417d0,&
+               -0.834d0,&
+                0.417d0,&
+                0.417d0,&
+               -0.834d0,&
+                0.417d0,&
+                0.417d0 /)
 
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,status)
+call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -306,5 +309,8 @@ end do
 
 ! Finalizes variables on the TeraChem side
 call tc_finalize()
+
+! Deallocate variables that have been allocated
+deallocate(qmattypes,qmcoords,qmgrad,mmcoords,mmcharges,mmgrad)
 
 end program test_api

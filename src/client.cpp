@@ -265,9 +265,9 @@ const Output Client::RecvJobAsync()
 const Output Client::ComputeJobSync(const Input &input)
 {
   // Try to submit job
-  while (!SendJobAsync(input)) {
-    sleep(1);
-  }
+  if (!SendJobAsync(input)) throw ServerCommError(
+    "ComputeJobSync: problem to submit the job",
+    host_, port_, currJobDir_, currJobId_);
 
   // Check for job completion
   while (!CheckJobComplete()) {

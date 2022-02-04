@@ -16,6 +16,8 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Run `make install`
 
+* To install the Python interface `pytcpb`, run `make pytcpb`. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
+
 * Add the absolute path to `lib` into `LD_LIBRARY_PATH`
 
 ## Installation (with CMake)
@@ -28,6 +30,8 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Run `make install`
 
+* The Python interface `pytcpb` is installed by default. To deactivate its installation, add `-DBUILD_PYTHON=FALSE` into your cmake command. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
+
 * Add the absolute path to `../lib` into `LD_LIBRARY_PATH`
 
 ## Tests
@@ -36,7 +40,9 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 ## Examples
 
-* After installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
+* Native examples: after installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
+
+* Examples using the API from different programming languages: after installation with configure script, run `make api_example`. With CMake, the API examples are automatically compiled and placed at the corresponding folder inside the folder `api_examples`. Currently, there are examples for Fortran, C++ and Python.
 
 ## Notes for TeraChem Developers
 
