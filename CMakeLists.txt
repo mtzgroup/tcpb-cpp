@@ -42,6 +42,8 @@ if(NOT INSIDE_AMBER)
 
 	option(INSTALL_EXAMPLES "Compile examples in the exemples folder of the install directory" TRUE)
 
+	option(BUILD_PYTHON "Install pytcpb in the Python environment" TRUE)
+
 	# Ensure that protobuf will be read from the environment
 	string(REPLACE ":" ";" _lib_path "$ENV{LD_LIBRARY_PATH}")
 	set( CMAKE_LIBRARY_PATH ${_lib_path} )
@@ -68,6 +70,12 @@ find_package(Threads REQUIRED)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
 add_subdirectory(src)
+if (BUILD_PYTHON AND NOT INSIDE_AMBER)
+  if (NOT DEFINED PYTHON_EXECUTABLE)
+    set(PYTHON_EXECUTABLE "python")
+  endif()
+  add_subdirectory(pytcpb)
+endif()
 if (INSTALL_TESTS)
   add_subdirectory(tests)
 endif()

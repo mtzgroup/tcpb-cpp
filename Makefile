@@ -61,6 +61,9 @@ example:
 	@cd examples/qm && make
 	@cd examples/qmmm && make
 
+pytcpb:
+	@cd pytcpb && python setup.py install
+
 api_example:
 	@cd api_examples/fortran && make
 	@cd api_examples/cpp && make
