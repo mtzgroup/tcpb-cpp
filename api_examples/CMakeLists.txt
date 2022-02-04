@@ -13,3 +13,8 @@ install(TARGETS test_api_cpp DESTINATION ${CMAKE_INSTALL_PREFIX}/api_examples/cp
 install(FILES ${tcpb_SOURCE_DIR}/api_examples/cpp/terachem.inp
               ${tcpb_SOURCE_DIR}/api_examples/cpp/reference.log
         DESTINATION ${CMAKE_INSTALL_PREFIX}/api_examples/cpp)
+
+install(FILES ${tcpb_SOURCE_DIR}/api_examples/python/terachem.inp
+              ${tcpb_SOURCE_DIR}/api_examples/python/reference.log
+              ${tcpb_SOURCE_DIR}/api_examples/python/test_api.py
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/api_examples/python)
