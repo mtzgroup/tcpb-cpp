@@ -16,6 +16,8 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Run `make install`
 
+* To install the Python interface `pytcpb`, run `make pytcpb`. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
+
 * Add the absolute path to `lib` into `LD_LIBRARY_PATH`
 
 ## Installation (with CMake)
@@ -27,6 +29,8 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 * To install, for example, with GNU compilers at /usr/local, run `cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCOMPILER=GNU`
 
 * Run `make install`
+
+* The Python interface `pytcpb` is installed by default. To deactivate its installation, add `-DBUILD_PYTHON=FALSE` into your cmake command. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
 
 * Add the absolute path to `../lib` into `LD_LIBRARY_PATH`
 
