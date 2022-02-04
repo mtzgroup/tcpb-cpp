@@ -70,7 +70,8 @@ extern "C" {
       (*status) = 2;
       return;
     }
-    // If all is gone, then done
+    //printf("Debug protobuf input string:\n%s\n", pb_input->GetDebugString().c_str());
+    // If all is done, then done
     (*status) = 0;
   }
 
@@ -147,7 +148,7 @@ extern "C" {
       (*status) = 2;
       return;
     }
-    // If all is gone, then done
+    // If all is done, then done
     (*status) = 0;
   }
 
