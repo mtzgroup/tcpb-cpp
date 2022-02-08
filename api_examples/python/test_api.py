@@ -15,7 +15,7 @@ port = 12345
 # Other input variables
 tcfile = "terachem.inp"
 
-# Set global treatment
+# Set global treatment (for how TeraChem will handle wavefunction initial guess)
 globaltreatment = 0
 
 # Information about initial QM region
@@ -63,7 +63,7 @@ mmmcharges = []
 
 # Compute energy and gradient
 print("")
-totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,globaltreatment=0)
+totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,globaltreatment=globaltreatment)
 if (status == 0):
     print(" Computed energy and gradient with success.")
 elif (status == 1):
@@ -118,7 +118,7 @@ mmcharges = [  -0.834,
 
 # Compute energy and gradient
 print("")
-totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment=0)
+totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment)
 if (status == 0):
     print(" Computed energy and gradient with success.")
 elif (status == 1):
@@ -141,7 +141,7 @@ for i in range(len(mmcharges)):
 
 # Compute energy and gradient
 print("")
-totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment=0)
+totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment)
 if (status == 0):
     print(" Computed energy and gradient with success.")
 elif (status == 1):
@@ -171,7 +171,7 @@ for i in range(len(qmcoords)):
 
 # Compute energy and gradient
 print("")
-totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment=0)
+totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment)
 if (status == 0):
     print(" Computed energy and gradient with success.")
 elif (status == 1):
@@ -231,7 +231,7 @@ mmcharges =  [ -0.834,
 
 # Compute energy and gradient
 print("")
-totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment=0)
+totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment)
 if (status == 0):
     print(" Computed energy and gradient with success.")
 elif (status == 1):
