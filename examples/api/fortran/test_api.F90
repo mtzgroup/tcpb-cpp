@@ -15,6 +15,7 @@ integer :: i
 double precision :: totenergy
 character(len=5), allocatable :: qmattypes(:)
 double precision, allocatable :: qmcoords(:), mmcoords(:), mmcharges(:), qmgrad(:), mmgrad(:)
+! Conversion parameter: Bohr to Angstrom
 double precision, parameter :: BohrToAng = 0.52917724924d0
 
 ! Set information about the server
@@ -71,7 +72,7 @@ else
   STOP
 end if
 
-! Set QM region coordinates
+! Set QM region coordinates, defined in Angstroms and then converted to Bohrs
 allocate(qmcoords(3*numqmatoms),qmgrad(3*numqmatoms))
 qmcoords = (/ -4.4798000d0,  -2.8400000d0,   4.2456000d0,&
               -4.8525000d0,  -3.7649000d0,   4.3951000d0,&
@@ -107,7 +108,7 @@ do i =1, numqmatoms
   write (*,'(a,i3,a,3f16.10,a)') "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
-! We now add an MM region
+! We now add an MM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
 nummmatoms = 15
 allocate(mmcoords(3*nummmatoms),mmcharges(nummmatoms),mmgrad(3*nummmatoms))
 mmcoords = (/ -2.6793000d0,  -2.1596000d0,   5.9264000d0,&
@@ -198,7 +199,7 @@ do i =1, nummmatoms
   write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
-! Change coordinates of the QM region
+! Change coordinates of the QM region, defined in Angstroms and then converted to Bohrs
 qmcoords = (/ -4.4748000d0,  -2.8700000d0,   4.5456000d0,&
               -4.8525000d0,  -3.7649000d0,   4.3951000d0,&
               -3.6050000d0,  -2.7568000d0,   4.9264000d0 /)
@@ -233,7 +234,7 @@ do i =1, nummmatoms
   write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
-! Move one water molecule from the MM region to the QM region
+! Move one water molecule from the MM region to the QM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units.
 deallocate(qmattypes,qmcoords,qmgrad,mmcoords,mmcharges,mmgrad)
 numqmatoms = 6
 allocate(qmattypes(numqmatoms),qmcoords(3*numqmatoms),qmgrad(3*numqmatoms))
