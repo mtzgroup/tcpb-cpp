@@ -1,13 +1,13 @@
 # This Makefile assumes you have installed the C++ TCPB client with make install
 # and added the lib and include folders to your environment
 
-include ../../config.h
+include ../../../config.h
 
-LIBS=-L$(LIBDIR) -lprotobuf -ltcpb
+LIBS=-L$(LIBDIR) -ltcpb
 
-test_api_cpp: test_api.cpp
-	$(CXX) $(TCPB_CXXFLAGS) -o $@ $< -I$(INCDIR) $(LIBS)
+test_api_fortran: test_api.F90
+	$(FC) $(FFLAGS) $(LIBS) -o $@ $<
 
 .PHONY: clean
 clean:
-	@rm -v test_api_cpp
+	@rm -v test_api_fortran
