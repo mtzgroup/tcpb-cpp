@@ -1,5 +1,5 @@
 import sys
-# Load tcpb_wrapper.py
+# Load TCPB wrapper
 try:
     import pytcpb as tc
 except:
