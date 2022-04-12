@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
   if (status == 0) {
     printf(" TeraChem setup completed with success.\n");
   } else if (status == 1) {
-    printf(" ERROR: No options read from TeraChem input file!\n");
+    printf(" ERROR: No options read from TeraChem input file or mismatch in the input options!\n");
     return 1;
   } else if (status == 2) {
     printf(" ERROR: Failed to setup TeraChem.\n");

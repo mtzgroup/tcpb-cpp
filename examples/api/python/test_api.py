@@ -43,7 +43,7 @@ status =  tc.setup(tcfile,qmattypes)
 if (status == 0):
     print(" TeraChem setup completed with success.")
 elif (status == 1):
-    print(" ERROR: No options read from TeraChem input file!")
+    print(" ERROR: No options read from TeraChem input file or mismatch in the input options!")
     sys.exit(1)
 elif (status == 2):
     printf(" ERROR: Failed to setup TeraChem.")

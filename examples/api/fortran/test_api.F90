@@ -62,7 +62,7 @@ call tc_setup(tcfile,qmattypes,numqmatoms,status)
 if (status == 0) then
   write (*,*) "TeraChem setup completed with success."
 else if (status == 1) then
-  write (*,*) "ERROR: No options read from TeraChem input file!"
+  write (*,*) "ERROR: No options read from TeraChem input file or mismatch in the input options!"
   STOP
 else if (status == 2) then
   write (*,*) "ERROR: Failed to setup TeraChem."
