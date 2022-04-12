@@ -64,8 +64,8 @@ def compute_energy_gradient(qmattypes,qmcoords,mmcoords=[],mmcharges=[],globaltr
     """
     global libtcpb
     numqmatoms = len(qmattypes)
-    nummmatoms = len(mmcharges)
-    if (len(qmcoords)!=3*numqmatoms or len(mmcoords)!=3*nummmatoms or globaltreatment<0 or globaltreatment>2):
+    nummmatoms = int(len(mmcoords)/3)
+    if (len(qmcoords)!=3*numqmatoms or (mmcharges and len(mmcharges)!=nummmatoms) or globaltreatment<0 or globaltreatment>2):
         return 1
     NewCharType = CharArr5 * numqmatoms
     bqmattypes = NewCharType()
@@ -83,8 +83,9 @@ def compute_energy_gradient(qmattypes,qmcoords,mmcoords=[],mmcharges=[],globaltr
     bmmgrad = MMDoubleType()
     MMChargeDoubleType = ctypes.c_double * nummmatoms
     bmmcharges = MMChargeDoubleType()
-    for i in range(nummmatoms):
-        bmmcharges[i] = ctypes.c_double(mmcharges[i])
+    if (mmcharges):
+        for i in range(nummmatoms):
+            bmmcharges[i] = ctypes.c_double(mmcharges[i])
     btotenergy = ctypes.c_double()
     status = ctypes.c_int()
     libtcpb.tc_compute_energy_gradient_(bqmattypes,bqmcoords,ctypes.c_int(numqmatoms),btotenergy,bqmgrad,bmmcoords,bmmcharges,ctypes.c_int(nummmatoms),
