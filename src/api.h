@@ -25,7 +25,7 @@ extern "C" {
    * @param[in]  qmattypes List of atomic types in the QM region
    * @param[in]  numqmatoms Number of atoms in the QM region
    * @param[out] status Status of execution: 0, all is good
-   *                                         1, no options read from tcfile
+   *                                         1, no options read from tcfile or mismatch in the input variables
    *                                         2, failed to setup
    **/
   void tc_setup_(const char tcfile[256], const char qmattypes[][5], const int* numqmatoms, int* status);

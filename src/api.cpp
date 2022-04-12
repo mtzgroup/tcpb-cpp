@@ -6,6 +6,9 @@
 using std::map;
 #include <stdio.h>
 #include <stdlib.h>
+#include<iostream>
+#include<fstream>
+#include<sstream>
 #include <string>
 using std::string;
 #include <vector>
@@ -26,6 +29,7 @@ extern "C" {
   TCPB::Client* TC = nullptr;
   TCPB::Input*  pb_input = nullptr;
   int old_numqmatoms = -1;
+  bool useopenmm = false;
 
   void tc_connect_(const char host[80], const int* port, int* status) {
     try {
@@ -53,6 +57,52 @@ extern "C" {
     options.erase("pointcharges");
     options.erase("run");
     options.emplace("run","gradient");
+    // Check if the prmtop flag is in the input options. If true, set a variable in the enviroment and
+    // read the prmtop file content and the qmindices
+    string prmtopcontent;
+    std::vector< int > qmindices;
+    if (options.count("prmtop")) {
+      useopenmm = true;
+      std::ifstream fl(options["prmtop"]);
+      std::ostringstream ss;
+      if (fl) {
+        ss << fl.rdbuf();
+        prmtopcontent = ss.str();
+      } else {
+        // prmtop file does not exist
+        (*status) = 1;
+        return;
+      }
+      fl.close();
+      ss.str("");
+      if (!options.count("qmindices")) {
+        (*status) = 1;
+        return;
+      }
+      fl.open(options["qmindices"]);
+      if (fl) {
+        int num;
+        int cnt = 0;
+        while (fl >> num) {
+          qmindices.push_back(num);
+          cnt++;
+        }
+        // Check if number of qmindices match the number of qmatoms
+        if (cnt != (*numqmatoms)) {
+          (*status) = 1;
+          return;
+        }
+      } else {
+        // qmindices file does not exist
+        (*status) = 1;
+        return;
+      }
+      fl.close();
+    } else {
+      useopenmm = false;
+    }
+    options.erase("prmtop");
+    options.erase("qmindices");
     // Since this is just a setup call, set all QM coordinates to zero
     double qmcoords[3*(*numqmatoms)];
     memset(qmcoords, 0, 3*(*numqmatoms)*sizeof(double));
@@ -70,6 +120,15 @@ extern "C" {
       (*status) = 2;
       return;
     }
+    // Set prmtop file content and qmindices
+    if (useopenmm) {
+      pb_input->GetMutablePB().clear_prmtop_content();
+      pb_input->GetMutablePB().set_prmtop_content(prmtopcontent);
+      pb_input->GetMutablePB().mutable_qm_indices()->Resize(qmindices.size(), 0);
+      for (i = 0; i<qmindices.size(); i++) {
+        pb_input->GetMutablePB().mutable_qm_indices()->mutable_data()[i] = qmindices[i];
+      }
+    }
     //printf("Debug protobuf input string:\n%s\n", pb_input->GetDebugString().c_str());
     // If all is done, then done
     (*status) = 0;
@@ -82,7 +141,7 @@ extern "C" {
     bool ConsiderMM = (nummmatoms != nullptr && (*nummmatoms) > 0);
     // Check for mistakes in the varibles passed to the function
     if (qmcoords == nullptr || numqmatoms == nullptr || (*numqmatoms) <= 0 || totenergy == nullptr ||
-        qmgrad == nullptr || (ConsiderMM && (mmcoords == nullptr || mmcharges == nullptr ||
+        qmgrad == nullptr || (ConsiderMM && (mmcoords == nullptr || (!useopenmm && mmcharges == nullptr) ||
         mmgrad == nullptr) ) || (globaltreatment != nullptr && ((*globaltreatment) < 0 || (*globaltreatment) > 2))) {
       (*status) = 1;
       return;
@@ -92,7 +151,12 @@ extern "C" {
       usleep(110000);
     }
     // Set initial condition
-    pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
+    if (useopenmm) {
+      pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_TC_OPENMM);
+      mmcharges = nullptr;
+    } else {
+      pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
+    }
     if (globaltreatment == nullptr || (*globaltreatment) == 0) {
       if (old_numqmatoms < 1 || old_numqmatoms !=  (*numqmatoms)) {
         pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
