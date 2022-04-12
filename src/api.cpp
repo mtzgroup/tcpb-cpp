@@ -65,7 +65,7 @@ extern "C" {
       useopenmm = true;
       std::ifstream fl(options["prmtop"]);
       std::ostringstream ss;
-      if (fl) {
+      if (fl.is_open()) {
         ss << fl.rdbuf();
         prmtopcontent = ss.str();
       } else {
@@ -80,7 +80,7 @@ extern "C" {
         return;
       }
       fl.open(options["qmindices"]);
-      if (fl) {
+      if (fl.is_open()) {
         int num;
         int cnt = 0;
         while (fl >> num) {
