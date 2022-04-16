@@ -6,6 +6,7 @@
 
 #include <tcpb/api.h>
 
+// Conversion parameter: Bohr to Angstrom
 #define BohrToAng 0.52917724924
 
 int main(int argc, char** argv) {
@@ -50,7 +51,7 @@ int main(int argc, char** argv) {
   if (status == 0) {
     printf(" TeraChem setup completed with success.\n");
   } else if (status == 1) {
-    printf(" ERROR: No options read from TeraChem input file!\n");
+    printf(" ERROR: No options read from TeraChem input file or mismatch in the input options!\n");
     return 1;
   } else if (status == 2) {
     printf(" ERROR: Failed to setup TeraChem.\n");
@@ -60,7 +61,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  // Set QM region coordinates
+  // Set QM region coordinates, defined in Angstroms and then converted to Bohrs
   double* qmcoords = new double[3*numqmatoms]
               { -4.4798000,  -2.8400000,   4.2456000,
                 -4.8525000,  -3.7649000,   4.3951000,
@@ -97,7 +98,7 @@ int main(int argc, char** argv) {
     printf("QM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,qmgrad[3*i], qmgrad[3*i+1], qmgrad[3*i+2]);
   }
 
-  // We now add an MM region
+  // We now add an MM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
   nummmatoms = 15;
   double* mmcoords = new double[3*nummmatoms] 
               { -2.6793000,  -2.1596000,   5.9264000,
@@ -190,7 +191,7 @@ int main(int argc, char** argv) {
     printf("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]);
   }
 
-  // Change coordinates of the QM region
+  // Change coordinates of the QM region, defined in Angstroms and then converted to Bohrs
   delete[] qmcoords;
   qmcoords = new double[3*numqmatoms]
              { -4.4748000,  -2.8700000,   4.5456000,
@@ -227,7 +228,7 @@ int main(int argc, char** argv) {
     printf("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]);
   }
 
-  // Move one water molecule from the MM region to the QM region
+  // Move one water molecule from the MM region to the QM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
   numqmatoms = 6;
   delete[] qmattypes;
   qmattypes = new char[numqmatoms][5] {"O","H","H","O","H","H"};

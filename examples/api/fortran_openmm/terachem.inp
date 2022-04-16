@@ -1,0 +1,12 @@
+basis           cc-pvdz
+guess           hcore
+method          rhf
+run             gradient
+
+charge          0
+spinmult        1
+
+precision       double
+
+prmtop          2waters.prmtop
+qmindices	2waters.qmregion

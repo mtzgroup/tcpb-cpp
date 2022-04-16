@@ -1,11 +1,12 @@
 import sys
-# Load tcpb_wrapper.py
+# Load TCPB wrapper
 try:
     import pytcpb as tc
 except:
     print("ERROR: Failed to import pytcpb in test_api.py")
     sys.exit(1)
 
+# Conversion parameter: Bohr to Angstrom
 BohrToAng = 0.52917724924
 
 # Set information about the server
@@ -42,7 +43,7 @@ status =  tc.setup(tcfile,qmattypes)
 if (status == 0):
     print(" TeraChem setup completed with success.")
 elif (status == 1):
-    print(" ERROR: No options read from TeraChem input file!")
+    print(" ERROR: No options read from TeraChem input file or mismatch in the input options!")
     sys.exit(1)
 elif (status == 2):
     printf(" ERROR: Failed to setup TeraChem.")
@@ -51,7 +52,7 @@ else:
     printf(" ERROR: Status on tc_setup function is not recognized!")
     sys.exit(1)
 
-# Set QM region coordinates
+# Set QM region coordinates, defined in Angstroms and then converted to Bohrs
 qmcoords = [-4.4798000,  -2.8400000,   4.2456000,
             -4.8525000,  -3.7649000,   4.3951000,
             -3.6050000,  -2.7568000,   4.9264000]
@@ -82,7 +83,7 @@ print("E = %16.10f Hartrees"%(totenergy))
 for i in range(len(qmattypes)):
     print("QM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,qmgrad[3*i], qmgrad[3*i+1], qmgrad[3*i+2]))
 
-# We now add an MM region
+# We now add an MM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
 mmcoords = [-2.6793000,  -2.1596000,   5.9264000,
             -1.7944000,  -2.5941000,   6.0208000,
             -2.4543000,  -1.2247000,   5.9247000,
@@ -162,7 +163,7 @@ for i in range(len(qmattypes)):
 for i in range(len(mmcharges)):
     print("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]))
 
-# Change coordinates of the QM region
+# Change coordinates of the QM region, defined in Angstroms and then converted to Bohrs
 qmcoords = [-4.4748000,  -2.8700000,   4.5456000,
             -4.8525000,  -3.7649000,   4.3951000,
             -3.6050000,  -2.7568000,   4.9264000 ]
@@ -192,7 +193,7 @@ for i in range(len(qmattypes)):
 for i in range(len(mmcharges)):
     print("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]))
 
-# Move one water molecule from the MM region to the QM region
+# Move one water molecule from the MM region to the QM region, defined in Angstroms and then converted to Bohrs; Charges in atomic units
 qmattypes = ["O","H","H","O","H","H"]
 qmcoords = [-4.4798000,  -2.8400000,   4.2456000,
             -4.8525000,  -3.7649000,   4.3951000,
