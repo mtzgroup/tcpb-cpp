@@ -38,8 +38,6 @@ if(NOT INSIDE_AMBER)
 	# build options
 	option(INSTALL_HEADERS "Copy headers to the include/tcpb folder of the install directory." TRUE)
 
-	option(INSTALL_TESTS "Compile tests in the tests folder of the install directory" TRUE)
-
 	option(INSTALL_EXAMPLES "Compile examples in the exemples folder of the install directory" TRUE)
 
 	option(BUILD_PYTHON "Install pytcpb in the Python environment" TRUE)
@@ -58,7 +56,6 @@ if(NOT INSIDE_AMBER)
     endif()
 else()
 	set(INSTALL_HEADERS TRUE)
-	set(INSTALL_TESTS FALSE)
 	set(INSTALL_EXAMPLES FALSE)
 endif()
 
@@ -75,9 +72,6 @@ if (BUILD_PYTHON AND NOT INSIDE_AMBER)
     set(PYTHON_EXECUTABLE "python")
   endif()
   add_subdirectory(pytcpb)
-endif()
-if (INSTALL_TESTS)
-  add_subdirectory(tests)
 endif()
 if (INSTALL_EXAMPLES)
   add_subdirectory(examples)
