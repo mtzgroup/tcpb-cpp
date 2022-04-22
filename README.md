@@ -34,10 +34,6 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Add the absolute path to `../lib` into `LD_LIBRARY_PATH`
 
-## Tests
-
-* After installation with configure script, run `make test`. With CMake, the tests are automatically compiled and placed at the folder `tests`
-
 ## Examples
 
 * Native examples: after installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
@@ -54,21 +50,6 @@ as this will cause old server/client versions to misinterpret the tags.
 Also, it is critically important that the current values of MessageType enum
 are not changed since this is a key part of the protocol's header,
 determining how the server/client deserialize the incoming message.
-
-### Branches and tests for any new features
-
-Extensions of the protocol are encouraged, but please follow some basic guidelines:
-
-* Develop any new features in a branch to avoid accidentally pushing broken protocols to `master`
-
-* Add test cases for your protocol/job type
-
-* Use the BitBucket Pipelines Docker container to ensure your tests will pass when pushed
-
-* Submit a pull request for your branch to facilitate code review
-
-The `run_pipelines_tests.sh` script automates build, install, and testing for the repo.
-The `run_docker_tests.sh` script wraps the magic Docker lines to do this with the container that Pipelines will use.
 
 ## Contact
 
