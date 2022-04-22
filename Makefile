@@ -7,7 +7,6 @@ LIBSRC := src/exceptions.cpp \
 	src/client.cpp \
 	src/input.cpp \
 	src/output.cpp \
-	src/server.cpp \
 	src/socket.cpp \
 	src/terachem_server.pb.cpp \
 	src/utils.cpp \
