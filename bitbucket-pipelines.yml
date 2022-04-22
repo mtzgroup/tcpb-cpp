@@ -1,8 +1,0 @@
-# Since I want to test Python and C++, need to use a Linux container
-image: sseritan/tcpb-client-docker:1.0
-
-pipelines:
-  default:
-    - step:
-        script:
-          - ./run_pipeline.sh
