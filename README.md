@@ -12,25 +12,25 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Ensure `protoc` and `libprotobuf.so` are in your `PATH` and `LD_LIBRARY_PATH`, respectively
 
-* Run `./configure gnu`. Other compiler options are intel and clang (not tested). To pick another install location, like /usr/local, run `./configure --prefix=/usr/local gnu`
+* Run `./configure gnu` if using GNU compilers or `./configure intel` if using Intel compilers. Other compiler options are intel and clang (not tested). To pick another install location, like /usr/local, run `./configure --prefix=/usr/local gnu`
 
 * Run `make install`
 
-* To install the Python interface `pytcpb`, run `make pytcpb`. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
+* To install the Python interface *PyTCPB*, run `make pytcpb`. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
 
 * Add the absolute path to `lib` into `LD_LIBRARY_PATH`
 
 ## Installation (with CMake)
 
-* Ensure you have CMake version 3.8.0 or higher
+* Ensure you have CMake version 3.8.0 or higher.
 
 * Run `mkdir build && cd build`
 
-* To install, for example, with GNU compilers at /usr/local, run `cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCOMPILER=GNU`
+* To install, for example, with GNU compilers at /usr/local, run `cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCOMPILER=GNU`. To use Intel compilers, the option `-DCOMPILER=INTEL` must be specified instead.
 
 * Run `make install`
 
-* The Python interface `pytcpb` is installed by default. To deactivate its installation, add `-DBUILD_PYTHON=FALSE` into your cmake command. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
+* The Python interface *PyTCPB* is installed by default. To deactivate its installation, add `-DBUILD_PYTHON=FALSE` into your CMake command. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
 
 * Add the absolute path to `../lib` into `LD_LIBRARY_PATH`
 
