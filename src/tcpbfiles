@@ -5,7 +5,6 @@ SOURCES=\
         exceptions.cpp \
         input.cpp \
         output.cpp \
-        server.cpp \
         socket.cpp \
         terachem_server.pb.cpp \
         utils.cpp

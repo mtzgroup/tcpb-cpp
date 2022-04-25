@@ -55,7 +55,6 @@ if arg[0].lower() in ('gnu', 'gcc'):
    cpp = 'g++'
    f90 = 'gfortran'
    ldflags = ['-lprotobuf']
-   tests_ldflags = ['-lprotobuf','-ltcpb']
    cppflags = ['-fPIC -std=c++11 -pthread -Wall']
    f90flags = ['-fPIC', '-Wall']
 
@@ -79,7 +78,6 @@ elif arg[0].lower() == 'clang':
    cpp = 'clang++'
    f90 = 'gfortran'
    ldflags = ['-lprotobuf']
-   tests_ldflags = ['-lprotobuf','-ltcpb']
 
    cppflags = ['-fPIC -std=c++11 -pthread -Wall']
    f90flags = ['-fPIC', '-Wall']
@@ -103,7 +101,6 @@ else:
    cpp = 'icpc'
    f90 = 'ifort'
    ldflags = ['-lprotobuf']
-   tests_ldflags = ['-lprotobuf','-ltcpb']
    cppflags = ['-fPIC -std=c++11 -pthread -Wall']
    f90flags = ['-fPIC', '-warn', 'all']
 
@@ -121,7 +118,7 @@ else:
       f90flags.extend(['-g', '-debug'])
       ldflags.extend(['-g', '-debug'])
 
-confighopts = dict(cpp=cpp, f90=f90, ldflags=' '.join(ldflags), tests_ldflags=' '.join(tests_ldflags),
+confighopts = dict(cpp=cpp, f90=f90, ldflags=' '.join(ldflags),
                    cppflags=' '.join(cppflags), f90flags=' '.join(f90flags),
                    confline=' '.join(sys.argv), prefix=opt.prefix)
 f.write("""# configured with [[ %(confline)s ]]
@@ -135,11 +132,9 @@ PROTOC = protoc
 FFLAGS = %(f90flags)s
 TCPB_CXXFLAGS = %(cppflags)s
 TCPB_LDFLAGS = %(ldflags)s
-TESTS_LDFLAGS = %(tests_ldflags)s
 
 # Where program gets installed
 LIBDIR = %(prefix)s/lib
 INCDIR = %(prefix)s/include
-TESTDIR = %(prefix)s/tests
 """ % confighopts)
 f.close()
