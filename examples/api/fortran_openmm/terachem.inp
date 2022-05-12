@@ -1,7 +1,5 @@
 basis           cc-pvdz
-guess           hcore
 method          rhf
-run             gradient
 
 charge          0
 spinmult        1
