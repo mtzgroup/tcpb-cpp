@@ -53,5 +53,5 @@ determining how the server/client deserialize the incoming message.
 
 ## Contact
 
-* Stefan Seritan <sseritan@stanford.edu>
 * Vinicius Wilian D. Cruzeiro <vwcruz@stanford.edu>
+* Stefan Seritan <sseritan@stanford.edu>
