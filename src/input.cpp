@@ -189,11 +189,21 @@ JobInput Input::InitInputPB(const vector<string> &atoms,
     pb.set_run(runtype);
     parsed_options.erase("run");
 
-    int charge = stoi(parsed_options.at("charge"));
+    int charge;
+    if (parsed_options.count("charge")) {
+      charge = stoi(parsed_options.at("charge"));
+    } else {
+      charge = 0;
+    }
     mol->set_charge(charge);
     parsed_options.erase("charge");
 
-    int spinmult = stoi(parsed_options.at("spinmult"));
+    int spinmult;
+    if (parsed_options.count("spinmult")) {
+      spinmult = stoi(parsed_options.at("spinmult"));
+    } else {
+      spinmult = 1;
+    }
     mol->set_multiplicity(spinmult);
     parsed_options.erase("spinmult");
 
