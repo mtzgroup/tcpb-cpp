@@ -4,20 +4,20 @@
 
  Computed energy and gradient with success.
  Results from 1st calculation (one water molecule in the QM region and one in the MM region)
-E =   -76.0159356313 Hartrees
-QM Grad(  1,:) =    -0.0436418029    0.0482951421   -0.0495491374 Hartree/Bohr
-QM Grad(  2,:) =    -0.0258616622   -0.0530839266    0.0042166773 Hartree/Bohr
-QM Grad(  3,:) =     0.0766392859   -0.0000119124    0.0449301211 Hartree/Bohr
-MM Grad(  1,:) =    -0.0286420277    0.0204081566    0.0014549894 Hartree/Bohr
-MM Grad(  2,:) =     0.0259351594   -0.0225405193    0.0008346312 Hartree/Bohr
-MM Grad(  3,:) =    -0.0044289525    0.0069330596   -0.0018872816 Hartree/Bohr
+E =   -76.0159356291 Hartrees
+QM Grad(  1,:) =    -0.0436382479    0.0482901951   -0.0495443317 Hartree/Bohr
+QM Grad(  2,:) =    -0.0258611263   -0.0530812171    0.0042126604 Hartree/Bohr
+QM Grad(  3,:) =     0.0766348895   -0.0000098534    0.0449289167 Hartree/Bohr
+MM Grad(  1,:) =    -0.0286415209    0.0204084496    0.0014555151 Hartree/Bohr
+MM Grad(  2,:) =     0.0259350252   -0.0225405056    0.0008345701 Hartree/Bohr
+MM Grad(  3,:) =    -0.0044290195    0.0069329314   -0.0018873307 Hartree/Bohr
 
  Computed energy and gradient with success.
  Results from 2nd calculation (one water molecule in the QM region and one in the MM region)
-E =   -76.0159355956 Hartrees
-QM Grad(  1,:) =    -0.0436393036    0.0482928024   -0.0495456002 Hartree/Bohr
-QM Grad(  2,:) =    -0.0258619051   -0.0530821665    0.0042155083 Hartree/Bohr
-QM Grad(  3,:) =     0.0766368747   -0.0000115200    0.0449274536 Hartree/Bohr
-MM Grad(  1,:) =    -0.0286418411    0.0204084093    0.0014553624 Hartree/Bohr
-MM Grad(  2,:) =     0.0259351840   -0.0225406833    0.0008345909 Hartree/Bohr
-MM Grad(  3,:) =    -0.0044290089    0.0069331580   -0.0018873150 Hartree/Bohr
+E =   -76.0159355955 Hartrees
+QM Grad(  1,:) =    -0.0436388566    0.0482919224   -0.0495446769 Hartree/Bohr
+QM Grad(  2,:) =    -0.0258620333   -0.0530816968    0.0042148509 Hartree/Bohr
+QM Grad(  3,:) =     0.0766365261   -0.0000111175    0.0449271288 Hartree/Bohr
+MM Grad(  1,:) =    -0.0286417883    0.0204084250    0.0014554430 Hartree/Bohr
+MM Grad(  2,:) =     0.0259351702   -0.0225406770    0.0008345809 Hartree/Bohr
+MM Grad(  3,:) =    -0.0044290181    0.0069331439   -0.0018873267 Hartree/Bohr
