@@ -5,7 +5,7 @@ pipeline {
         stage('build') {
             agent {
                 docker {
-                    image 'henryw7/terachem_compilation_enviroment:latest'
+                    image 'henryw7/terachem_compilation_enviroment:0.0.1'
                     alwaysPull true
                 }
             }
