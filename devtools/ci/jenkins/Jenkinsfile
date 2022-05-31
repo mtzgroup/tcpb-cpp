@@ -3,6 +3,12 @@ pipeline {
 
     stages {
         stage('build') {
+            agent {
+                docker {
+                    image 'henryw7/terachem_compilation_enviroment:latest'
+                    alwaysPull true
+                }
+            }
             steps {
                 echo 'Building TCPB-cpp...'
                 sh './configure gnu'
