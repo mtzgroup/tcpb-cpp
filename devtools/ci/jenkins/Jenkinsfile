@@ -4,8 +4,10 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                echo 'Building...'
-                echo 'Done building'
+                echo 'Building TCPB-cpp...'
+                sh './configure gnu'
+                sh 'make install'
+                echo 'Done building TCPB-cpp'
             }
         }
     }
