@@ -59,4 +59,4 @@ example:
 	@cd examples/api/cpp_openmm && make
 
 pytcpb:
-	@cd pytcpb && python setup.py install 
+	@cd pytcpb && python setup.py install
