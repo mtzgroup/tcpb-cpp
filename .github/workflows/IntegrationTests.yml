@@ -13,6 +13,8 @@ on:
 jobs:
   build-tcpb-cpp:
     runs-on: self-hosted
+    container:
+      image: henryw7/terachem_compilation_enviroment
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
