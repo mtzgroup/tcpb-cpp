@@ -14,7 +14,7 @@ jobs:
         run: ./configure intel
       - name: Run make
         run: make -j12 install
-        run: echo "Eita" > eita.dat
+      - run: echo "Eita" > eita.dat
   build-terachem:
     runs-on: self-hosted
     needs: build-tcpb-cpp
@@ -23,4 +23,4 @@ jobs:
     steps:
       - name: Clone TeraChem repo
         run: git clone https://imd-mtz:${{ secrets.IMD_MTZ_PAT }}@github.com/mtzgroup/terachem.git terachem
-        run: ls -l
+      - run: ls -l
