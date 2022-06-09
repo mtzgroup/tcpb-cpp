@@ -22,4 +22,9 @@ jobs:
     steps:
       - name: Clone TeraChem repo
         run: git clone https://imd-mtz:${{ secrets.IMD_MTZ_PAT }}@github.com/mtzgroup/terachem.git terachem
-      - run: ls -l
+      - run: cd terachem
+      - name: Configure TeraChem
+        run: HOSTNAME=fire-fake ./configure
+      - name: Compile TeraChem
+        run: make -j32
+      - run: cd ..
