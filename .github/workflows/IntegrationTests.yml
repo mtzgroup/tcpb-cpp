@@ -23,5 +23,3 @@ jobs:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
       - run: echo "Print all files"
-      -	name: List files
-       	run: ls	-l
