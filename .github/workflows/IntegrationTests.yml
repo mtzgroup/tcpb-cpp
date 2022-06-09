@@ -14,7 +14,6 @@ jobs:
         run: ./configure intel
       - name: Run make
         run: make -j12 install
-      - run: echo "Eita" > eita.dat
   build-terachem:
     runs-on: self-hosted
     needs: build-tcpb-cpp
