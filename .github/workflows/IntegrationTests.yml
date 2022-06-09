@@ -20,4 +20,4 @@ jobs:
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
-      - run: git clone git@github.com:mtzgroup/terachem.git
+      - run: git clone https://imd-mtz:${{ secrets.IMD_MTZ_PAT }}@github.com/mtzgroup/terachem.git terachem
