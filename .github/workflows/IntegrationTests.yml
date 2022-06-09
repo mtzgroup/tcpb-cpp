@@ -32,3 +32,9 @@ jobs:
           cd terachem
           make -j32
           cd ..
+      - name: Set enviromental variables
+        run: |
+          export TeraChem=$(pwd)/terachem/build
+          export PATH=$TeraChem/bin:$PATH
+          export LD_LIBRARY_PATH=$TeraChem/lib:$LD_LIBRARY_PATH
+      - run: which terachem
