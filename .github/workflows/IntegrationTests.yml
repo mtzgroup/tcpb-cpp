@@ -7,6 +7,7 @@ jobs:
     runs-on: self-hosted
     container:
       image: henryw7/terachem_compilation_enviroment
+      tag: 0.0.1
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
