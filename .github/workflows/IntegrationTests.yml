@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   Explore-GitHub-Actions:
-    runs-on: self-runner
+    runs-on: self-hosted
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on the ${{ runner.os }} server!"
