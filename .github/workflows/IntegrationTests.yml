@@ -22,4 +22,4 @@ jobs:
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
-      - run: echo "Print all files"
+      - run: ls -l
