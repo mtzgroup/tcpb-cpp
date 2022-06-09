@@ -14,3 +14,13 @@ jobs:
         run: ./configure intel
       - name: Run make
         run: make -j12 install
+      - name: List files
+        run: ls -l
+  build-terachem:
+    needs: build-tcpb-cpp
+    runs-on: self-hosted
+    container:
+      image: henryw7/terachem_compilation_enviroment:0.0.1
+    steps:
+      -	name: List files
+       	run: ls	-l
