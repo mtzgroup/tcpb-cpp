@@ -14,6 +14,8 @@ jobs:
         run: ./configure intel
       - name: Run make
         run: make -j12 install
+      - name: Install pyTCPB
+        run: make pytcpb
   build-terachem:
     runs-on: self-hosted
     needs: build-tcpb-cpp
