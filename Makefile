@@ -59,4 +59,5 @@ example:
 	@cd examples/api/cpp_openmm && make
 
 pytcpb:
+        @echo "[pyTCPB]  Installing pyTCPB"
 	@cd pytcpb && python setup.py install
