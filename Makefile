@@ -1,7 +1,7 @@
 include config.h
 
 .NOTPARALLEL:clean install all
-.PHONY: test
+.PHONY: test pytcpb
 
 LIBSRC := src/exceptions.cpp \
 	src/client.cpp \
