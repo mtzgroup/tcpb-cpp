@@ -46,10 +46,10 @@ elif (status == 1):
     print(" ERROR: No options read from TeraChem input file or mismatch in the input options!")
     sys.exit(1)
 elif (status == 2):
-    printf(" ERROR: Failed to setup TeraChem.")
+    print(" ERROR: Failed to setup TeraChem.")
     sys.exit(1)
 else:
-    printf(" ERROR: Status on tc_setup function is not recognized!")
+    print(" ERROR: Status on tc_setup function is not recognized!")
     sys.exit(1)
 
 # Set QM region coordinates, defined in Angstroms and then converted to Bohrs
@@ -74,7 +74,7 @@ elif (status == 2):
     print(" ERROR: Problem to compute energy and gradient!")
     sys.exit(1)
 else:
-    printf(" ERROR: Status on tc_compute_energy_gradient function is not recognized!")
+    print(" ERROR: Status on tc_compute_energy_gradient function is not recognized!")
     sys.exit(1)
 
 # Print results
