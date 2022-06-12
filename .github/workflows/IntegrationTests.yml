@@ -46,6 +46,11 @@ jobs:
     steps:
       - name: Clone TeraChem Test Suite repo
         run: git clone https://imd-mtz:${{ secrets.IMD_MTZ_PAT }}@github.com/mtzgroup/terachem-test-suite.git terachem-test-suite
+      - name: Change branch
+        run |
+          cd terachem-test-suite
+          git checkout vwdc
+          cd ..
       - name: Run TCPB-cpp tests
         run: |
           cd terachem-test-suite
