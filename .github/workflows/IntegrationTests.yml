@@ -22,6 +22,8 @@ jobs:
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
+      - name: which
+        run: which python
       - name: Check
         run: |
           echo "import pytcpb" > eita.py
