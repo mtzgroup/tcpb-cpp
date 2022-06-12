@@ -30,7 +30,7 @@ jobs:
           python eita.py
   build-terachem:
     runs-on: self-hosted
-    needs: build-tcpb-cpp
+    needs: check-pytcpb
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
