@@ -11,7 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Run configure script
-        run: ./configure intel
+        run: ./configure --prefix=/usr/local intel
       - name: Run make
         run: make -j12 install
       - name: Install pyTCPB
@@ -55,12 +55,17 @@ jobs:
         run: |
           source terachem/build/terachem.sh
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
+          echo $LD_LIBRARY_PATH
+          echo $LD_LIBRARY_PATH
           cd terachem-test-suite
           python test.py -c QMMM TCPB-cpp -g 0
           cd ..
       - name: Print run.log
+        if: always()
         run: cat terachem-test-suite/run.log
-      - uses: actions/upload-artifact@v3
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: |
