@@ -24,7 +24,9 @@ jobs:
     steps:
       - name: Check
         run: |
-          echo "import pytcpb\nprint(pytcpb.__file__)" > eita.py
+          echo "import pytcpb" > eita.py
+          echo "print(pytcpb.__file__)" >> eita.py
+          cat eita.py
           python eita.py
   build-terachem:
     runs-on: self-hosted
