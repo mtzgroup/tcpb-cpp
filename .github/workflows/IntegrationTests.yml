@@ -62,14 +62,16 @@ jobs:
           cd ..
       - name: Print run.log
         if: always()
-        run: cat terachem-test-suite/run.log
+        run: |
+          cat terachem-test-suite/run.log
+          ls -l
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: |
-            terachem_test_suite/run.log
-            terachem_test_suite/summary.out
-            terachem_test_suite/summary.err
+            run.log
+            summary.out
+            summary.err
           if-no-files-found: error
