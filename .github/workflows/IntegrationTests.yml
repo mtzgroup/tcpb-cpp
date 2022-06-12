@@ -53,6 +53,7 @@ jobs:
           cd ..
       - name: Run TCPB-cpp tests
         run: |
+          source terachem/build/terachem.sh
           cd terachem-test-suite
           python test.py -c TCPB-cpp -g 0
           cd ..
