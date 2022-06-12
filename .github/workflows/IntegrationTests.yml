@@ -16,6 +16,8 @@ jobs:
         run: make -j12 install
       - name: Install pyTCPB
         run: make pytcpb
+      - name: List libs
+        run: ls -l /root/miniconda2/lib/python2.7/site-packages
   check-pytcpb:
     runs-on: self-hosted
     needs: build-tcpb-cpp
