@@ -18,7 +18,7 @@ jobs:
         run: cd pytcpb && python setup.py build
   build-terachem:
     runs-on: self-hosted
-    needs: check-pytcpb
+    needs: build-tcpb-cpp
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
