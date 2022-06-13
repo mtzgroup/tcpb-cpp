@@ -16,15 +16,18 @@ jobs:
         run: make -j12 install
       - name: Install pyTCPB
         run: cd pytcpb && python setup.py build
-      - run: ls -l pytcpb/build
+      - run: echo $LD_LIBRARY_PATH
+      - run: echo ${{ github.workspace }}
+      - env:
+          LD_LIBRARY_PATH: ${{ github.workspace }}/lib
+      - run: echo $LD_LIBRARY_PATH
   check-pytcpb:
     runs-on: self-hosted
     needs: build-tcpb-cpp
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
-      - name: List libs
-        run: ls -l /root/miniconda2/lib/python2.7/site-packages
+      - run: echo $LD_LIBRARY_PATH
       - name: Check
         run: |
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
