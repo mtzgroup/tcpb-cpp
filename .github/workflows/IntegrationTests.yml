@@ -16,20 +16,6 @@ jobs:
         run: make -j12 install
       - name: Install pyTCPB
         run: cd pytcpb && python setup.py build
-  check-pytcpb:
-    runs-on: self-hosted
-    needs: build-tcpb-cpp
-    container:
-      image: henryw7/terachem_compilation_enviroment:0.0.1
-    steps:
-      - run: echo $LD_LIBRARY_PATH
-      - name: Check
-        run: |
-          export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
-          export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
-          echo "import pytcpb" > eita.py
-          echo "print(pytcpb.__file__)" >> eita.py
-          python eita.py
   build-terachem:
     runs-on: self-hosted
     needs: check-pytcpb
