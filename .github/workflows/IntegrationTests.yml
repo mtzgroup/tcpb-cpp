@@ -25,7 +25,6 @@ jobs:
       - run: echo $LD_LIBRARY_PATH
       - name: Check
         run: |
-          ls -l ${{ github.workspace }}
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
           export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           echo "import pytcpb" > eita.py
