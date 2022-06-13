@@ -26,7 +26,7 @@ jobs:
       - name: Check
         run: |
           export LD_LIBRARY_PATH=${{ github.workspace }}/lib:$LD_LIBRARY_PATH
-          export PYTHONPATH=${{ github.workspace }}/pytcpb/build/lib:$PYTHONPATH
+          export PYTHONPATH=${{ github.workspace }}/pytcpb/build/lib
           echo "import pytcpb" > eita.py
           echo "print(pytcpb.__file__)" >> eita.py
           cat eita.py
@@ -70,7 +70,7 @@ jobs:
         run: |
           source terachem/build/terachem.sh
           export LD_LIBRARY_PATH=${{ github.workspace }}/lib:$LD_LIBRARY_PATH
-          export PYTHONPATH=${{ github.workspace }}/pytcpb/build/lib:$PYTHONPATH
+          export PYTHONPATH=${{ github.workspace }}/pytcpb/build/lib
           cd terachem-test-suite
           python test.py -c QMMM TCPB-cpp -g 0
           cd ..
