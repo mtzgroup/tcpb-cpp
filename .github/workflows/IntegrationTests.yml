@@ -57,13 +57,8 @@ jobs:
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
           export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           cd terachem-test-suite
-          python test.py -c QMMM TCPB-cpp -g 0
+          python test.py -c TCPB-cpp -g 0
           cd ..
-      - name: Print run.log
-        if: always()
-        run: |
-          cat terachem-test-suite/run.log
-          ls -l
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v3
