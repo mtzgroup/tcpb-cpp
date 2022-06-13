@@ -32,40 +32,29 @@ jobs:
       - name: Compile TeraChem
         run: |
           cd terachem
-          make -j32
+          make -j12
           cd ..
-      - name: Look for TeraChem
-        run: |
-          source terachem/build/terachem.sh
-          which terachem
   run-test-suite:
     runs-on: self-hosted
     needs: build-terachem
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
-      - name: Clone TeraChem Test Suite repo
-        run: git clone https://imd-mtz:${{ secrets.IMD_MTZ_PAT }}@github.com/mtzgroup/terachem-test-suite.git terachem-test-suite
-      - name: Change branch
-        run: |
-          cd terachem-test-suite
-          git checkout vwdc
-          cd ..
       - name: Run TCPB-cpp tests
         run: |
           source terachem/build/terachem.sh
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
           export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
-          cd terachem-test-suite
+          cd terachem/tests
           python test.py -c TCPB-cpp -g 0
-          cd ..
+          cd ../..
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: |
-            terachem-test-suite/run.log
-            terachem-test-suite/summary.out
-            terachem-test-suite/summary.err
+            terachem/tests/run.log
+            terachem/tests/summary.out
+            terachem/tests/summary.err
           if-no-files-found: error
