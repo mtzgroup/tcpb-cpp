@@ -12,15 +12,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Run configure script
         run: ./configure intel
-      - run: echo $LD_LIBRARY_PATH
-      - run: echo ${{ github.workspace }}
       - name: Run make
         run: make -j12 install
-        env:
-          LD_LIBRARY_PATH: ${{ github.workspace }}/lib
       - name: Install pyTCPB
         run: cd pytcpb && python setup.py build
-      - run: echo $LD_LIBRARY_PATH
   check-pytcpb:
     runs-on: self-hosted
     needs: build-tcpb-cpp
@@ -30,8 +25,8 @@ jobs:
       - run: echo $LD_LIBRARY_PATH
       - name: Check
         run: |
-          export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
-          export PYTHONPATH=$(pwd)/pytcpb/build/lib
+          export LD_LIBRARY_PATH=${{ github.workspace }}/lib:$LD_LIBRARY_PATH
+          export PYTHONPATH=${{ github.workspace }}/pytcpb/build/lib:$PYTHONPATH
           echo "import pytcpb" > eita.py
           echo "print(pytcpb.__file__)" >> eita.py
           cat eita.py
@@ -74,6 +69,8 @@ jobs:
       - name: Run TCPB-cpp tests
         run: |
           source terachem/build/terachem.sh
+          export LD_LIBRARY_PATH=${{ github.workspace }}/lib:$LD_LIBRARY_PATH
+          export PYTHONPATH=${{ github.workspace }}/pytcpb/build/lib:$PYTHONPATH
           cd terachem-test-suite
           python test.py -c QMMM TCPB-cpp -g 0
           cd ..
