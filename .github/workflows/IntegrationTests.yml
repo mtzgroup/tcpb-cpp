@@ -11,13 +11,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Run configure script
-        run: ./configure --prefix=/usr/local intel
+        run: ./configure intel
       - name: Run make
         run: make -j12 install
       - name: Install pyTCPB
-        run: make pytcpb
-      - name: List libs
-        run: ls -l /root/miniconda2/lib/python2.7/site-packages
+        run: cd pytcpb && python setup.py build
+      - run: ls -l pytcpb/build
   check-pytcpb:
     runs-on: self-hosted
     needs: build-tcpb-cpp
@@ -28,6 +27,8 @@ jobs:
         run: ls -l /root/miniconda2/lib/python2.7/site-packages
       - name: Check
         run: |
+          export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
+          export PYTHONPATH=$(pwd)/pytcpb/build/lib
           echo "import pytcpb" > eita.py
           echo "print(pytcpb.__file__)" >> eita.py
           cat eita.py
