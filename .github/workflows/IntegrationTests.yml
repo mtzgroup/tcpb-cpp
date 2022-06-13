@@ -26,8 +26,8 @@ jobs:
       - name: Check
         run: |
           ls -l ${{ github.workspace }}
-          export LD_LIBRARY_PATH=${{ github.workspace }}/lib:$LD_LIBRARY_PATH
-          export PYTHONPATH=${{ github.workspace }}/pytcpb/build/lib
+          export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
+          export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           echo "import pytcpb" > eita.py
           echo "print(pytcpb.__file__)" >> eita.py
           python eita.py
@@ -69,8 +69,8 @@ jobs:
       - name: Run TCPB-cpp tests
         run: |
           source terachem/build/terachem.sh
-          export LD_LIBRARY_PATH=${{ github.workspace }}/lib:$LD_LIBRARY_PATH
-          export PYTHONPATH=${{ github.workspace }}/pytcpb/build/lib
+          export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
+          export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           cd terachem-test-suite
           python test.py -c QMMM TCPB-cpp -g 0
           cd ..
@@ -85,7 +85,7 @@ jobs:
         with:
           name: test-results
           path: |
-            run.log
-            summary.out
-            summary.err
+            terachem-test-suite/run.log
+            terachem-test-suite/summary.out
+            terachem-test-suite/summary.err
           if-no-files-found: error
