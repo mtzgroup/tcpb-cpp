@@ -16,6 +16,7 @@ jobs:
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
     steps:
+      - run: echo $CUDA_VISIBLE_DEVICES
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Run configure script
@@ -24,8 +25,6 @@ jobs:
         run: make -j16 install
       - name: Install pyTCPB
         run: cd pytcpb && python setup.py build
-      - name: Print runner name
-        run: echo ${{ runner.name }}
   build-terachem:
     runs-on: self-hosted
     needs: build-tcpb-cpp
