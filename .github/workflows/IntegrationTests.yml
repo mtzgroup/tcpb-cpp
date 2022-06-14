@@ -21,7 +21,7 @@ jobs:
       - name: Run configure script
         run: ./configure intel
       - name: Run make
-        run: make -j12 install
+        run: make -j16 install
       - name: Install pyTCPB
         run: cd pytcpb && python setup.py build
   build-terachem:
@@ -40,7 +40,7 @@ jobs:
       - name: Compile TeraChem
         run: |
           cd terachem
-          make -j12
+          make -j16
           cd ..
   run-test-suite:
     runs-on: self-hosted
