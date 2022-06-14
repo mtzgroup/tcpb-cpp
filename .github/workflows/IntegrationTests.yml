@@ -16,7 +16,7 @@ jobs:
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
       env:
-        CUDA_VISIBLE_DEVICES: $CUDA_VISIBLE_DEVICES
+        CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
     steps:
       - run: echo $CUDA_VISIBLE_DEVICES
       - name: Checkout repository
