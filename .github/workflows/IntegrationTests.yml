@@ -1,6 +1,14 @@
 name: Integration Tests
 
-on: [push]
+on:
+  push:
+    branches: master
+    paths-ignore:
+      - README.md
+  pull_request:
+    branches: master
+    paths-ignore:
+      - README.md
 
 jobs:
   build-tcpb-cpp:
