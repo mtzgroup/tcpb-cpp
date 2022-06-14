@@ -36,7 +36,7 @@ jobs:
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
       env:
-	CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
+        CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
     steps:
       - name: Name of the runner executing this job 
        	run: echo ${{ runner.name }}
@@ -60,7 +60,7 @@ jobs:
     container:
       image: henryw7/terachem_compilation_enviroment:0.0.1
       env:
-	CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
+        CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
     steps:
       - name: Name of the runner executing this job 
        	run: echo ${{ runner.name }}
