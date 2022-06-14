@@ -25,7 +25,7 @@ jobs:
       - name: Install pyTCPB
         run: cd pytcpb && python setup.py build
       - name: Print runner name
-        run: echo "Runner name: $env:RUNNER_NAME"
+        run: echo "Runner name: ${{ runner.name }}"
   build-terachem:
     runs-on: self-hosted
     needs: build-tcpb-cpp
