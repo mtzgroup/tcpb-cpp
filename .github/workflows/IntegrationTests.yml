@@ -14,7 +14,7 @@ jobs:
   build-tcpb-cpp:
     runs-on: self-hosted
     container:
-      image: henryw7/terachem_compilation_enviroment:0.0.1
+      image: vwcruzeiro/terachem_environment:latest
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
     steps:
@@ -34,7 +34,7 @@ jobs:
     runs-on: self-hosted
     needs: build-tcpb-cpp
     container:
-      image: henryw7/terachem_compilation_enviroment:0.0.1
+      image: vwcruzeiro/terachem_environment:latest
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
     steps:
@@ -55,10 +55,10 @@ jobs:
           make -j16
           cd ..
   run-test-suite:
-    runs-on: self-hosted
+    runs-on: [self-hosted, 1gpu]
     needs: build-terachem
     container:
-      image: henryw7/terachem_compilation_enviroment:0.0.1
+      image: vwcruzeiro/terachem_environment:latest
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
     steps:
@@ -72,7 +72,7 @@ jobs:
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
           export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           cd terachem/tests
-          python test.py -c TCPB-cpp -g 0
+          python test.py -c TCPB-cpp -g 0 -l 0
           cd ../..
       - name: Archive test results
         if: always()
