@@ -30,6 +30,8 @@ jobs:
       volumes:
         - /data/actions-scratch/$GITHUB_RUN_ID
     steps:
+      - name: Current folder
+        run: pwd
       - name: ID of this GitHub Actions run
         run: echo $GITHUB_RUN_ID
       - name: Name of the runner executing this job
