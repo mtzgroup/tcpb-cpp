@@ -16,8 +16,8 @@ jobs:
     steps:
       - name: ID of this GitHub Actions run
         run: echo $GITHUB_RUN_ID
-      - name: Workflow location
-        run: echo $GITHUB_WORKSPACE
+      - name: ID test
+        run: echo ${{ github.run_id }}
       - name: Name of the runner executing this job
         run: echo ${{ runner.name }}
       - name: Create folder where GitHub Actions run will be executed
@@ -114,8 +114,6 @@ jobs:
     steps:
       - name: ID of this GitHub Actions run
         run: echo $GITHUB_RUN_ID
-      - name: Workflow location
-        run: echo $GITHUB_WORKSPACE
       - name: Name of the runner executing this job
         run: echo ${{ runner.name }}
       - name: Delete folder where GitHub Actions run was executed
