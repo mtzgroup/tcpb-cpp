@@ -101,13 +101,32 @@ jobs:
         with:
           name: test-results
           path: |
-            terachem/tests/run.log
-            terachem/tests/summary.out
-            terachem/tests/summary.err
+            /_work/terachem/tests/run.log
+            /_work/terachem/tests/summary.out
+            /_work/terachem/tests/summary.err
           if-no-files-found: error
-  cleanup-run:
+  cleanup-run-part1:
     runs-on: self-hosted
     needs: run-test-suite
+    if: always()
+    container:
+      image: vwcruzeiro/terachem_environment:latest
+      env:
+        CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
+      volumes:
+        - /data/actions-scratch/${{ github.run_id }}:/_work
+    steps:
+      - name: ID of this GitHub Actions	run
+        run: echo $GITHUB_RUN_ID
+      - name: Name of the runner executing this job 
+        run: echo ${{ runner.name }}
+      - name: Print CUDA_VISIBLE_DEVICES, as seen inside the Docker container
+        run: echo $CUDA_VISIBLE_DEVICES
+      - name: Remove all files from where the GitHub Actions run were executed
+        run: rm -Rf /_work/*
+  cleanup-run-part2:
+    runs-on: self-hosted
+    needs: cleanup-run-part1
     if: always()
     steps:
       - name: ID of this GitHub Actions run
