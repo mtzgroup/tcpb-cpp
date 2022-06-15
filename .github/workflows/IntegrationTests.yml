@@ -15,13 +15,11 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: ID of this GitHub Actions run
-        run: echo $GITHUB_RUN_ID
-      - name: ID test
         run: echo ${{ github.run_id }}
       - name: Name of the runner executing this job
         run: echo ${{ runner.name }}
       - name: Create folder where GitHub Actions run will be executed
-        run: mkdir /data/actions-scratch/$GITHUB_RUN_ID
+        run: mkdir /data/actions-scratch/${{ github.run_id }}
   build-tcpb-cpp:
     runs-on: self-hosted
     needs: setup-run
@@ -30,7 +28,7 @@ jobs:
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
       volumes:
-        - /data/actions-scratch/$GITHUB_RUN_ID:/_work
+        - /data/actions-scratch/${{ github.run_id }}:/_work
     steps:
       - name: ID of this GitHub Actions run
         run: echo $GITHUB_RUN_ID
@@ -56,7 +54,7 @@ jobs:
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
       volumes:
-        - /data/actions-scratch/$GITHUB_RUN_ID:/_work
+        - /data/actions-scratch/${{ github.run_id }}:/_work
     steps:
       - name: ID of this GitHub Actions	run
         run: echo $GITHUB_RUN_ID
@@ -79,7 +77,7 @@ jobs:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
         TCPB_PORT: ${{ env.TCPB_PORT }}
       volumes:
-        - /data/actions-scratch/$GITHUB_RUN_ID:/_work
+        - /data/actions-scratch/${{ github.run_id }}:/_work
     steps:
       - name: ID of this GitHub Actions	run
         run: echo $GITHUB_RUN_ID
@@ -113,8 +111,8 @@ jobs:
     if: always()
     steps:
       - name: ID of this GitHub Actions run
-        run: echo $GITHUB_RUN_ID
+        run: echo ${{ github.run_id }}
       - name: Name of the runner executing this job
         run: echo ${{ runner.name }}
       - name: Delete folder where GitHub Actions run was executed
-        run: rm -Rf /data/actions-scratch/$GITHUB_RUN_ID
+        run: rm -Rf /data/actions-scratch/${{ github.run_id }}
