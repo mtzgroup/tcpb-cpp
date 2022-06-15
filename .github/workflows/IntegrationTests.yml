@@ -30,10 +30,8 @@ jobs:
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
       volumes:
-        - /data/actions-scratch/$GITHUB_RUN_ID:/__w
+        - /data/actions-scratch/$GITHUB_RUN_ID:/_work
     steps:
-      - name: Current folder
-        run: pwd
       - name: ID of this GitHub Actions run
         run: echo $GITHUB_RUN_ID
       - name: Name of the runner executing this job
@@ -42,12 +40,14 @@ jobs:
         run: echo $CUDA_VISIBLE_DEVICES
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Move files to the correct folder
+        run: mv * /_work/.
       - name: Run configure script
-        run: ./configure intel
+        run: cd /_work && ./configure intel
       - name: Run make
-        run: make -j14 install
+        run: cd /_work && make -j14 install
       - name: Install pyTCPB
-        run: cd pytcpb && python setup.py build
+        run: cd /_work && cd pytcpb && python setup.py build
   build-terachem:
     runs-on: self-hosted
     needs: build-tcpb-cpp
@@ -56,7 +56,7 @@ jobs:
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
       volumes:
-        - /data/actions-scratch/$GITHUB_RUN_ID:/__w
+        - /data/actions-scratch/$GITHUB_RUN_ID:/_work
     steps:
       - name: ID of this GitHub Actions	run
         run: echo $GITHUB_RUN_ID
@@ -65,17 +65,11 @@ jobs:
       - name: Print CUDA_VISIBLE_DEVICES, as seen inside the Docker container
         run: echo $CUDA_VISIBLE_DEVICES
       - name: Clone TeraChem repo
-        run: git clone https://imd-mtz:${{ secrets.IMD_MTZ_PAT }}@github.com/mtzgroup/terachem.git terachem
+        run: cd /_work && git clone https://imd-mtz:${{ secrets.IMD_MTZ_PAT }}@github.com/mtzgroup/terachem.git terachem
       - name: Configure TeraChem
-        run: |
-          cd terachem
-          HOSTNAME=fire-fake ./configure
-          cd ..
+        run: cd /_work && cd terachem && HOSTNAME=fire-fake ./configure
       - name: Compile TeraChem
-        run: |
-          cd terachem
-          make -j14
-          cd ..
+        run: cd /_work && cd terachem && make -j14
   run-test-suite:
     runs-on: [self-hosted, 1gpu]
     needs: build-terachem
@@ -85,7 +79,7 @@ jobs:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
         TCPB_PORT: ${{ env.TCPB_PORT }}
       volumes:
-        - /data/actions-scratch/$GITHUB_RUN_ID:/__w
+        - /data/actions-scratch/$GITHUB_RUN_ID:/_work
     steps:
       - name: ID of this GitHub Actions	run
         run: echo $GITHUB_RUN_ID
@@ -97,12 +91,12 @@ jobs:
         run: echo $TCPB_PORT
       - name: Run TCPB-cpp tests
         run: |
+          cd /_work
           source terachem/build/terachem.sh
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
           export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           cd terachem/tests
           python test.py -c TCPB-cpp -g 0 -l 0 -p $TCPB_PORT
-          cd ../..
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v3
@@ -113,3 +107,16 @@ jobs:
             terachem/tests/summary.out
             terachem/tests/summary.err
           if-no-files-found: error
+  cleanup-run:
+    runs-on: self-hosted
+    needs: run-test-suite
+    if: always()
+    steps:
+      - name: ID of this GitHub Actions run
+        run: echo $GITHUB_RUN_ID
+      - name: Workflow location
+        run: echo $GITHUB_WORKSPACE
+      - name: Name of the runner executing this job
+        run: echo ${{ runner.name }}
+      - name: Delete folder where GitHub Actions run was executed
+        run: rm -Rf /data/actions-scratch/$GITHUB_RUN_ID
