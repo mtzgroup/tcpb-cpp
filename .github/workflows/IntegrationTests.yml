@@ -52,7 +52,7 @@ jobs:
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
       volumes:
-       	- /data/actions-scratch/$GITHUB_RUN_ID
+        - /data/actions-scratch/$GITHUB_RUN_ID
     steps:
       - name: ID of this GitHub Actions	run
         run: echo $GITHUB_RUN_ID
@@ -81,7 +81,7 @@ jobs:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
         TCPB_PORT: ${{ env.TCPB_PORT }}
       volumes:
-       	- /data/actions-scratch/$GITHUB_RUN_ID
+        - /data/actions-scratch/$GITHUB_RUN_ID
     steps:
       - name: ID of this GitHub Actions	run
         run: echo $GITHUB_RUN_ID
