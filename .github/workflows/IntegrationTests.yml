@@ -67,6 +67,8 @@ jobs:
         run: echo ${{ runner.name }}
       - name: Print CUDA_VISIBLE_DEVICES, as seen inside the Docker container
         run: echo $CUDA_VISIBLE_DEVICES
+      - name: Print TCPB_PORT, as seen inside the Docker container
+        run: echo $TCPB_PORT
       - name: Run TCPB-cpp tests
         run: |
           source terachem/build/terachem.sh
