@@ -19,7 +19,7 @@ jobs:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
     steps:
       - name: ID of action
-        run: $GITHUB_ACTION
+        run: echo $GITHUB_ACTION
       - name: Name of the runner executing this job
         run: echo ${{ runner.name }}
       - name: Print CUDA_VISIBLE_DEVICES, as seen inside the Docker container
@@ -41,7 +41,7 @@ jobs:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
     steps:
       - name: ID of action
-        run: $GITHUB_ACTION
+        run: echo $GITHUB_ACTION
       - name: Name of the runner executing this job 
         run: echo ${{ runner.name }}
       - name: Print CUDA_VISIBLE_DEVICES, as seen inside the Docker container
