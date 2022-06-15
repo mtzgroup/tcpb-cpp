@@ -61,6 +61,7 @@ jobs:
       image: vwcruzeiro/terachem_environment:latest
       env:
         CUDA_VISIBLE_DEVICES: ${{ env.CUDA_VISIBLE_DEVICES }}
+        TCPB_PORT: ${{ env.TCPB_PORT }}
     steps:
       - name: Name of the runner executing this job 
         run: echo ${{ runner.name }}
@@ -72,7 +73,7 @@ jobs:
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
           export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           cd terachem/tests
-          python test.py -c TCPB-cpp -g 0 -l 0 -p ${{ env.TCPB_PORT }}
+          python test.py -c TCPB-cpp -g 0 -l 0 -p $TCPB_PORT
           cd ../..
       - name: Archive test results
         if: always()
