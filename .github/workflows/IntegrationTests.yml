@@ -47,7 +47,7 @@ jobs:
       - name: Install pyTCPB
         run: cd /_work && cd pytcpb && python setup.py build
   build-terachem:
-    runs-on: self-hosted
+    runs-on: [self-hosted, 1gpu]
     needs: build-tcpb-cpp
     container:
       image: vwcruzeiro/terachem_environment:latest
@@ -94,7 +94,7 @@ jobs:
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
           export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           cd terachem/tests
-          python test.py -c TCPB-cpp -g 0 -l 0 -p $TCPB_PORT
+          python test.py -c TCPB-cpp -g 0 -p $TCPB_PORT
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v3
