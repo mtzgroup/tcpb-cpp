@@ -155,7 +155,7 @@ extern "C" {
       pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_TC_OPENMM);
       mmcharges = nullptr;
     } else if (mmcoords == nullptr || !ConsiderMM) {
-      pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_NO_QMMM;
+      pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_NO_QMMM);
     } else {
       pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
     }
