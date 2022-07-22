@@ -29,6 +29,7 @@ extern "C" {
   TCPB::Client* TC = nullptr;
   TCPB::Input*  pb_input = nullptr;
   int old_numqmatoms = -1;
+  int old_qmmmtype = -1;
   bool useopenmm = false;
 
   void tc_connect_(const char host[80], const int* port, int* status) {
@@ -151,16 +152,26 @@ extern "C" {
       usleep(110000);
     }
     // Set initial condition
+    bool usenewcondition = false;
     if (useopenmm) {
       pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_TC_OPENMM);
       mmcharges = nullptr;
+      if (old_qmmmtype != 2)
+        usenewcondition = true;
+      old_qmmmtype = 2;
     } else if (mmcoords == nullptr || !ConsiderMM) {
       pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_NO_QMMM);
+      if (old_qmmmtype != 0)
+        usenewcondition = true;
+      old_qmmmtype = 0;
     } else {
       pb_input->GetMutablePB().set_qmmm_type(terachem_server::JobInput_QmmmType::JobInput_QmmmType_POINT_CHARGE);
+      if (old_qmmmtype != 1)
+        usenewcondition = true;
+      old_qmmmtype = 1;
     }
     if (globaltreatment == nullptr || (*globaltreatment) == 0) {
-      if (old_numqmatoms < 1 || old_numqmatoms !=  (*numqmatoms)) {
+      if (old_numqmatoms < 1 || old_numqmatoms !=  (*numqmatoms) || usenewcondition) {
         pb_input->GetMutablePB().set_md_global_type(terachem_server::JobInput_MDGlobalTreatment::JobInput_MDGlobalTreatment_NEW_CONDITION);
         old_numqmatoms = (*numqmatoms);
       } else {
