@@ -2,7 +2,7 @@
 
 This repository is designed to facilitate the communication between TeraChem and third party software.
 
-The client and server (set by the TeraChem executable) use C-style sockets for communication, and Protocol Buffers for a clean, well-defined way to serialize TeraChem input & output data.
+The client and the server (set by the TeraChem executable) use C-style sockets for communication, and Protocol Buffers for a clean, well-defined way to serialize TeraChem input & output data.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ git submodule update
 
 * Run `make install`
 
-* To install the Python interface *PyTCPB*, run `make pytcpb`. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
+* To install the Python interface *PyTCPB*, run `make pytcpb`. After installation, the API functions can be called from your custom Python script. Refer to `examples/api/python` for usage example.
 
 * Add the absolute path to `lib` into `LD_LIBRARY_PATH`
 
@@ -45,9 +45,19 @@ git submodule update
 
 * Run `make install`
 
-* The Python interface *PyTCPB* is installed by default. To deactivate its installation, add `-DBUILD_PYTHON=FALSE` into your CMake command. After installation, the API functions can be called from your custom Python script. Refer to `api_examples/python` for usage example.
+* The Python interface *PyTCPB* is installed by default. To deactivate its installation, add `-DBUILD_PYTHON=FALSE` into your CMake command. After installation, the API functions can be called from your custom Python script. Refer to `examples/api/python` for usage example.
 
 * Add the absolute path to `../lib` into `LD_LIBRARY_PATH`
+
+## Running TeraChem in server mode
+
+TeraChem needs to be active in server mode so that TCPB-cpp can connect to it.
+
+TeraChem can be executed in server mode with the following command:
+```
+terachem -s 12345
+```
+where `-s` specifies the port number to be used and 12345 is a value picked for illustration purposes only. By default, TeraChem will use all GPUs in the machine, but users can control which GPUs are accessible by using the `-g` in the TeraChem command above or by setting the `CUDA_VISIBLE_DEVICES` environment variable before running the command above.
 
 ## Examples
 
