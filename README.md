@@ -8,9 +8,24 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 * Protocol Buffers >= 3.2.0 (`protoc` and `libprotobuf.so` for C++)
 
+## Cloning this repo and setting up its submodules
+
+```
+git clone git@github.com:mtzgroup/tcpb-cpp.git tcpb-cpp
+cd tcpb-cpp
+git submodule init
+git submodule update
+```
+
+## Obtaining and installing Protocol Buffers
+
+* Please refer to [this page](https://developers.google.com/protocol-buffers) for instructions on how to download and install Google’s Protocol Buffers libraries and executables.
+
+* At the time of writing, protocol buffers can be downloaded from <https://github.com/protocolbuffers/protobuf/releases> (e.g., `protobuf-cpp-3.20.1.zip`) and installation instructions for C++ are provided at <https://github.com/protocolbuffers/protobuf/blob/main/src/README.md>.
+
 ## Installation (with configure script)
 
-* Ensure `protoc` and `libprotobuf.so` are in your `PATH` and `LD_LIBRARY_PATH`, respectively
+* Ensure `protoc` and `libprotobuf.so` (from Protocol Buffers) are in your `PATH` and `LD_LIBRARY_PATH`, respectively
 
 * Run `./configure gnu` if using GNU compilers or `./configure intel` if using Intel compilers. Other compiler options are intel and clang (not tested). To pick another install location, like /usr/local, run `./configure --prefix=/usr/local gnu`
 
@@ -36,9 +51,9 @@ The client and server (set by the TeraChem executable) use C-style sockets for c
 
 ## Examples
 
-* Native examples: after installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
+* **Using TCPB-cpp from different programming languages:** examples available at the folder `examples/api`.
 
-* Examples using the API from different programming languages are available at the folder `examples/api`.
+* **Native C++ examples:** after installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
 
 ## Notes for TeraChem Developers
 
@@ -53,5 +68,5 @@ determining how the server/client deserialize the incoming message.
 
 ## Contact
 
-* Vinicius Wilian D. Cruzeiro <vwcruz@stanford.edu>
-* Stefan Seritan <sseritan@stanford.edu>
+* Vinicius Wilian D. Cruzeiro: <vwcruz@stanford.edu>
+* Henry Wang: <henryw7@stanford.edu>
