@@ -28,6 +28,7 @@ extern "C" {
   // Variables to be used/modified by all function calls, and to be active in between function calls
   TCPB::Client* TC = nullptr;
   TCPB::Input*  pb_input = nullptr;
+  TCPB::Output* pb_output = nullptr;
   int old_numqmatoms = -1;
   int old_qmmmtype = -1;
   bool useopenmm = false;
@@ -218,11 +219,26 @@ extern "C" {
     //printf("Debug protobuf input string:\n%s\n", pb_input->GetDebugString().c_str());
     // Attempt to create the PB input variable
     try {
-      TCPB::Output pb_output = TC->ComputeGradient((*pb_input), (*totenergy), qmgrad, mmgrad);
-      //printf("Debug protobuf output string:\n%s\n", pb_output.GetDebugString().c_str());
+      TCPB::Output temp_pb_output = TC->ComputeGradient((*pb_input), (*totenergy), qmgrad, mmgrad);
+      pb_output = new TCPB::Output;
+      (*pb_output) = temp_pb_output;
+      //printf("Debug protobuf output string:\n%s\n", pb_output->GetDebugString().c_str());
     }
     catch (...) {
       (*status) = 2;
+      return;
+    }
+    // If all is done, then done
+    (*status) = 0;
+  }
+
+  void tc_get_qm_charges_(double* qmcharges, int* status) {
+    //printf("Debug protobuf output string:\n%s\n", pb_output->GetDebugString().c_str());
+    try {
+      pb_output->GetCharges(qmcharges);
+    }
+    catch (...) {
+      (*status) = 1;
       return;
     }
     // If all is done, then done
@@ -237,6 +253,10 @@ extern "C" {
     if (pb_input != nullptr) {
       delete pb_input;
       pb_input = nullptr;
+    }
+    if (pb_output != nullptr) {
+      delete pb_output;
+      pb_output = nullptr;
     }
   }
 

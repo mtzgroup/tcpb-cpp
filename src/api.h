@@ -57,6 +57,15 @@ extern "C" {
     const int* nummmatoms, double* mmgrad, const int* globaltreatment, int* status);
 
   /**
+   * \brief Gets the charges of the atoms in the QM region. Must be ran after tc_compute_energy_gradient_.
+   *\
+   * @param[out] qmccharges Charges of the atoms in the QM region (unit: atomic units)
+   * @param[out] status Status of execution: 0, all is good
+   *                                         1, calculation failed
+   **/
+  void tc_get_qm_charges_(double* qmcharges, int* status);
+
+  /**
    * \brief Deletes from memory variables that are allocated
    **/
   void tc_finalize_();

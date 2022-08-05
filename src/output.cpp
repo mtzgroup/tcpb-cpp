@@ -35,6 +35,12 @@ void Output::GetGradient(double *qmgradient,
   }
 }
 
+void Output::GetCharges(double *qmcharges) const
+{
+  int charges_size = pb_.charges_size();
+  memcpy(qmcharges, pb_.charges().data(), charges_size * sizeof(double));
+}
+
 bool Output::IsApproxEqual(const Output &other) const
 {
   using namespace google::protobuf::util;
