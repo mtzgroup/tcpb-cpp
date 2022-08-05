@@ -92,6 +92,20 @@ def compute_energy_gradient(qmattypes,qmcoords,mmcoords=[],mmcharges=[],globaltr
                                         bmmgrad,ctypes.c_int(globaltreatment),status)
     return btotenergy.value, bqmgrad, bmmgrad, status.value
 
+# Function tc_get_qm_charges
+libtcpb.tc_get_qm_charges_.argtypes = (ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_int))
+libtcpb.tc_get_qm_charges_.restype = None
+def get_qm_charges(numqmatoms):
+    """
+    Python version of function tc_get_qm_charges from libtcpb.so
+    """
+    global libtcpb
+    DoubleType = ctypes.c_double * (numqmatoms)
+    bqmcharges = DoubleType()
+    status = ctypes.c_int()
+    libtcpb.tc_get_qm_charges_(bqmcharges,status)
+    return bqmcharges, status.value
+
 # Function tc_finalize
 libtcpb.tc_finalize_.argtypes = ()
 libtcpb.tc_finalize_.restype = None
