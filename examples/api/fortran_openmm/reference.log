@@ -14,6 +14,12 @@ MM Grad(  1,:) =    -0.0286415209    0.0204084496    0.0014555151 Hartree/Bohr
 MM Grad(  2,:) =     0.0259350252   -0.0225405056    0.0008345701 Hartree/Bohr
 MM Grad(  3,:) =    -0.0044290195    0.0069329314   -0.0018873307 Hartree/Bohr
  
+ Got QM charges with success.
+ Charges from 1st calculation
+QM Charge(  1) =    -0.4694568654
+QM Charge(  2) =     0.1690065774
+QM Charge(  3) =     0.3004502880
+ 
  Computed energy and gradient with success.
  Results from 2nd calculation (one water molecule in the QM region and one in th
  e MM region)
@@ -24,3 +30,9 @@ QM Grad(  3,:) =     0.0766365261   -0.0000111175    0.0449271288 Hartree/Bohr
 MM Grad(  1,:) =    -0.0286417883    0.0204084250    0.0014554430 Hartree/Bohr
 MM Grad(  2,:) =     0.0259351702   -0.0225406770    0.0008345809 Hartree/Bohr
 MM Grad(  3,:) =    -0.0044290181    0.0069331439   -0.0018873267 Hartree/Bohr
+ 
+ Got QM charges with success.
+ Charges from 2nd calculation
+QM Charge(  1) =    -0.4694527258
+QM Charge(  2) =     0.1690058163
+QM Charge(  3) =     0.3004469095

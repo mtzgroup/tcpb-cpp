@@ -70,6 +70,7 @@ int main(int argc, char** argv) {
   for (int i=0; i < 3*numqmatoms; i++) {
     qmcoords[i] /= BohrToAng;
   }
+  double* qmcharges = new double[numqmatoms];
 
   // MM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
   int nummmatoms = 3;
@@ -110,6 +111,26 @@ int main(int argc, char** argv) {
     printf("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]);
   }
 
+  // Get QM charges
+  printf("\n");
+  status = -1;
+  tc_get_qm_charges_(qmcharges,&status);
+  if (status == 0) {
+    printf(" Got QM charges with success.\n");
+  } else if (status == 1) {
+    printf(" ERROR: Problem to get QM charges!\n");
+    return 1;
+  } else {
+    printf(" ERROR: Status on tc_get_qm_charges function is not recognized!\n");
+    return 1;
+  }
+
+  // Print results
+  printf(" Charges from 1st calculation\n");
+  for (int i=0; i < numqmatoms; i++) {
+    printf("QM Charge(%3d) = %16.10f\n",i+1,qmcharges[i]);
+  }
+
   // Compute energy and gradient
   printf("\n");
   status = -1;
@@ -137,6 +158,26 @@ int main(int argc, char** argv) {
     printf("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]);
   }
 
+  // Get QM charges
+  printf("\n");
+  status = -1;
+  tc_get_qm_charges_(qmcharges,&status);
+  if (status == 0) {
+    printf(" Got QM charges with success.\n");
+  } else if (status == 1) {
+    printf(" ERROR: Problem to get QM charges!\n");
+    return 1;
+  } else {
+    printf(" ERROR: Status on tc_get_qm_charges function is not recognized!\n");
+    return 1;
+  }
+
+  // Print results
+  printf(" Charges from 2nd calculation\n");
+  for (int i=0; i < numqmatoms; i++) {
+    printf("QM Charge(%3d) = %16.10f\n",i+1,qmcharges[i]);
+  }
+
   // Finalizes variables on the TeraChem side
   tc_finalize_();
 
@@ -144,6 +185,7 @@ int main(int argc, char** argv) {
   delete[] qmattypes;
   delete[] qmcoords;
   delete[] qmgrad;
+  delete[] qmcharges;
   delete[] mmcoords;
   delete[] mmgrad;
 

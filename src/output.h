@@ -55,6 +55,13 @@ public:
    **/
   void GetGradient(double *qmgradient,
     double *mmgradient = nullptr) const;
+  
+  /**
+   * \brief Gets the charges of the QM region from a JobOutput Protocol Buffer
+   *
+   * @param qmcharges Double array to store computed charges of the QM region (user-allocated)
+   **/
+  void GetCharges(double *qmcharges) const;
 
   /**
    * \brief Accessor for internal protobuf object

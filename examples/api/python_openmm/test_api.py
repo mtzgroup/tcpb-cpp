@@ -90,6 +90,23 @@ for i in range(len(qmattypes)):
 for i in range(int(len(mmcoords)/3)):
     print("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]))
 
+# Get QM charges
+print("")
+qmcharges, status = tc.get_qm_charges(len(qmattypes))
+if (status == 0):
+    print(" Got QM charges with success.")
+elif (status == 1):
+    print(" ERROR: Problem to get QM charges!")
+    sys.exit(1)
+else:
+    print(" ERROR: Status on tc_get_qm_charges function is not recognized!")
+    sys.exit(1)
+
+# Print charges
+print(" Charges from 1st calculation")
+for i in range(len(qmattypes)):
+    print("QM Charge(%3d) = %16.10f"%(i+1,qmcharges[i]))
+
 # Compute energy and gradient
 print("")
 totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment)
@@ -112,6 +129,23 @@ for i in range(len(qmattypes)):
     print("QM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,qmgrad[3*i], qmgrad[3*i+1], qmgrad[3*i+2]))
 for i in range(int(len(mmcoords)/3)):
     print("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]))
+
+# Get QM charges
+print("")
+qmcharges, status = tc.get_qm_charges(len(qmattypes))
+if (status == 0):
+    print(" Got QM charges with success.")
+elif (status == 1):
+    print(" ERROR: Problem to get QM charges!")
+    sys.exit(1)
+else:
+    print(" ERROR: Status on tc_get_qm_charges function is not recognized!")
+    sys.exit(1)
+
+# Print charges
+print(" Charges from 2nd calculation")
+for i in range(len(qmattypes)):
+    print("QM Charge(%3d) = %16.10f"%(i+1,qmcharges[i]))
 
 # Finalizes variables on the TeraChem side
 tc.finalize()
