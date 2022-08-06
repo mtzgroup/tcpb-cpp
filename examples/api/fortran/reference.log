@@ -6,62 +6,80 @@
  Computed energy and gradient with success.
  Results from 1st calculation (only one water molecule in the QM region)
 E =   -76.0022844529 Hartrees
-QM Grad(  1,:) =    -0.0642406389    0.0370956894   -0.0713555244 Hartree/Bohr
-QM Grad(  2,:) =    -0.0266141336   -0.0518062910    0.0036404714 Hartree/Bohr
-QM Grad(  3,:) =     0.0908547725    0.0147106016    0.0677150530 Hartree/Bohr
+QM Grad(  1,:) =    -0.0642404031    0.0370950932   -0.0713551718 Hartree/Bohr
+QM Grad(  2,:) =    -0.0266142281   -0.0518058747    0.0036403073 Hartree/Bohr
+QM Grad(  3,:) =     0.0908546312    0.0147107815    0.0677148645 Hartree/Bohr
+ 
+ Got QM charges with success.
+ Charges from 1st calculation
+QM Charge(  1) =    -0.4063025437
+QM Charge(  2) =     0.1870243776
+QM Charge(  3) =     0.2192781661
  
  Computed energy and gradient with success.
  Results from 2nd calculation (one water molecule in the QM region and five in t
  he MM region)
-E =   -76.0387136202 Hartrees
-QM Grad(  1,:) =    -0.0620228992    0.0306042719   -0.0738584300 Hartree/Bohr
-QM Grad(  2,:) =    -0.0247730918   -0.0505936249    0.0075343399 Hartree/Bohr
-QM Grad(  3,:) =     0.0745816275    0.0010694597    0.0466699213 Hartree/Bohr
-MM Grad(  1,:) =     0.0168460171    0.0176625990    0.0202798044 Hartree/Bohr
-MM Grad(  2,:) =    -0.0052857625   -0.0011172722   -0.0025479304 Hartree/Bohr
-MM Grad(  3,:) =    -0.0012305925   -0.0049104979   -0.0011060954 Hartree/Bohr
-MM Grad(  4,:) =     0.0047910601   -0.0062894768   -0.0061427873 Hartree/Bohr
-MM Grad(  5,:) =    -0.0070490571    0.0137660684    0.0088585537 Hartree/Bohr
-MM Grad(  6,:) =     0.0004543012    0.0013874748    0.0023238938 Hartree/Bohr
-MM Grad(  7,:) =     0.0018573909    0.0001200179   -0.0051518436 Hartree/Bohr
-MM Grad(  8,:) =    -0.0002598901   -0.0006551840    0.0015615260 Hartree/Bohr
-MM Grad(  9,:) =    -0.0003799402    0.0007765587    0.0013011774 Hartree/Bohr
-MM Grad( 10,:) =    -0.0046678910    0.0008143729    0.0014719507 Hartree/Bohr
-MM Grad( 11,:) =     0.0058564219   -0.0020721504   -0.0012500201 Hartree/Bohr
-MM Grad( 12,:) =     0.0011666960   -0.0005276604    0.0001503219 Hartree/Bohr
-MM Grad( 13,:) =    -0.0018475362   -0.0000440529    0.0030407461 Hartree/Bohr
-MM Grad( 14,:) =     0.0003060682    0.0010221060   -0.0022137623 Hartree/Bohr
-MM Grad( 15,:) =     0.0016570779   -0.0010130100   -0.0009213661 Hartree/Bohr
+E =   -76.0387136437 Hartrees
+QM Grad(  1,:) =    -0.0620199245    0.0306036281   -0.0738621659 Hartree/Bohr
+QM Grad(  2,:) =    -0.0247707378   -0.0505935327    0.0075317164 Hartree/Bohr
+QM Grad(  3,:) =     0.0745759889    0.0010700667    0.0466763099 Hartree/Bohr
+MM Grad(  1,:) =     0.0168465106    0.0176626987    0.0202797256 Hartree/Bohr
+MM Grad(  2,:) =    -0.0052858250   -0.0011172602   -0.0025478785 Hartree/Bohr
+MM Grad(  3,:) =    -0.0012306757   -0.0049105311   -0.0011060605 Hartree/Bohr
+MM Grad(  4,:) =     0.0047909276   -0.0062893583   -0.0061427939 Hartree/Bohr
+MM Grad(  5,:) =    -0.0070489747    0.0137658871    0.0088586079 Hartree/Bohr
+MM Grad(  6,:) =     0.0004543302    0.0013874127    0.0023238813 Hartree/Bohr
+MM Grad(  7,:) =     0.0018573605    0.0001200324   -0.0051518105 Hartree/Bohr
+MM Grad(  8,:) =    -0.0002598832   -0.0006551922    0.0015615099 Hartree/Bohr
+MM Grad(  9,:) =    -0.0003799305    0.0007765423    0.0013011691 Hartree/Bohr
+MM Grad( 10,:) =    -0.0046679025    0.0008143624    0.0014720113 Hartree/Bohr
+MM Grad( 11,:) =     0.0058564122   -0.0020721699   -0.0012501007 Hartree/Bohr
+MM Grad( 12,:) =     0.0011667070   -0.0005276621    0.0001503032 Hartree/Bohr
+MM Grad( 13,:) =    -0.0018475776   -0.0000441465    0.0030407502 Hartree/Bohr
+MM Grad( 14,:) =     0.0003060708    0.0010221667   -0.0022137716 Hartree/Bohr
+MM Grad( 15,:) =     0.0016571236   -0.0010129441   -0.0009214032 Hartree/Bohr
+ 
+ Got QM charges with success.
+ Charges from 2nd calculation
+QM Charge(  1) =    -0.5070730740
+QM Charge(  2) =     0.2153154366
+QM Charge(  3) =     0.2917576374
  
  Computed energy and gradient with success.
  Results from 3rd calculation (just repeating the 2nd calculation)
-E =   -76.0387136123 Hartrees
-QM Grad(  1,:) =    -0.0620194357    0.0305990750   -0.0738538591 Hartree/Bohr
-QM Grad(  2,:) =    -0.0247672596   -0.0505866192    0.0075303638 Hartree/Bohr
-QM Grad(  3,:) =     0.0745722054    0.0010677314    0.0466694855 Hartree/Bohr
-MM Grad(  1,:) =     0.0168462247    0.0176626634    0.0202796606 Hartree/Bohr
-MM Grad(  2,:) =    -0.0052857902   -0.0011172757   -0.0025478976 Hartree/Bohr
-MM Grad(  3,:) =    -0.0012306275   -0.0049105039   -0.0011060668 Hartree/Bohr
-MM Grad(  4,:) =     0.0047909574   -0.0062894162   -0.0061427559 Hartree/Bohr
-MM Grad(  5,:) =    -0.0070489471    0.0137659197    0.0088585062 Hartree/Bohr
-MM Grad(  6,:) =     0.0004543197    0.0013874419    0.0023238765 Hartree/Bohr
-MM Grad(  7,:) =     0.0018573313    0.0001199890   -0.0051518124 Hartree/Bohr
-MM Grad(  8,:) =    -0.0002598724   -0.0006551795    0.0015615109 Hartree/Bohr
-MM Grad(  9,:) =    -0.0003799223    0.0007765529    0.0013011663 Hartree/Bohr
-MM Grad( 10,:) =    -0.0046678655    0.0008143712    0.0014719602 Hartree/Bohr
-MM Grad( 11,:) =     0.0058563743   -0.0020721605   -0.0012500400 Hartree/Bohr
-MM Grad( 12,:) =     0.0011666918   -0.0005276603    0.0001503173 Hartree/Bohr
-MM Grad( 13,:) =    -0.0018475864   -0.0000441057    0.0030407274 Hartree/Bohr
-MM Grad( 14,:) =     0.0003060838    0.0010221440   -0.0022137721 Hartree/Bohr
-MM Grad( 15,:) =     0.0016571183   -0.0010129676   -0.0009213710 Hartree/Bohr
+E =   -76.0387136178 Hartrees
+QM Grad(  1,:) =    -0.0620225574    0.0306060276   -0.0738606357 Hartree/Bohr
+QM Grad(  2,:) =    -0.0247702619   -0.0505944561    0.0075317522 Hartree/Bohr
+QM Grad(  3,:) =     0.0745782667    0.0010685317    0.0466747668 Hartree/Bohr
+MM Grad(  1,:) =     0.0168463387    0.0176627646    0.0202797248 Hartree/Bohr
+MM Grad(  2,:) =    -0.0052858164   -0.0011172877   -0.0025479020 Hartree/Bohr
+MM Grad(  3,:) =    -0.0012306358   -0.0049105280   -0.0011060622 Hartree/Bohr
+MM Grad(  4,:) =     0.0047909804   -0.0062894351   -0.0061428106 Hartree/Bohr
+MM Grad(  5,:) =    -0.0070489961    0.0137659798    0.0088586029 Hartree/Bohr
+MM Grad(  6,:) =     0.0004543222    0.0013874421    0.0023238941 Hartree/Bohr
+MM Grad(  7,:) =     0.0018573316    0.0001199868   -0.0051518543 Hartree/Bohr
+MM Grad(  8,:) =    -0.0002598704   -0.0006551860    0.0015615219 Hartree/Bohr
+MM Grad(  9,:) =    -0.0003799222    0.0007765586    0.0013011772 Hartree/Bohr
+MM Grad( 10,:) =    -0.0046678988    0.0008143841    0.0014719714 Hartree/Bohr
+MM Grad( 11,:) =     0.0058564074   -0.0020721841   -0.0012500415 Hartree/Bohr
+MM Grad( 12,:) =     0.0011666997   -0.0005276661    0.0001503185 Hartree/Bohr
+MM Grad( 13,:) =    -0.0018475986   -0.0000441181    0.0030407680 Hartree/Bohr
+MM Grad( 14,:) =     0.0003060791    0.0010221564   -0.0022137965 Hartree/Bohr
+MM Grad( 15,:) =     0.0016571320   -0.0010129706   -0.0009213950 Hartree/Bohr
+ 
+ Got QM charges with success.
+ Charges from 3rd calculation
+QM Charge(  1) =    -0.5070681314
+QM Charge(  2) =     0.2153130640
+QM Charge(  3) =     0.2917550674
  
  Computed energy and gradient with success.
  Results from 4th calculation (changed coordinates of the QM region)
 E =   -76.0548152889 Hartrees
-QM Grad(  1,:) =     0.0277853774   -0.0016369513    0.0124164694 Hartree/Bohr
-QM Grad(  2,:) =    -0.0340403806   -0.0300349490   -0.0126915118 Hartree/Bohr
-QM Grad(  3,:) =    -0.0022279424    0.0127779057   -0.0179219261 Hartree/Bohr
-MM Grad(  1,:) =     0.0126910302    0.0153657018    0.0211217166 Hartree/Bohr
+QM Grad(  1,:) =     0.0277853773   -0.0016369512    0.0124164694 Hartree/Bohr
+QM Grad(  2,:) =    -0.0340403805   -0.0300349490   -0.0126915118 Hartree/Bohr
+QM Grad(  3,:) =    -0.0022279423    0.0127779056   -0.0179219261 Hartree/Bohr
+MM Grad(  1,:) =     0.0126910302    0.0153657018    0.0211217167 Hartree/Bohr
 MM Grad(  2,:) =    -0.0043962218   -0.0009158453   -0.0029765323 Hartree/Bohr
 MM Grad(  3,:) =    -0.0005489751   -0.0044261435   -0.0016275420 Hartree/Bohr
 MM Grad(  4,:) =     0.0063032470   -0.0083947351   -0.0042624902 Hartree/Bohr
@@ -77,24 +95,39 @@ MM Grad( 13,:) =    -0.0017946943    0.0016373740    0.0010381927 Hartree/Bohr
 MM Grad( 14,:) =     0.0008848209    0.0000738152   -0.0013955991 Hartree/Bohr
 MM Grad( 15,:) =     0.0012578729   -0.0016867429    0.0010137729 Hartree/Bohr
  
+ Got QM charges with success.
+ Charges from 4th calculation
+QM Charge(  1) =    -0.4531462082
+QM Charge(  2) =     0.2180805124
+QM Charge(  3) =     0.2350656958
+ 
  Computed energy and gradient with success.
  Results from 5th calculation (moved one molecule from the MM to the QM region)
-E =  -152.0466482506 Hartrees
-QM Grad(  1,:) =    -0.0481676593    0.0386349853   -0.0649772250 Hartree/Bohr
-QM Grad(  2,:) =    -0.0221502077   -0.0518804670    0.0102667720 Hartree/Bohr
-QM Grad(  3,:) =     0.0889511142    0.0087806290    0.0683852591 Hartree/Bohr
-QM Grad(  4,:) =    -0.0642057374    0.0014942988   -0.0234318485 Hartree/Bohr
-QM Grad(  5,:) =     0.0360945204   -0.0166648033    0.0031908778 Hartree/Bohr
-QM Grad(  6,:) =     0.0073674759    0.0109357574    0.0029558736 Hartree/Bohr
-MM Grad(  1,:) =     0.0063289679   -0.0099814846   -0.0066612746 Hartree/Bohr
-MM Grad(  2,:) =    -0.0091756390    0.0174865641    0.0090410916 Hartree/Bohr
-MM Grad(  3,:) =     0.0009353361    0.0034408626    0.0026878477 Hartree/Bohr
-MM Grad(  4,:) =     0.0009505293    0.0024132640   -0.0037969578 Hartree/Bohr
-MM Grad(  5,:) =    -0.0001065371   -0.0014103202    0.0008991090 Hartree/Bohr
-MM Grad(  6,:) =    -0.0000559438   -0.0000267964    0.0010201811 Hartree/Bohr
-MM Grad(  7,:) =    -0.0069573917    0.0001617030    0.0027488148 Hartree/Bohr
-MM Grad(  8,:) =     0.0078233685   -0.0021738059   -0.0029913824 Hartree/Bohr
-MM Grad(  9,:) =     0.0021162875   -0.0003868007    0.0000012675 Hartree/Bohr
-MM Grad( 10,:) =    -0.0011105967    0.0031666451   -0.0000889617 Hartree/Bohr
-MM Grad( 11,:) =     0.0014790428   -0.0015914500   -0.0006121920 Hartree/Bohr
-MM Grad( 12,:) =    -0.0001169298   -0.0023987813    0.0013627478 Hartree/Bohr
+E =  -152.0466482505 Hartrees
+QM Grad(  1,:) =    -0.0481677235    0.0386350136   -0.0649772316 Hartree/Bohr
+QM Grad(  2,:) =    -0.0221501637   -0.0518804803    0.0102667157 Hartree/Bohr
+QM Grad(  3,:) =     0.0889511638    0.0087806423    0.0683853676 Hartree/Bohr
+QM Grad(  4,:) =    -0.0642057302    0.0014942061   -0.0234319131 Hartree/Bohr
+QM Grad(  5,:) =     0.0360944623   -0.0166647758    0.0031908946 Hartree/Bohr
+QM Grad(  6,:) =     0.0073674968    0.0109358008    0.0029558794 Hartree/Bohr
+MM Grad(  1,:) =     0.0063289664   -0.0099814799   -0.0066612720 Hartree/Bohr
+MM Grad(  2,:) =    -0.0091756361    0.0174865574    0.0090410886 Hartree/Bohr
+MM Grad(  3,:) =     0.0009353355    0.0034408610    0.0026878465 Hartree/Bohr
+MM Grad(  4,:) =     0.0009505331    0.0024132592   -0.0037969604 Hartree/Bohr
+MM Grad(  5,:) =    -0.0001065378   -0.0014103186    0.0008991104 Hartree/Bohr
+MM Grad(  6,:) =    -0.0000559448   -0.0000267949    0.0010201814 Hartree/Bohr
+MM Grad(  7,:) =    -0.0069573885    0.0001617037    0.0027488164 Hartree/Bohr
+MM Grad(  8,:) =     0.0078233648   -0.0021738066   -0.0029913840 Hartree/Bohr
+MM Grad(  9,:) =     0.0021162867   -0.0003868011    0.0000012666 Hartree/Bohr
+MM Grad( 10,:) =    -0.0011105942    0.0031666454   -0.0000889593 Hartree/Bohr
+MM Grad( 11,:) =     0.0014790408   -0.0015914507   -0.0006121927 Hartree/Bohr
+MM Grad( 12,:) =    -0.0001169310   -0.0023987814    0.0013627460 Hartree/Bohr
+ 
+ Got QM charges with success.
+ Charges from 5th calculation
+QM Charge(  1) =    -0.5613782933
+QM Charge(  2) =     0.2002097213
+QM Charge(  3) =     0.2771402646
+QM Charge(  4) =    -0.3044649750
+QM Charge(  5) =     0.1957766139
+QM Charge(  6) =     0.1927166685

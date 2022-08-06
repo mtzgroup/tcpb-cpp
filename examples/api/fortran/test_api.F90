@@ -14,7 +14,7 @@ integer :: numqmatoms, nummmatoms
 integer :: i
 double precision :: totenergy
 character(len=5), allocatable :: qmattypes(:)
-double precision, allocatable :: qmcoords(:), mmcoords(:), mmcharges(:), qmgrad(:), mmgrad(:)
+double precision, allocatable :: qmcoords(:), mmcoords(:), mmcharges(:), qmcharges(:), qmgrad(:), mmgrad(:)
 ! Conversion parameter: Bohr to Angstrom
 double precision, parameter :: BohrToAng = 0.52917724924d0
 
@@ -73,7 +73,7 @@ else
 end if
 
 ! Set QM region coordinates, defined in Angstroms and then converted to Bohrs
-allocate(qmcoords(3*numqmatoms),qmgrad(3*numqmatoms))
+allocate(qmcoords(3*numqmatoms),qmgrad(3*numqmatoms),qmcharges(numqmatoms))
 qmcoords = (/ -4.4798000d0,  -2.8400000d0,   4.2456000d0,&
               -4.8525000d0,  -3.7649000d0,   4.3951000d0,&
               -3.6050000d0,  -2.7568000d0,   4.9264000d0 /)
@@ -106,6 +106,26 @@ write (*,*) "Results from 1st calculation (only one water molecule in the QM reg
 write (*,'(a,f16.10,a)') "E = ", totenergy, " Hartrees"
 do i =1, numqmatoms
   write (*,'(a,i3,a,3f16.10,a)') "QM Grad(",i,",:) = ",qmgrad(3*(i-1)+1), qmgrad(3*(i-1)+2), qmgrad(3*(i-1)+3), " Hartree/Bohr"
+end do
+
+! Get QM charges
+write (*,*) ""
+status = -1
+call tc_get_qm_charges(qmcharges,status)
+if (status == 0) then
+  write (*,*) "Got QM charges with success."
+else if (status == 1) then
+  write (*,*) "ERROR: Problem to get QM charges!"
+  STOP
+else
+  write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
+  STOP
+end if
+
+! Print charges
+write (*,*) "Charges from 1st calculation"
+do i =1, numqmatoms
+  write (*,'(a,i3,a,f16.10,a)') "QM Charge(",i,") = ",qmcharges(i)
 end do
 
 ! We now add an MM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
@@ -172,6 +192,26 @@ do i =1, nummmatoms
   write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
+! Get QM charges
+write (*,*) ""
+status = -1
+call tc_get_qm_charges(qmcharges,status)
+if (status == 0) then
+  write (*,*) "Got QM charges with success."
+else if (status == 1) then
+  write (*,*) "ERROR: Problem to get QM charges!"
+  STOP
+else
+  write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
+  STOP
+end if
+
+! Print charges
+write (*,*) "Charges from 2nd calculation"
+do i =1, numqmatoms
+  write (*,'(a,i3,a,f16.10,a)') "QM Charge(",i,") = ",qmcharges(i)
+end do
+
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
@@ -197,6 +237,26 @@ do i =1, numqmatoms
 end do
 do i =1, nummmatoms
   write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
+end do
+
+! Get QM charges
+write (*,*) ""
+status = -1
+call tc_get_qm_charges(qmcharges,status)
+if (status == 0) then
+  write (*,*) "Got QM charges with success."
+else if (status == 1) then
+  write (*,*) "ERROR: Problem to get QM charges!"
+  STOP
+else
+  write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
+  STOP
+end if
+
+! Print charges
+write (*,*) "Charges from 3rd calculation"
+do i =1, numqmatoms
+  write (*,'(a,i3,a,f16.10,a)') "QM Charge(",i,") = ",qmcharges(i)
 end do
 
 ! Change coordinates of the QM region, defined in Angstroms and then converted to Bohrs
@@ -234,10 +294,30 @@ do i =1, nummmatoms
   write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
 end do
 
+! Get QM charges
+write (*,*) ""
+status = -1
+call tc_get_qm_charges(qmcharges,status)
+if (status == 0) then
+  write (*,*) "Got QM charges with success."
+else if (status == 1) then
+  write (*,*) "ERROR: Problem to get QM charges!"
+  STOP
+else
+  write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
+  STOP
+end if
+
+! Print charges
+write (*,*) "Charges from 4th calculation"
+do i =1, numqmatoms
+  write (*,'(a,i3,a,f16.10,a)') "QM Charge(",i,") = ",qmcharges(i)
+end do
+
 ! Move one water molecule from the MM region to the QM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units.
-deallocate(qmattypes,qmcoords,qmgrad,mmcoords,mmcharges,mmgrad)
+deallocate(qmattypes,qmcoords,qmgrad,qmcharges,mmcoords,mmcharges,mmgrad)
 numqmatoms = 6
-allocate(qmattypes(numqmatoms),qmcoords(3*numqmatoms),qmgrad(3*numqmatoms))
+allocate(qmattypes(numqmatoms),qmcoords(3*numqmatoms),qmgrad(3*numqmatoms),qmcharges(numqmatoms))
 qmattypes = (/ "O","H","H","O","H","H" /)
 do i =1, numqmatoms
   qmattypes(i)=trim(qmattypes(i))//CHAR(0)
@@ -306,6 +386,26 @@ do i =1, numqmatoms
 end do
 do i =1, nummmatoms
   write (*,'(a,i3,a,3f16.10,a)') "MM Grad(",i,",:) = ",mmgrad(3*(i-1)+1), mmgrad(3*(i-1)+2), mmgrad(3*(i-1)+3), " Hartree/Bohr"
+end do
+
+! Get QM charges
+write (*,*) ""
+status = -1
+call tc_get_qm_charges(qmcharges,status)
+if (status == 0) then
+  write (*,*) "Got QM charges with success."
+else if (status == 1) then
+  write (*,*) "ERROR: Problem to get QM charges!"
+  STOP
+else
+  write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
+  STOP
+end if
+
+! Print charges
+write (*,*) "Charges from 5th calculation"
+do i =1, numqmatoms
+  write (*,'(a,i3,a,f16.10,a)') "QM Charge(",i,") = ",qmcharges(i)
 end do
 
 ! Finalizes variables on the TeraChem side

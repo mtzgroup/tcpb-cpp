@@ -59,8 +59,11 @@ qmcoords = [-4.4798000,  -2.8400000,   4.2456000,
 for i in range(len(qmcoords)):
     qmcoords[i] /= BohrToAng
 
+# QM charges
+qmcharges = []
+
 # No MM region at the moment
-mmmcharges = []
+mmcharges = []
 
 # Compute energy and gradient
 print("")
@@ -82,6 +85,23 @@ print(" Results from 1st calculation (only one water molecule in the QM region)"
 print("E = %16.10f Hartrees"%(totenergy))
 for i in range(len(qmattypes)):
     print("QM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,qmgrad[3*i], qmgrad[3*i+1], qmgrad[3*i+2]))
+
+# Get QM charges
+print("")
+qmcharges, status = tc.get_qm_charges(len(qmattypes))
+if (status == 0):
+    print(" Got QM charges with success.")
+elif (status == 1):
+    print(" ERROR: Problem to get QM charges!")
+    sys.exit(1)
+else:
+    print(" ERROR: Status on tc_get_qm_charges function is not recognized!")
+    sys.exit(1)
+
+# Print charges
+print(" Charges from 1st calculation")
+for i in range(len(qmattypes)):
+    print("QM Charge(%3d) = %16.10f"%(i+1,qmcharges[i]))
 
 # We now add an MM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
 mmcoords = [-2.6793000,  -2.1596000,   5.9264000,
@@ -140,6 +160,23 @@ for i in range(len(qmattypes)):
 for i in range(len(mmcharges)):
     print("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]))
 
+# Get QM charges
+print("")
+qmcharges, status = tc.get_qm_charges(len(qmattypes))
+if (status == 0):
+    print(" Got QM charges with success.")
+elif (status == 1):
+    print(" ERROR: Problem to get QM charges!")
+    sys.exit(1)
+else:
+    print(" ERROR: Status on tc_get_qm_charges function is not recognized!")
+    sys.exit(1)
+
+# Print charges
+print(" Charges from 2nd calculation")
+for i in range(len(qmattypes)):
+    print("QM Charge(%3d) = %16.10f"%(i+1,qmcharges[i]))
+
 # Compute energy and gradient
 print("")
 totenergy, qmgrad, mmgrad, status = tc.compute_energy_gradient(qmattypes,qmcoords,mmcoords,mmcharges,globaltreatment)
@@ -162,6 +199,23 @@ for i in range(len(qmattypes)):
     print("QM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,qmgrad[3*i], qmgrad[3*i+1], qmgrad[3*i+2]))
 for i in range(len(mmcharges)):
     print("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]))
+
+# Get QM charges
+print("")
+qmcharges, status = tc.get_qm_charges(len(qmattypes))
+if (status == 0):
+    print(" Got QM charges with success.")
+elif (status == 1):
+    print(" ERROR: Problem to get QM charges!")
+    sys.exit(1)
+else:
+    print(" ERROR: Status on tc_get_qm_charges function is not recognized!")
+    sys.exit(1)
+
+# Print charges
+print(" Charges from 3rd calculation")
+for i in range(len(qmattypes)):
+    print("QM Charge(%3d) = %16.10f"%(i+1,qmcharges[i]))
 
 # Change coordinates of the QM region, defined in Angstroms and then converted to Bohrs
 qmcoords = [-4.4748000,  -2.8700000,   4.5456000,
@@ -192,6 +246,23 @@ for i in range(len(qmattypes)):
     print("QM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,qmgrad[3*i], qmgrad[3*i+1], qmgrad[3*i+2]))
 for i in range(len(mmcharges)):
     print("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]))
+
+# Get QM charges
+print("")
+qmcharges, status = tc.get_qm_charges(len(qmattypes))
+if (status == 0):
+    print(" Got QM charges with success.")
+elif (status == 1):
+    print(" ERROR: Problem to get QM charges!")
+    sys.exit(1)
+else:
+    print(" ERROR: Status on tc_get_qm_charges function is not recognized!")
+    sys.exit(1)
+
+# Print charges
+print(" Charges from 4th calculation")
+for i in range(len(qmattypes)):
+    print("QM Charge(%3d) = %16.10f"%(i+1,qmcharges[i]))
 
 # Move one water molecule from the MM region to the QM region, defined in Angstroms and then converted to Bohrs; Charges in atomic units
 qmattypes = ["O","H","H","O","H","H"]
@@ -253,8 +324,25 @@ for i in range(len(qmattypes)):
 for i in range(len(mmcharges)):
     print("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr"%(i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]))
 
+# Get QM charges
+print("")
+qmcharges, status = tc.get_qm_charges(len(qmattypes))
+if (status == 0):
+    print(" Got QM charges with success.")
+elif (status == 1):
+    print(" ERROR: Problem to get QM charges!")
+    sys.exit(1)
+else:
+    print(" ERROR: Status on tc_get_qm_charges function is not recognized!")
+    sys.exit(1)
+
+# Print charges
+print(" Charges from 5th calculation")
+for i in range(len(qmattypes)):
+    print("QM Charge(%3d) = %16.10f"%(i+1,qmcharges[i]))
+
 # Finalizes variables on the TeraChem side
 tc.finalize()
 
 # Delete variables that have been allocated
-del qmattypes, qmcoords, qmgrad, mmcoords, mmcharges, mmgrad
+del qmattypes, qmcoords, qmgrad, mmcoords, mmcharges, mmgrad, qmcharges

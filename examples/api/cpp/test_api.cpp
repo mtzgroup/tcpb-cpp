@@ -70,6 +70,7 @@ int main(int argc, char** argv) {
   for (int i=0; i < 3*numqmatoms; i++) {
     qmcoords[i] /= BohrToAng;
   }
+  double* qmcharges = new double[numqmatoms];
 
   // No MM region at the moment
   int nummmatoms = 0;
@@ -96,6 +97,26 @@ int main(int argc, char** argv) {
   printf("E = %16.10f Hartrees\n", totenergy);
   for (int i=0; i < numqmatoms; i++) {
     printf("QM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,qmgrad[3*i], qmgrad[3*i+1], qmgrad[3*i+2]);
+  }
+
+  // Get QM charges
+  printf("\n");
+  status = -1;
+  tc_get_qm_charges_(qmcharges,&status);
+  if (status == 0) {
+    printf(" Got QM charges with success.\n");
+  } else if (status == 1) {
+    printf(" ERROR: Problem to get QM charges!\n");
+    return 1;
+  } else {
+    printf(" ERROR: Status on tc_get_qm_charges function is not recognized!\n");
+    return 1;
+  }
+
+  // Print results
+  printf(" Charges from 1st calculation\n");
+  for (int i=0; i < numqmatoms; i++) {
+    printf("QM Charge(%3d) = %16.10f\n",i+1,qmcharges[i]);
   }
 
   // We now add an MM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
@@ -164,6 +185,26 @@ int main(int argc, char** argv) {
     printf("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]);
   }
 
+  // Get QM charges
+  printf("\n");
+  status = -1;
+  tc_get_qm_charges_(qmcharges,&status);
+  if (status == 0) {
+    printf(" Got QM charges with success.\n");
+  } else if (status == 1) {
+    printf(" ERROR: Problem to get QM charges!\n");
+    return 1;
+  } else {
+    printf(" ERROR: Status on tc_get_qm_charges function is not recognized!\n");
+    return 1;
+  }
+
+  // Print results
+  printf(" Charges from 2nd calculation\n");
+  for (int i=0; i < numqmatoms; i++) {
+    printf("QM Charge(%3d) = %16.10f\n",i+1,qmcharges[i]);
+  }
+
   // Compute energy and gradient
   printf("\n");
   status = -1;
@@ -189,6 +230,26 @@ int main(int argc, char** argv) {
   }
   for (int i=0; i < nummmatoms; i++) {
     printf("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]);
+  }
+
+  // Get QM charges
+  printf("\n");
+  status = -1;
+  tc_get_qm_charges_(qmcharges,&status);
+  if (status == 0) {
+    printf(" Got QM charges with success.\n");
+  } else if (status == 1) {
+    printf(" ERROR: Problem to get QM charges!\n");
+    return 1;
+  } else {
+    printf(" ERROR: Status on tc_get_qm_charges function is not recognized!\n");
+    return 1;
+  }
+
+  // Print results
+  printf(" Charges from 3rd calculation\n");
+  for (int i=0; i < numqmatoms; i++) {
+    printf("QM Charge(%3d) = %16.10f\n",i+1,qmcharges[i]);
   }
 
   // Change coordinates of the QM region, defined in Angstroms and then converted to Bohrs
@@ -228,6 +289,26 @@ int main(int argc, char** argv) {
     printf("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]);
   }
 
+  // Get QM charges
+  printf("\n");
+  status = -1;
+  tc_get_qm_charges_(qmcharges,&status);
+  if (status == 0) {
+    printf(" Got QM charges with success.\n");
+  } else if (status == 1) {
+    printf(" ERROR: Problem to get QM charges!\n");
+    return 1;
+  } else {
+    printf(" ERROR: Status on tc_get_qm_charges function is not recognized!\n");
+    return 1;
+  }
+
+  // Print results
+  printf(" Charges from 4th calculation\n");
+  for (int i=0; i < numqmatoms; i++) {
+    printf("QM Charge(%3d) = %16.10f\n",i+1,qmcharges[i]);
+  }
+
   // Move one water molecule from the MM region to the QM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
   numqmatoms = 6;
   delete[] qmattypes;
@@ -245,6 +326,8 @@ int main(int argc, char** argv) {
   for (int i=0; i < 3*numqmatoms; i++) {
     qmcoords[i] /= BohrToAng;
   }
+  delete[] qmcharges;
+  qmcharges = new double[numqmatoms];
   nummmatoms = 12;
   delete[] mmcoords;
   mmcoords = new double[3*nummmatoms]
@@ -307,6 +390,26 @@ int main(int argc, char** argv) {
     printf("MM Grad(%3d,:) = %16.10f%16.10f%16.10f Hartree/Bohr\n",i+1,mmgrad[3*i], mmgrad[3*i+1], mmgrad[3*i+2]);
   }
 
+  // Get QM charges
+  printf("\n");
+  status = -1;
+  tc_get_qm_charges_(qmcharges,&status);
+  if (status == 0) {
+    printf(" Got QM charges with success.\n");
+  } else if (status == 1) {
+    printf(" ERROR: Problem to get QM charges!\n");
+    return 1;
+  } else {
+    printf(" ERROR: Status on tc_get_qm_charges function is not recognized!\n");
+    return 1;
+  }
+
+  // Print results
+  printf(" Charges from 5th calculation\n");
+  for (int i=0; i < numqmatoms; i++) {
+    printf("QM Charge(%3d) = %16.10f\n",i+1,qmcharges[i]);
+  }
+
   // Finalizes variables on the TeraChem side
   tc_finalize_();
 
@@ -314,6 +417,7 @@ int main(int argc, char** argv) {
   delete[] qmattypes;
   delete[] qmcoords;
   delete[] qmgrad;
+  delete[] qmcharges;
   delete[] mmcoords;
   delete[] mmcharges;
   delete[] mmgrad;
