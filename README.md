@@ -31,6 +31,8 @@ git submodule update
 
 * Run `make install`
 
+* To compile the C++ and Fortran examples, run `make example`
+
 * To install the Python interface *PyTCPB*, run `make pytcpb`. After installation, the API functions can be called from your custom Python script. Refer to `examples/api/python` for usage example.
 
 * Add the absolute path to `lib` into `LD_LIBRARY_PATH`
@@ -44,6 +46,8 @@ git submodule update
 * To install, for example, with GNU compilers at /usr/local, run `cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCOMPILER=GNU`. To use Intel compilers, the option `-DCOMPILER=INTEL` must be specified instead.
 
 * Run `make install`
+
+* The command above also compiles the C++ and Fortran examples.
 
 * The Python interface *PyTCPB* is installed by default. To deactivate its installation, add `-DBUILD_PYTHON=FALSE` into your CMake command. After installation, the API functions can be called from your custom Python script. Refer to `examples/api/python` for usage example.
 
@@ -61,9 +65,11 @@ where `-s` specifies the port number to be used and 12345 is a value picked for 
 
 ## Examples
 
+**Compiling C++ and Fortran examples:** as mentioned above, after installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside `examples`.
+
 * **Using TCPB-cpp from different programming languages:** examples available at the folder `examples/api`.
 
-* **Native C++ examples:** after installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
+* **Native C++ examples:** available at the folders `examples/qm` and `examples/qmmm`.
 
 ## Notes for TeraChem Developers
 
