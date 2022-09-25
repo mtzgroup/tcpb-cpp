@@ -23,6 +23,12 @@ git submodule update
 
 * At the time of writing, protocol buffers can be downloaded from <https://github.com/protocolbuffers/protobuf/releases> (e.g., `protobuf-cpp-3.20.1.zip`) and installation instructions for C++ are provided at <https://github.com/protocolbuffers/protobuf/blob/main/src/README.md>.
 
+* You might also be able to install Protocol Buffers using your system package manager. For example on Ubuntu 20.04 you can run
+
+```console
+$ sudo apt install protobuf-compiler
+```
+
 ## Installation (with configure script)
 
 * Ensure `protoc` and `libprotobuf.so` (from Protocol Buffers) are in your `PATH` and `LD_LIBRARY_PATH`, respectively
@@ -64,6 +70,7 @@ where `-s` specifies the port number to be used and 12345 is a value picked for 
 * **Using TCPB-cpp from different programming languages:** examples available at the folder `examples/api`.
 
 * **Native C++ examples:** after installation with configure script, run `make example`. With CMake, the examples are automatically compiled and placed at the corresponding folder inside the folder `examples`
+* Before you run the example binaries, you need to launch the TC server on port 12345, `terachem -s 12345`.
 
 ## Notes for TeraChem Developers
 
