@@ -5,8 +5,8 @@ include ../../../config.h
 
 LIBS=-L$(LIBDIR) -ltcpb
 
-test_api_fortran: test_api.F90
-	$(FC) $(FFLAGS) $(LIBS) -o $@ $<
+test_api_fortran_openmm: test_api.F90
+	$(FC) $(FFLAGS) -o $@ $< $(LIBS)
 
 .PHONY: clean
 clean:

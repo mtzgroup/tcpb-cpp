@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
   // Information about initial QM region
   int numqmatoms = 3;
-  char (*qmattypes)[5] = new char[numqmatoms][5] {"O","H","H"};
+  char (*qmattypes)[5] = new char[numqmatoms][5] {{'O'}, {'H'}, {'H'}};
 
   // Attempts to connect to the TeraChem server
   printf(" Attempting to connect to TeraChem server using host %s and port %d.\n", host, port);

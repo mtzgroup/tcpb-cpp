@@ -94,7 +94,8 @@ end do
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
+call tc_compute_energy_gradient(qmattypes, qmcoords, numqmatoms, totenergy, qmgrad, &
+    & mmcoords, mmcharges, nummmatoms, mmgrad, globaltreatment, status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
@@ -141,7 +142,8 @@ end do
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
+call tc_compute_energy_gradient(qmattypes, qmcoords, numqmatoms, totenergy, qmgrad, &
+    & mmcoords, mmcharges, nummmatoms, mmgrad, globaltreatment, status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then

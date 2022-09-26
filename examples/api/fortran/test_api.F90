@@ -46,14 +46,14 @@ if (status == 0) then
   write (*,*) "Successfully connected to TeraChem server."
 else if (status == 1) then
   write (*,*) "ERROR: Connection to TeraChem server failed!"
-  STOP
+  STOP 1
 else if (status == 2) then
   write (*,*) "ERROR: Connection to TeraChem server succeed, but the ", &
        "       server is not available!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_connect function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Setup TeraChem
@@ -63,13 +63,13 @@ if (status == 0) then
   write (*,*) "TeraChem setup completed with success."
 else if (status == 1) then
   write (*,*) "ERROR: No options read from TeraChem input file or mismatch in the input options!"
-  STOP
+  STOP 1
 else if (status == 2) then
   write (*,*) "ERROR: Failed to setup TeraChem."
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_setup function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Set QM region coordinates, defined in Angstroms and then converted to Bohrs
@@ -87,18 +87,19 @@ nummmatoms = 0
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
+call tc_compute_energy_gradient(qmattypes, qmcoords, numqmatoms, totenergy, qmgrad, &
+  & mmcoords, mmcharges, nummmatoms, mmgrad, globaltreatment, status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
   write (*,*) "ERROR: Mismatch in the variables passed to the function to compute energy and gradient!"
-  STOP
+  STOP 1
 else if (status == 2) then
   write (*,*) "ERROR: Problem to compute energy and gradient!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_compute_energy_gradient function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print results
@@ -116,10 +117,10 @@ if (status == 0) then
   write (*,*) "Got QM charges with success."
 else if (status == 1) then
   write (*,*) "ERROR: Problem to get QM charges!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print charges
@@ -168,18 +169,19 @@ mmcharges = (/ -0.834d0,&
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
+call tc_compute_energy_gradient(qmattypes, qmcoords, numqmatoms, totenergy, qmgrad, &
+  & mmcoords, mmcharges, nummmatoms, mmgrad, globaltreatment, status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
   write (*,*) "ERROR: Mismatch in the variables passed to the function to compute energy and gradient!"
-  STOP
+  STOP 1
 else if (status == 2) then
   write (*,*) "ERROR: Problem to compute energy and gradient!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_compute_energy_gradient function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print results
@@ -200,10 +202,10 @@ if (status == 0) then
   write (*,*) "Got QM charges with success."
 else if (status == 1) then
   write (*,*) "ERROR: Problem to get QM charges!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print charges
@@ -215,18 +217,19 @@ end do
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
+call tc_compute_energy_gradient(qmattypes, qmcoords, numqmatoms, totenergy, qmgrad, &
+  & mmcoords, mmcharges, nummmatoms, mmgrad, globaltreatment, status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
   write (*,*) "ERROR: Mismatch in the variables passed to the function to compute energy and gradient!"
-  STOP
+  STOP 1
 else if (status == 2) then
   write (*,*) "ERROR: Problem to compute energy and gradient!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_compute_energy_gradient function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print results
@@ -247,10 +250,10 @@ if (status == 0) then
   write (*,*) "Got QM charges with success."
 else if (status == 1) then
   write (*,*) "ERROR: Problem to get QM charges!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print charges
@@ -270,18 +273,19 @@ end do
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
+call tc_compute_energy_gradient(qmattypes, qmcoords, numqmatoms, totenergy, qmgrad,&
+  & mmcoords, mmcharges, nummmatoms, mmgrad, globaltreatment, status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
   write (*,*) "ERROR: Mismatch in the variables passed to the function to compute energy and gradient!"
-  STOP
+  STOP 1
 else if (status == 2) then
   write (*,*) "ERROR: Problem to compute energy and gradient!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_compute_energy_gradient function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print results
@@ -302,10 +306,10 @@ if (status == 0) then
   write (*,*) "Got QM charges with success."
 else if (status == 1) then
   write (*,*) "ERROR: Problem to get QM charges!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print charges
@@ -364,18 +368,19 @@ mmcharges = (/ -0.834d0,&
 ! Compute energy and gradient
 write (*,*) ""
 status = -1
-call tc_compute_energy_gradient(qmattypes,qmcoords,numqmatoms,totenergy,qmgrad,mmcoords,mmcharges,nummmatoms,mmgrad,globaltreatment,status)
+call tc_compute_energy_gradient(qmattypes, qmcoords, numqmatoms, totenergy, qmgrad, &
+  & mmcoords, mmcharges, nummmatoms, mmgrad, globaltreatment, status)
 if (status == 0) then
   write (*,*) "Computed energy and gradient with success."
 else if (status == 1) then
   write (*,*) "ERROR: Mismatch in the variables passed to the function to compute energy and gradient!"
-  STOP
+  STOP 1
 else if (status == 2) then
   write (*,*) "ERROR: Problem to compute energy and gradient!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_compute_energy_gradient function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print results
@@ -396,10 +401,10 @@ if (status == 0) then
   write (*,*) "Got QM charges with success."
 else if (status == 1) then
   write (*,*) "ERROR: Problem to get QM charges!"
-  STOP
+  STOP 1
 else
   write (*,*) "ERROR: Status on tc_get_qm_charges function is not recognized!"
-  STOP
+  STOP 1
 end if
 
 ! Print charges
