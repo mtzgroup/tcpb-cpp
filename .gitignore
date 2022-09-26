@@ -1,0 +1,18 @@
+src/*.o
+config.h
+build/
+include/
+lib/
+# Generatedd automatically by protobuf compiler
+src/terachem_server.pb.cpp
+src/terachem_server.pb.h
+
+# Compiled example binaries
+examples/api/cpp/test_api_cpp
+examples/api/cpp_openmm/test_api_cpp_openmm
+examples/api/fortran/test_api_fortran
+examples/api/fortran_openmm/test_api_fortran_openmm
+examples/qm/qm-tcpb-example
+examples/qm/tcpb-example
+examples/qmmm/qmmm-tcpb-example
+examples/qmmm/tcpb-example
