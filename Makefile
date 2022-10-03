@@ -49,6 +49,12 @@ src/terachem_server.pb.cpp: proto/terachem_server.proto
 
 clean:
 	/bin/rm -f $(LIBOBJS)
+	$(MAKE) -C examples/qm clean
+	$(MAKE) -C examples/qmmm clean
+	$(MAKE) -C examples/api/fortran clean
+	$(MAKE) -C examples/api/fortran_openmm clean
+	$(MAKE) -C examples/api/cpp clean
+	$(MAKE) -C examples/api/cpp_openmm clean
 
 example:
 	@cd examples/qm && make

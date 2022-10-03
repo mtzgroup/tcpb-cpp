@@ -5,7 +5,7 @@ include ../../../config.h
 
 LIBS=-L$(LIBDIR) -lprotobuf -ltcpb
 
-test_api_cpp: test_api.cpp
+test_api_cpp_openmm: test_api.cpp
 	$(CXX) $(TCPB_CXXFLAGS) -o $@ $< -I$(INCDIR) $(LIBS)
 
 .PHONY: clean

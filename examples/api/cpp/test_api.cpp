@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
   // Information about initial QM region
   int numqmatoms = 3;
-  char (*qmattypes)[5] = new char[numqmatoms][5] {"O","H","H"};
+  char (*qmattypes)[5] = new char[numqmatoms][5] {{'O'}, {'H'}, {'H'}};
 
   // Attempts to connect to the TeraChem server
   printf(" Attempting to connect to TeraChem server using host %s and port %d.\n", host, port);
@@ -312,7 +312,7 @@ int main(int argc, char** argv) {
   // Move one water molecule from the MM region to the QM region, defined in Angstroms and then converted to Bohrs. Charges in atomic units
   numqmatoms = 6;
   delete[] qmattypes;
-  qmattypes = new char[numqmatoms][5] {"O","H","H","O","H","H"};
+  qmattypes = new char[numqmatoms][5] {{'O'}, {'H'}, {'H'}, {'O'}, {'H'} , {'H'}};
   delete[] qmcoords;
   qmcoords = new double[3*numqmatoms]
               { -4.4798000,  -2.8400000,   4.2456000,
