@@ -94,7 +94,7 @@ jobs:
           export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
           export PYTHONPATH=$(pwd)/pytcpb/build/lib:$PYTHONPATH
           cd terachem/tests
-          python test.py -c TCPB-cpp -g 0 -p $TCPB_PORT
+          python test.py -df -c TCPB-cpp -g 0 -p $TCPB_PORT
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v3
@@ -104,6 +104,7 @@ jobs:
             /_work/terachem/tests/run.log
             /_work/terachem/tests/summary.out
             /_work/terachem/tests/summary.err
+            /_work/terachem/tests/tests
           if-no-files-found: error
   cleanup-run-part1:
     runs-on: self-hosted
