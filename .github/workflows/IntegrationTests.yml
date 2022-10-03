@@ -136,3 +136,18 @@ jobs:
         run: echo ${{ runner.name }}
       - name: Delete folder where GitHub Actions run was executed
         run: rm -Rf /data/actions-scratch/${{ github.run_id }}
+      - name: Get PR number
+        uses: juliangruber/find-pull-request-action@v1
+        id: find-pull-request
+        with:
+          branch: ${{ github.ref_name }}
+      - name: Get workflow conclusion
+        uses: technote-space/workflow-conclusion-action@v3
+      - name: Comment in the PR, if workflow has not failed
+        if: ${{ (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') }}
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          message: |
+            GitHub Actions run [#${{ github.run_id }}](https://github.com/mtzgroup/terachem/actions/runs/${{ github.run_id }}) finished. **Status:** ${{ env.WORKFLOW_CONCLUSION }}.
+          pr_number: ${{ steps.find-pull-request.outputs.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
